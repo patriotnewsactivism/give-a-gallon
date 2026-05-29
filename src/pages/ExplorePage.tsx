@@ -80,7 +80,7 @@ export function ExplorePage() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {filtered.map((creator) => (
+            {filtered.map((creator: any) => (
               <Link
                 key={creator._id}
                 to={`/${creator.slug}`}
