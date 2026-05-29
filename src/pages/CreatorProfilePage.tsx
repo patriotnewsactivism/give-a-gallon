@@ -191,8 +191,8 @@ export function CreatorProfilePage() {
               ) : (
                 <div className="space-y-2">
                   {donations
-                    .filter((d) => d.status === "completed")
-                    .map((d) => (
+                    .filter((d: any) => d.status === "completed")
+                    .map((d: any) => (
                       <div
                         key={d._id}
                         className="p-3 rounded-lg border border-border/30 bg-card/30"
