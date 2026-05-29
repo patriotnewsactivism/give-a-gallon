@@ -21,7 +21,7 @@
     "screenshot": "bun run --bun scripts/screenshot.ts",
     "env:get": "bunx convex env get",
     "env:list": "bunx convex env list",
-    "build:vercel": "npx convex codegen && tsc -b && vite build"
+    "build:vercel": "tsc -b && vite build"
   },
   "dependencies": {
     "@auth/core": "^0.37.4",
@@ -93,5 +93,10 @@
   },
   "engines": {
     "node": "20.x"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.54.0",
+    "@tailwindcss/oxide-linux-x64-gnu": "4.1.18",
+    "lightningcss-linux-x64-gnu": "1.30.2"
   }
 }
