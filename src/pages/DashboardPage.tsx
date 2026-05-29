@@ -166,7 +166,7 @@ export function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {donations.map((d) => (
+            {donations.map((d: any) => (
               <div
                 key={d._id}
                 className="flex items-start gap-3 p-3 rounded-lg border border-border/30 bg-card/30"
