@@ -317,7 +317,7 @@ function FeaturedCreatorsSection() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-          {creators.map((creator) => (
+          {creators.map((creator: any) => (
             <CreatorCard key={creator._id} creator={creator} />
           ))}
         </div>
