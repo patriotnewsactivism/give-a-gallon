@@ -1,44 +1,87 @@
-import { Password } from "@convex-dev/auth/providers/Password";
+import { ConvexCredentials } from "@convex-dev/auth/providers/ConvexCredentials";
 import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
+import { createAccount, retrieveAccount } from "@convex-dev/auth/server";
+import { Scrypt } from "lucia";
+import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
-
-declare const process: { env: Record<string, string | undefined> };
-
-function decodePrivateKey(key: string | undefined): string | undefined {
-  if (!key) return undefined;
-  if (key.includes("\n")) return key;
-  if (key.startsWith("-----BEGIN")) {
-    return key
-      .replace("-----BEGIN PRIVATE KEY----- ", "-----BEGIN PRIVATE KEY-----\n")
-      .replace(" -----END PRIVATE KEY-----", "\n-----END PRIVATE KEY-----")
-      .split(" ")
-      .join("\n");
-  }
-  try {
-    return atob(key);
-  } catch {
-    return key;
-  }
-}
-
-const authPrivateKey = process.env.AUTH_PRIVATE_KEY;
-if (authPrivateKey) {
-  process.env.AUTH_PRIVATE_KEY = decodePrivateKey(authPrivateKey);
-}
-
-const jwtPrivateKey = process.env.JWT_PRIVATE_KEY;
-if (jwtPrivateKey) {
-  process.env.JWT_PRIVATE_KEY = decodePrivateKey(jwtPrivateKey);
-}
-
-// Simple password auth — no email verification step required.
-// Users sign up with email + password directly.
-export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [
-    Password(),
-  ],
+​
+// Direct password auth using ConvexCredentials.
+// No email verification, no Resend API key, no JWT_PRIVATE_KEY needed.
+// Passwords are hashed with Scrypt (via lucia).
+const PasswordCredentials = ConvexCredentials<DataModel>({
+  id: "password",
+  crypto: {
+    async hashSecret(password: string) {
+      return await new Scrypt().hash(password);
+    },
+    async verifySecret(password: string, hash: string) {
+      return await new Scrypt().verify(hash, password);
+    },
+  },
+  authorize: async (params, ctx) => {
+    const email = params.email as string;
+    const password = params.password as string;
+    const flow = params.flow as string;
+    const name = (params.name as string) || undefined;
+​
+    if (!email || !password) {
+      throw new Error("Email and password are required");
+    }
+​
+    if (password.length < 8) {
+      throw new Error("Password must be at least 8 characters");
+    }
+​
+    if (flow === "signUp") {
+      // Try to retrieve existing account first
+      try {
+        const existing = await retrieveAccount(ctx, {
+          provider: "password",
+          account: {
+            id: email,
+            secret: password,
+          },
+        });
+        // Account exists and password matches — sign them in
+        return { userId: existing.user._id };
+      } catch {
+        // Account doesn't exist or password wrong — create new
+      }
+​
+      const { user } = await createAccount(ctx, {
+        provider: "password",
+        account: {
+          id: email,
+          secret: password,
+        },
+        profile: {
+          email,
+          name: name || email.split("@")[0],
+          emailVerificationTime: Date.now(),
+        },
+        shouldLinkViaEmail: false,
+      });
+​
+      return { userId: user._id };
+    }
+​
+    // Sign in flow
+    const result = await retrieveAccount(ctx, {
+      provider: "password",
+      account: {
+        id: email,
+        secret: password,
+      },
+    });
+​
+    return { userId: result.user._id };
+  },
 });
-
+​
+export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
+  providers: [PasswordCredentials],
+});
+​
 export const currentUser = query({
   args: {},
   handler: async (ctx) => {
