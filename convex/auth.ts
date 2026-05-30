@@ -1,11 +1,7 @@
 import { Password } from "@convex-dev/auth/providers/Password";
 import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
 import { query } from "./_generated/server";
-import { TestCredentials } from "./testAuth";
-import {
-  ViktorSpacesEmail,
-  ViktorSpacesPasswordReset,
-} from "./ViktorSpacesEmail";
+import { ResendEmail, ResendPasswordReset } from "./ViktorSpacesEmail";
 
 declare const process: { env: Record<string, string | undefined> };
 
@@ -44,10 +40,10 @@ if (jwtPrivateKey) {
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
     Password({
-      verify: ViktorSpacesEmail,
-      reset: ViktorSpacesPasswordReset,
+      verify: ResendEmail,
+      reset: ResendPasswordReset,
     }),
-    ...(process.env.VIKTOR_SPACES_IS_PREVIEW === "true" ? [TestCredentials] : []),
+    // TestCredentials removed — use real email auth only,
   ],
 });
 
