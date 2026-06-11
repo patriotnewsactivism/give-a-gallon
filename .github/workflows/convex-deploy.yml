@@ -17,10 +17,7 @@ jobs:
       - name: Set Convex environment variables
         run: |
           npx convex env set SITE_URL "https://give-a-gallon.vercel.app" || true
-          JWKS=$(node scripts/generateJwks.cjs)
-          echo "Generated JWKS: ${#JWKS} chars"
-          npx convex env set JWKS "$JWKS"
-          echo "JWKS set successfully"
+          node scripts/generateJwks.cjs
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
       - run: npx convex deploy -y
