@@ -15,13 +15,9 @@ jobs:
           node-version: '20'
       - run: npm install
       - name: Set Convex environment variables
-        run: |
-          npx convex env set SITE_URL "https://give-a-gallon.vercel.app" || true
-          JWT_ONELINE=$(echo "$JWT_KEY" | tr '\n' '|')
-          npx convex env set JWT_PRIVATE_KEY "$JWT_ONELINE" || true
+        run: npx convex env set SITE_URL "https://give-a-gallon.vercel.app" || true
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
-          JWT_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
       - run: npx convex deploy -y
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
