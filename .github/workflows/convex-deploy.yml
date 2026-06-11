@@ -14,6 +14,11 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
+      - name: Set Convex environment variables
+        run: |
+          npx convex env set SITE_URL "https://give-a-gallon.vercel.app" || true
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
       - run: npx convex deploy -y
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
