@@ -1,67 +1,47 @@
-const { generateKeyPair, exportPKCS8 } = require("jose");
+const { generateKeyPair, exportPKCS8, exportJWK } = require("jose");
+const { execFileSync } = require("child_process");
+const path = require("path");
 
 async function main() {
-  const deployKey = process.env.CONVEX_DEPLOY_KEY;
-  if (!deployKey) {
-    console.error("CONVEX_DEPLOY_KEY not set");
-    process.exit(1);
-  }
-
-  // Generate RSA key pair and export as PKCS8 PEM
-  const { privateKey } = await generateKeyPair("RS256");
+  // Generate RSA key pair
+  const { publicKey, privateKey } = await generateKeyPair("RS256");
+  
+  // Export PKCS8 PEM
   const pem = await exportPKCS8(privateKey);
   console.log("Generated PEM key (" + pem.length + " chars)");
-
-  // Try multiple Convex admin API endpoints
-  const adminUrl = "https://api.convex.dev";
-  const deploymentUrl = "https://ardent-schnauzer-537.convex.cloud";
-  const authHeader = "Convex " + deployKey;
-
-  // Approach 1: Try the admin API
-  const endpoints = [
-    { 
-      url: adminUrl + "/api/deploy2/set_environment_variable",
-      body: { name: "JWT_PRIVATE_KEY", value: pem }
-    },
-    {
-      url: adminUrl + "/api/deployment/set_environment_variable",
-      body: { name: "JWT_PRIVATE_KEY", value: pem }
-    },
-    {
-      url: deploymentUrl + "/api/set_environment_variable",
-      body: { name: "JWT_PRIVATE_KEY", value: pem }
-    },
-    {
-      url: adminUrl + "/api/deploy2/update_environment_variables",
-      body: { changes: [{ name: "JWT_PRIVATE_KEY", value: pem }] }
-    },
-  ];
-
-  for (const ep of endpoints) {
-    try {
-      console.log("Trying:", ep.url);
-      const res = await fetch(ep.url, {
-        method: "POST",
-        headers: {
-          "Authorization": authHeader,
-          "Content-Type": "application/json",
-          "Convex-Client": "actions-1.0",
-        },
-        body: JSON.stringify(ep.body),
-      });
-      const text = await res.text();
-      console.log("  Status:", res.status, "Body:", text.slice(0, 200));
-      if (res.ok) {
-        console.log("  SUCCESS!");
-        return;
-      }
-    } catch (e) {
-      console.error("  Error:", e.message);
-    }
+  
+  // Export JWKS (public key)
+  const jwk = await exportJWK(publicKey);
+  jwk.use = "sig";
+  jwk.kid = "convex-auth-key-1";
+  jwk.alg = "RS256";
+  const jwks = JSON.stringify({ keys: [jwk] });
+  console.log("Generated JWKS (" + jwks.length + " chars)");
+  
+  // Find the convex binary
+  const convexBin = path.resolve("node_modules/.bin/convex");
+  
+  // Set JWT_PRIVATE_KEY using execFileSync (no shell, direct argv)
+  try {
+    const result1 = execFileSync(convexBin, ["env", "set", "JWT_PRIVATE_KEY", pem], {
+      env: { ...process.env },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    console.log("JWT_PRIVATE_KEY: " + result1.toString().trim());
+  } catch (e) {
+    console.error("JWT_PRIVATE_KEY failed:", e.stderr?.toString().trim());
   }
   
-  console.error("All endpoints failed");
-  process.exit(1);
+  // Set JWKS using execFileSync
+  try {
+    const result2 = execFileSync(convexBin, ["env", "set", "JWKS", jwks], {
+      env: { ...process.env },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    console.log("JWKS: " + result2.toString().trim());
+  } catch (e) {
+    console.error("JWKS failed:", e.stderr?.toString().trim());
+  }
 }
 
 main().catch(e => { console.error(e); process.exit(1); });
