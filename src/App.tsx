@@ -15,6 +15,8 @@ import {
   SettingsPage,
   SignupPage,
 } from "./pages";
+import { DonationSuccessPage } from "./pages/DonationSuccessPage";
+import { DonationCancelPage } from "./pages/DonationCancelPage";
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
             </Route>
+            <Route path="/donation-success" element={<DonationSuccessPage />} />
+            <Route path="/donation-cancel" element={<DonationCancelPage />} />
             {/* Public creator profile — must be last in public routes */}
             <Route path="/:slug" element={<CreatorProfilePage />} />
           </Route>
