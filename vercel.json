@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npx convex deploy --cmd 'tsc -b && vite build' -y",
+  "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
