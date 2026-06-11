@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npx convex deploy --cmd \"npx vite build\"",
+  "buildCommand": "if [ \"$CONVEX_DEPLOY_KEY\" != \"\" ]; then npx convex deploy --cmd \"npx vite build\"; else npx vite build; fi",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
