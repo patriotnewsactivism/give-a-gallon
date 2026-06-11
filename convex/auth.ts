@@ -1,3 +1,9 @@
+// Decode base64-encoded JWT_PRIVATE_KEY at import time
+// (Stored as base64 to avoid CLI issues with PEM newlines/dashes)
+if (typeof process !== "undefined" && process.env.JWT_PRIVATE_KEY_B64 && !process.env.JWT_PRIVATE_KEY) {
+  process.env.JWT_PRIVATE_KEY = atob(process.env.JWT_PRIVATE_KEY_B64);
+}
+
 import { ConvexCredentials } from "@convex-dev/auth/providers/ConvexCredentials";
 import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
 import { createAccount, retrieveAccount } from "@convex-dev/auth/server";
