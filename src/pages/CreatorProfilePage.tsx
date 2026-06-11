@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import {
   ArrowLeft,
   Check,
@@ -240,7 +240,7 @@ function DonationForm({
   creatorId: string;
   creatorName: string;
 }) {
-  const createDonation = useMutation(api.donations.create);
+  const createCheckout = useAction(api.stripe.createCheckoutSession);
   const [gallons, setGallons] = useState(3);
   const [customGallons, setCustomGallons] = useState("");
   const [isCustom, setIsCustom] = useState(false);
@@ -260,15 +260,18 @@ function DonationForm({
     }
     setSubmitting(true);
     try {
-      await createDonation({
+      const result = await createCheckout({
         creatorId: creatorId as any,
         gallons: effectiveGallons,
         donorName: isAnonymous ? undefined : donorName || undefined,
+        donorEmail: undefined,
         message: message || undefined,
         isAnonymous,
       });
-      setSubmitted(true);
-      toast.success("Gallons sent! 🔥");
+      // Redirect to Stripe Checkout
+      if (result.url) {
+        window.location.href = result.url;
+      }
     } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {
