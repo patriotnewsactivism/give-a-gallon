@@ -1,0 +1,19 @@
+name: Deploy Convex Backend
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'convex/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npx convex deploy -y
+        env:
+          CONVEX_DEPLOY_KEY: prod:aware-sandpiper-557|eyJ2MiI6IjA0YzIyMTg0NjhlYzRiMmE5ODE2MGQyMzllOWQ2ODI3In0=
