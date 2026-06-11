@@ -28,8 +28,10 @@ const schema = defineSchema({
         instagram: v.optional(v.string()),
       })
     ),
+    stripeSessionId: v.optional(v.string()),
     createdAt: v.number(),
   })
+    .index("by_stripeSession", ["stripeSessionId"])
     .index("by_slug", ["slug"])
     .index("by_userId", ["userId"])
     .index("by_active", ["isActive", "totalGallons"])
@@ -50,8 +52,10 @@ const schema = defineSchema({
       v.literal("completed"),
       v.literal("failed")
     ),
+    stripeSessionId: v.optional(v.string()),
     createdAt: v.number(),
   })
+    .index("by_stripeSession", ["stripeSessionId"])
     .index("by_creator", ["creatorId", "createdAt"])
     .index("by_status", ["status", "createdAt"]),
 });
