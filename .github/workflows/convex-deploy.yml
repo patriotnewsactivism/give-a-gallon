@@ -1,6 +1,9 @@
 name: Deploy Convex Backend
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'convex/**'
 
 jobs:
   deploy:
@@ -13,4 +16,4 @@ jobs:
       - run: npm install
       - run: npx convex deploy -y
         env:
-          CONVEX_DEPLOY_KEY: "prod:ardent-schnauzer-537|eyJ2MiI6IjhmOTk2OTg2NWE2OTQ3OTNhYWYxZWI4MjBhNzU4ZjUyIn0="
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
