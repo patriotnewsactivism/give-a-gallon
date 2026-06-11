@@ -1,21 +1,70 @@
 import { ConvexCredentials } from "@convex-dev/auth/providers/ConvexCredentials";
 import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
 import { createAccount, retrieveAccount } from "@convex-dev/auth/server";
-import { Scrypt } from "lucia";
 import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 
-// Direct password auth using ConvexCredentials.
-// No email verification, no Resend API key, no JWT_PRIVATE_KEY needed.
-// Passwords are hashed with Scrypt (via lucia).
+// PBKDF2 password hashing using Web Crypto API (works in Convex runtime)
+async function hashPassword(password: string): Promise<string> {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+  const hash = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    256
+  );
+  const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, "0")).join("");
+  const hashHex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+  return `pbkdf2:${saltHex}:${hashHex}`;
+}
+
+async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  const parts = stored.split(":");
+  if (parts[0] !== "pbkdf2" || parts.length !== 3) return false;
+  const salt = new Uint8Array(parts[1].match(/.{2}/g)!.map(b => parseInt(b, 16)));
+  const expectedHash = parts[2];
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+  const hash = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    256
+  );
+  const hashHex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+  return hashHex === expectedHash;
+}
+
 const PasswordCredentials = ConvexCredentials<DataModel>({
   id: "password",
   crypto: {
     async hashSecret(password: string) {
-      return await new Scrypt().hash(password);
+      return await hashPassword(password);
     },
     async verifySecret(password: string, hash: string) {
-      return await new Scrypt().verify(hash, password);
+      return await verifyPassword(password, hash);
     },
   },
   authorize: async (params, ctx) => {
@@ -42,10 +91,9 @@ const PasswordCredentials = ConvexCredentials<DataModel>({
             secret: password,
           },
         });
-        // Account exists and password matches — sign them in
         return { userId: existing.user._id };
       } catch {
-        // Account doesn't exist or password wrong — create new
+        // Account doesn't exist — create new
       }
 
       const { user } = await createAccount(ctx, {
