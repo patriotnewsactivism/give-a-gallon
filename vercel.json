@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node scripts/set-convex-env.mjs && npx convex deploy && vite build",
+  "buildCommand": "vite build",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
