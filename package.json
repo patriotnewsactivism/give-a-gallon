@@ -21,7 +21,7 @@
     "screenshot": "bun run --bun scripts/screenshot.ts",
     "env:get": "bunx convex env get",
     "env:list": "bunx convex env list",
-    "build:vercel": "npx convex deploy --cmd \"tsc -b && vite build\" -y"
+    "build:vercel": "npx convex deploy -y && tsc -b && vite build"
   },
   "dependencies": {
     "@auth/core": "^0.37.4",
