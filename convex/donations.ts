@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-const GALLON_PRICE_CENTS = 350; // $3.50
+const GALLON_PRICE_CENTS = 425; // $4.25
 const PLATFORM_FEE_PCT = 0.05; // 5%
 
 // Get recent donations for a creator (public)
