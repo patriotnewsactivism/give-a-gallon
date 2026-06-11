@@ -1,7 +1,7 @@
 export default {
   providers: [
     {
-      domain: "https://aware-sandpiper-557.convex.cloud",
+      domain: "https://ardent-schnauzer-537.convex.cloud",
       applicationID: "convex",
     },
   ],
