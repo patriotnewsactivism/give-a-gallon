@@ -16,4 +16,4 @@ jobs:
       - run: npm install
       - run: npx convex deploy -y
         env:
-          CONVEX_DEPLOY_KEY: prod:aware-sandpiper-557|eyJ2MiI6IjA0YzIyMTg0NjhlYzRiMmE5ODE2MGQyMzllOWQ2ODI3In0=
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
