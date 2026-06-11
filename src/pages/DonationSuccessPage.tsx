@@ -1,11 +1,8 @@
 import { Fuel, Check, ArrowLeft } from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export function DonationSuccessPage() {
-  const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get("session_id");
-
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-md mx-auto text-center p-8">
