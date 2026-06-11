@@ -1,3 +1,4 @@
+// Give a Gallon — HTTP routes (webhook verified)
 import { httpRouter } from "convex/server";
 import { auth } from "./auth";
 import { httpAction } from "./_generated/server";
