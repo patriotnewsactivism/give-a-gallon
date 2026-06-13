@@ -17,6 +17,7 @@ import { Link } from "react-router-dom";
 import { CountUp } from "@/components/CountUp";
 import { FuelGauge } from "@/components/FuelGauge";
 import { FuelGaugeMark } from "@/components/FuelGaugeMark";
+import { DonationTicker } from "@/components/DonationTicker";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 import { GALLON_PRICE } from "@/lib/constants";
