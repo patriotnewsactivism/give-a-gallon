@@ -322,9 +322,9 @@ function DonationForm({
 
       {/* Gallon selector */}
       <div>
-        <label className="text-xs text-muted-foreground mb-2 block">
+        <span className="text-xs text-muted-foreground mb-2 block">
           How many gallons?
-        </label>
+        </span>
         <div className="grid grid-cols-3 gap-2">
           {GALLON_PRESETS.map((n) => (
             <button
@@ -385,9 +385,9 @@ function DonationForm({
 
       {/* Donor name */}
       <div>
-        <label className="text-xs text-muted-foreground mb-1.5 block">
+        <span className="text-xs text-muted-foreground mb-1.5 block">
           Your name (optional)
-        </label>
+        </span>
         <Input
           placeholder="Your name"
           value={donorName}
@@ -408,9 +408,9 @@ function DonationForm({
 
       {/* Message */}
       <div>
-        <label className="text-xs text-muted-foreground mb-1.5 block">
+        <span className="text-xs text-muted-foreground mb-1.5 block">
           Leave a message (optional)
-        </label>
+        </span>
         <Textarea
           placeholder="Keep fighting the good fight!"
           value={message}

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { FuelGaugeMark } from "@/components/FuelGaugeMark";
 import { SignUp } from "@/components/SignUp";
 import { TestUserLoginSection } from "@/components/TestUserLoginSection";
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,8 @@ export function SignupPage() {
 
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center space-y-2">
-          <div className="mx-auto size-12 rounded-xl bg-primary flex items-center justify-center mb-4">
-            <span className="text-primary-foreground font-bold text-lg">M</span>
+          <div className="mx-auto size-12 rounded-xl bg-fuel flex items-center justify-center mb-4">
+            <FuelGaugeMark className="size-7 text-fuel-foreground" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">
             Create an account

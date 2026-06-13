@@ -289,36 +289,46 @@ import { useSidebar } from "@/components/ui/sidebar";
 
 ## Environment Variables
 
-Your project comes **pre-configured** with all required environment variables. You only need to add new ones when integrating additional services.
+See [`.env.example`](./.env.example) for the full, annotated list. Config lives
+in two places: **client** vars (`VITE_*`, inlined by Vite at build time) and
+**Convex deployment** secrets (set via the CLI, read at runtime via
+`process.env`).
 
-### What's Already Set Up
+### Client (`.env.local` / Vercel build env)
+- `VITE_CONVEX_URL` — Frontend connects to your Convex backend (required).
+- `VITE_IS_PREVIEW` — `true` on preview builds to show the test-login shortcut.
 
-**Local file** (`.env.local`) — already exists, don't modify:
-- `CONVEX_DEPLOY_KEY` — Authenticates CLI with your deployment
-- `VITE_CONVEX_URL` — Frontend connects to your Convex backend
-
-**Convex deployment** — already configured:
-- `AUTH_PRIVATE_KEY` — For Convex Auth JWT signing
-- `SITE_URL` — Your app's URL for auth redirects
-- `VIKTOR_SPACES_*` — Email sending configuration
-
-### Adding New Variables
-
-When integrating a new service (e.g., OpenAI, Stripe):
+### Convex deployment secrets (`bunx convex env set ...`)
+- `SITE_URL` — App URL; used for auth redirects and Stripe success/cancel URLs.
+- `STRIPE_SECRET_KEY` — Stripe API key (required for donations).
+- `STRIPE_WEBHOOK_SECRET` — Stripe webhook signing secret (required to confirm payments).
+- `RESEND_API_KEY` — Resend key. **When set, sign-up email verification + password
+  reset turn on automatically.** Leave unset for password-only auth.
+- `RESEND_FROM_EMAIL` — From address for OTP emails (defaults to `noreply@give-a-gallon.com`).
+- `AUTH_PRIVATE_KEY` — Convex Auth JWT signing key.
 
 ```bash
-# Set on Convex deployment (takes effect immediately)
-bunx convex env set OPENAI_API_KEY "sk-..."
 bunx convex env set STRIPE_SECRET_KEY "sk_live_..."
+bunx convex env set STRIPE_WEBHOOK_SECRET "whsec_..."
+bunx convex env set SITE_URL "https://give-a-gallon.vercel.app"
+bunx convex env set RESEND_API_KEY "re_..."
 ```
 
-Then use in your Convex functions:
+**Note**: Runtime vars must be set via CLI — they are NOT read from `.env.local`,
+and changes take effect immediately (no redeploy needed).
 
-```ts
-const apiKey = process.env.OPENAI_API_KEY;
+### Stripe webhook
+
+Register a webhook in the Stripe dashboard pointing at your Convex **site** URL
+(ends in `.convex.site`), listening for `checkout.session.completed`:
+
+```
+https://<your-deployment>.convex.site/stripe-webhook
 ```
 
-**Note**: Runtime vars must be set via CLI — they are NOT read from `.env.local`.
+Then set `STRIPE_WEBHOOK_SECRET` to that endpoint's signing secret. The handler
+verifies the signature, marks the donation `completed`, and updates the
+creator's gallon totals (`convex/stripe.ts`, `convex/http.ts`).
 
 ### CLI Commands
 
@@ -354,15 +364,19 @@ No redeploy needed — env var changes take effect immediately.
 
 ## Auth Flows
 
-This starter includes complete email/password authentication with OTP verification.
+Email/password authentication via Convex Auth's `Password` provider
+(`convex/auth.ts`). Email OTP verification and password reset are **enabled
+automatically when `RESEND_API_KEY` is set**; without it, auth is password-only
+and sign-up logs in immediately. The UI keys off `signIn`'s `signingIn` result,
+so the same forms work in both modes.
 
 ### Sign Up Flow
 
 ```
 1. User enters name + email + password
-2. Clicks "Sign Up" → OTP code sent to email
-3. User enters 6-digit code
-4. Account created + signed in
+2. Clicks "Create account"
+   • Resend configured  → OTP code emailed → user enters 6-digit code → signed in
+   • Resend not set      → account created + signed in immediately
 ```
 
 ### Sign In Flow
