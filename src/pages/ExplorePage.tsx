@@ -89,13 +89,21 @@ export function ExplorePage() {
                 className="group rounded-xl border border-border/50 bg-card/50 hover:border-fuel/30 hover:bg-fuel/[0.02] transition-all duration-300 p-5 block"
               >
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="size-12 rounded-full bg-fuel/10 flex items-center justify-center shrink-0">
-                    <span
-                      className="text-fuel font-bold"
-                      style={{ fontFamily: "var(--font-display)" }}
-                    >
-                      {creator.displayName.charAt(0).toUpperCase()}
-                    </span>
+                  <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-fuel/10">
+                    {creator.avatarUrl ? (
+                      <img
+                        src={creator.avatarUrl}
+                        alt={creator.displayName}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <span
+                        className="text-fuel font-bold"
+                        style={{ fontFamily: "var(--font-display)" }}
+                      >
+                        {creator.displayName.charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </div>
                   <div className="min-w-0">
                     <h3 className="font-semibold truncate group-hover:text-fuel transition-colors">

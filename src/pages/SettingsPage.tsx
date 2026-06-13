@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
+import { ProfilePhotos } from "@/components/ProfilePhotos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -127,6 +128,19 @@ export function SettingsPage() {
       </p>
 
       <div className="space-y-5">
+        {/* Profile photos — only after the profile exists */}
+        {creator ? (
+          <ProfilePhotos
+            avatarUrl={creator.avatarUrl}
+            coverUrl={creator.coverUrl}
+            displayName={creator.displayName}
+          />
+        ) : (
+          <p className="rounded-xl border border-dashed border-border/50 bg-card/30 p-4 text-xs text-muted-foreground">
+            Save your profile first — then you can add a cover photo and avatar.
+          </p>
+        )}
+
         {/* Display Name */}
         <Field label="Display Name *">
           <Input

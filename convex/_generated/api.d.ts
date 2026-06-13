@@ -16,6 +16,7 @@ import type {
 import type * as auth from "../auth.js";
 import type * as creators from "../creators.js";
 import type * as donations from "../donations.js";
+import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as stripe from "../stripe.js";
 import type * as users from "../users.js";
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   creators: typeof creators;
   donations: typeof donations;
+  files: typeof files;
   http: typeof http;
   stripe: typeof stripe;
   users: typeof users;
