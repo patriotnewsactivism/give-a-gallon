@@ -75,6 +75,35 @@ export const create = mutation({
   },
 });
 
+// Get the most recent completed donations across all creators (public live feed)
+export const getRecent = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, { limit }) => {
+    const donations = await ctx.db
+      .query("donations")
+      .withIndex("by_status", (q) => q.eq("status", "completed"))
+      .order("desc")
+      .take(limit ?? 8);
+
+    const withCreators = await Promise.all(
+      donations.map(async (d) => {
+        const creator = await ctx.db.get(d.creatorId);
+        return {
+          _id: d._id,
+          gallons: d.gallons,
+          donorName: d.isAnonymous ? "Anonymous" : (d.donorName || "Someone"),
+          message: d.message,
+          createdAt: d.createdAt,
+          creatorSlug: creator?.slug ?? "",
+          creatorName: creator?.displayName ?? "",
+        };
+      })
+    );
+
+    return withCreators;
+  },
+});
+
 // Get platform stats (public)
 export const platformStats = query({
   args: {},

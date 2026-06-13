@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
+import { DonationTicker } from "@/components/DonationTicker";
 import { FuelGauge } from "@/components/FuelGauge";
 import { FuelGaugeMark } from "@/components/FuelGaugeMark";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ function GallonIcon({ className }: { className?: string }) {
 
 function HeroSection() {
   const stats = useQuery(api.donations.platformStats);
+  const recentDonations = useQuery(api.donations.getRecent, { limit: 6 });
   const totalGallons = stats?.totalGallons ?? 0;
   const milestone = Math.max(1000, Math.ceil((totalGallons + 1) / 1000) * 1000);
 
@@ -108,6 +110,13 @@ function HeroSection() {
                 value={stats.totalDonations.toLocaleString()}
                 label="Donations"
               />
+            </div>
+          )}
+
+          {/* Live donation ticker */}
+          {recentDonations && recentDonations.length > 0 && (
+            <div className="mt-8">
+              <DonationTicker donations={recentDonations} />
             </div>
           )}
         </div>
