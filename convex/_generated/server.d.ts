@@ -52,6 +52,11 @@ export declare const action: ActionBuilder<DataModel, "public">;
  */
 export declare const internalAction: ActionBuilder<DataModel, "internal">;
 
+/**
+ * Define a Convex HTTP action.
+ */
+export declare const httpAction: HttpActionBuilder;
+
 export type QueryCtx = GenericQueryCtx<DataModel>;
 export type MutationCtx = GenericMutationCtx<DataModel>;
 export type ActionCtx = GenericActionCtx<DataModel>;
