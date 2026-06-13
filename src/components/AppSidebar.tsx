@@ -2,7 +2,6 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
 import {
   ExternalLink,
-  Fuel,
   LayoutDashboard,
   LogOut,
   Settings,
@@ -10,6 +9,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
+import { Logo } from "./Logo";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -163,15 +163,7 @@ function SidebarHeaderContent() {
         onClick={() => setOpenMobile(false)}
         className="flex items-center gap-2.5 px-2 py-1 font-semibold"
       >
-        <div className="size-8 rounded-lg bg-fuel/10 border border-fuel/20 flex items-center justify-center">
-          <Fuel className="size-4 text-fuel" />
-        </div>
-        <span
-          className="text-sm tracking-wide"
-          style={{ fontFamily: "var(--font-display)" }}
-        >
-          GIVE A GALLON
-        </span>
+        <Logo />
       </Link>
     </SidebarHeader>
   );

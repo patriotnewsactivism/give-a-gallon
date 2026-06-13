@@ -13,6 +13,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
+import { FuelGauge } from "@/components/FuelGauge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,11 +54,6 @@ export function CreatorProfilePage() {
       </div>
     );
   }
-
-  const fillPct =
-    creator.goal && creator.goal > 0
-      ? Math.min((creator.totalGallons / creator.goal) * 100, 100)
-      : 0;
 
   return (
     <div className="min-h-screen">
@@ -115,29 +111,31 @@ export function CreatorProfilePage() {
             )}
 
             {/* Fuel gauge */}
-            <div className="p-4 rounded-xl border border-border/50 bg-card/50">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium flex items-center gap-1.5">
-                  <Fuel className="size-4 text-fuel" />
-                  {creator.totalGallons} gallons received
-                </span>
-                {creator.goal && creator.goal > 0 && (
-                  <span className="text-sm text-muted-foreground">
-                    Goal: {creator.goal} gallons
-                  </span>
-                )}
-              </div>
-              <div className="h-3 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-fuel/80 to-fuel transition-all duration-700"
-                  style={{ width: `${fillPct}%` }}
-                />
-              </div>
-              <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-                <span>
-                  ${((creator.totalGallons * GALLON_PRICE)).toFixed(2)} raised
-                </span>
-                <span>{creator.totalDonations} supporters</span>
+            <div className="p-6 rounded-xl border border-border/50 bg-card/50 flex flex-col items-center">
+              <FuelGauge
+                value={creator.totalGallons}
+                goal={creator.goal}
+                size={260}
+              />
+              <div className="grid grid-cols-2 gap-3 w-full mt-4">
+                <div className="rounded-lg border border-border/40 bg-background/50 p-3 text-center">
+                  <div
+                    className="text-lg font-bold text-foreground"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    ${(creator.totalGallons * GALLON_PRICE).toFixed(2)}
+                  </div>
+                  <div className="text-xs text-muted-foreground">raised</div>
+                </div>
+                <div className="rounded-lg border border-border/40 bg-background/50 p-3 text-center">
+                  <div
+                    className="text-lg font-bold text-foreground"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {creator.totalDonations}
+                  </div>
+                  <div className="text-xs text-muted-foreground">supporters</div>
+                </div>
               </div>
             </div>
 

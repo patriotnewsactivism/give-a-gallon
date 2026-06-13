@@ -1,7 +1,8 @@
 import { useConvexAuth } from "convex/react";
-import { ArrowRight, Fuel, Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Logo } from "./Logo";
 import { Button } from "./ui/button";
 
 export function Header() {
@@ -21,15 +22,7 @@ export function Header() {
             to="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <div className="size-8 rounded-lg bg-fuel/10 border border-fuel/20 flex items-center justify-center">
-              <Fuel className="size-4 text-fuel" />
-            </div>
-            <span
-              className="font-bold text-sm tracking-wide hidden sm:inline"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              GIVE A GALLON
-            </span>
+            <Logo wordmarkClassName="hidden sm:inline" />
           </Link>
 
           {/* Desktop nav */}

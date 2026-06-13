@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
+import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { GALLON_PRICE } from "@/lib/constants";
 
@@ -523,15 +524,7 @@ function Footer() {
     <footer className="border-t border-border/30 py-8">
       <div className="container">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Fuel className="size-5 text-fuel" />
-            <span
-              className="font-bold text-sm"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              GIVE A GALLON
-            </span>
-          </div>
+          <Logo />
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Give a Gallon. Fuel the movement.
           </p>
