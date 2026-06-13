@@ -194,22 +194,22 @@ function HowItWorksSection() {
   const steps = [
     {
       num: "01",
-      title: "Create Your Page",
+      title: "Tell Your Story",
       description:
-        "Sign up, add your cause, set your gallon goal. Your page is live in under a minute.",
+        "Sign up as an activist, journalist, or creator. Describe what you're covering and where you need to go. Live in under a minute.",
       icon: Users,
     },
     {
       num: "02",
-      title: "Share Your Link",
-      description: `Supporters visit and give gallons at $${GALLON_PRICE.toFixed(2)} each. Pick 1, 5, 10, or go custom.`,
+      title: "Share Before You Go",
+      description: `Post your link before the rally, the courthouse run, the shoot. Supporters give gallons at $${GALLON_PRICE.toFixed(2)} each — enough to make sure you get there.`,
       icon: Fuel,
     },
     {
       num: "03",
-      title: "Fuel Your Fight",
+      title: "Cover the Distance",
       description:
-        "Funds hit your account. Use it for gas, travel, supplies — whatever keeps you moving.",
+        "Funds hit your account fast. Gas up, hit the road, and do the work. Your supporters literally put you on the ground.",
       icon: TrendingUp,
     },
   ];
@@ -225,7 +225,7 @@ function HowItWorksSection() {
             HOW IT WORKS
           </h2>
           <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-            Three steps. No complexity. Get funded and get moving.
+            Three steps between you and being on the ground where it matters.
           </p>
         </Reveal>
 
