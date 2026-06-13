@@ -11,6 +11,7 @@ import {
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
+import { FuelGauge } from "@/components/FuelGauge";
 import { Button } from "@/components/ui/button";
 import { GALLON_PRICE } from "@/lib/constants";
 
@@ -43,10 +44,6 @@ export function DashboardPage() {
   }
 
   const profileUrl = `${window.location.origin}/${creator.slug}`;
-  const fillPct =
-    creator.goal && creator.goal > 0
-      ? Math.min((creator.totalGallons / creator.goal) * 100, 100)
-      : 0;
 
   return (
     <div className="p-4 lg:p-6 space-y-6 max-w-5xl">
@@ -109,26 +106,33 @@ export function DashboardPage() {
       </div>
 
       {/* Fuel gauge */}
-      {creator.goal && creator.goal > 0 && (
-        <div className="p-4 rounded-xl border border-border/50 bg-card/50">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">Goal Progress</span>
-            <span className="text-sm text-fuel font-semibold">
-              {creator.totalGallons} / {creator.goal} gallons
-            </span>
-          </div>
-          <div className="h-4 rounded-full bg-muted overflow-hidden">
+      {creator.goal && creator.goal > 0 ? (
+        <div className="p-6 rounded-xl border border-border/50 bg-card/50 flex flex-col sm:flex-row items-center sm:justify-center gap-6">
+          <FuelGauge
+            value={creator.totalGallons}
+            goal={creator.goal}
+            size={240}
+          />
+          <div className="text-center sm:text-left">
+            <div className="text-sm font-medium">Goal progress</div>
             <div
-              className="h-full rounded-full bg-gradient-to-r from-fuel/70 to-fuel transition-all duration-700"
-              style={{ width: `${fillPct}%` }}
-            />
-          </div>
-          <div className="text-xs text-muted-foreground mt-1.5">
-            {Math.round(fillPct)}% — $
-            {(creator.totalGallons * GALLON_PRICE).toFixed(2)} of $
-            {(creator.goal * GALLON_PRICE).toFixed(2)}
+              className="text-2xl font-bold text-fuel"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              ${(creator.totalGallons * GALLON_PRICE).toFixed(2)}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              of ${(creator.goal * GALLON_PRICE).toFixed(2)} goal
+            </div>
           </div>
         </div>
+      ) : (
+        <Link
+          to="/settings"
+          className="block p-4 rounded-xl border border-dashed border-fuel/30 bg-fuel/[0.02] text-center text-sm text-muted-foreground hover:bg-fuel/[0.04] transition-colors"
+        >
+          Set a gallon goal to light up your fuel gauge →
+        </Link>
       )}
 
       {/* Share your link */}

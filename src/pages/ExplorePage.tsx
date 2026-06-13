@@ -3,6 +3,8 @@ import { Fuel, MapPin, Search, Users } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
+import { FuelGauge } from "@/components/FuelGauge";
+import { FuelGaugeMark } from "@/components/FuelGaugeMark";
 import { Input } from "@/components/ui/input";
 
 export function ExplorePage() {
@@ -120,27 +122,32 @@ export function ExplorePage() {
                 )}
 
                 {/* Fuel gauge */}
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="text-fuel font-medium flex items-center gap-1">
-                      <Fuel className="size-3" />
-                      {creator.totalGallons} gallons received
-                    </span>
-                    {creator.goal && creator.goal > 0 && (
-                      <span className="text-muted-foreground">
-                        / {creator.goal} goal
-                      </span>
-                    )}
-                  </div>
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-fuel transition-all duration-500"
-                      style={{
-                        width: `${creator.goal && creator.goal > 0 ? Math.min((creator.totalGallons / creator.goal) * 100, 100) : 0}%`,
-                      }}
+                {creator.goal && creator.goal > 0 ? (
+                  <div className="flex flex-col items-center">
+                    <FuelGauge
+                      value={creator.totalGallons}
+                      goal={creator.goal}
+                      size={150}
+                      showReadout={false}
                     />
+                    <div className="-mt-3 text-xs text-muted-foreground">
+                      <span className="text-fuel font-medium">
+                        {creator.totalGallons}
+                      </span>{" "}
+                      of {creator.goal} gallons
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-sm">
+                    <FuelGaugeMark className="size-4 text-fuel" />
+                    <span className="text-fuel font-medium">
+                      {creator.totalGallons}
+                    </span>
+                    <span className="text-muted-foreground">
+                      gallons received
+                    </span>
+                  </div>
+                )}
               </Link>
             ))}
           </div>

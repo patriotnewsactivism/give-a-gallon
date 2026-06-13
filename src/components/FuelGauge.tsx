@@ -38,6 +38,8 @@ export interface FuelGaugeProps {
   size?: number;
   /** Hide the centered numeric readout (useful for compact cards). */
   showReadout?: boolean;
+  /** Override the readout's sub-line (e.g. for a community/platform gauge). */
+  subtitle?: string;
   className?: string;
 }
 
@@ -46,6 +48,7 @@ export function FuelGauge({
   goal,
   size = 240,
   showReadout = true,
+  subtitle,
   className,
 }: FuelGaugeProps) {
   const hasGoal = typeof goal === "number" && goal > 0;
@@ -171,7 +174,9 @@ export function FuelGauge({
             {value.toLocaleString()}
           </span>
           <span className="mt-1 text-xs text-muted-foreground">
-            {hasGoal ? (
+            {subtitle ? (
+              subtitle
+            ) : hasGoal ? (
               <>
                 of {goal.toLocaleString()} gallon goal · {pct}%
               </>

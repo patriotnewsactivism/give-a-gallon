@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
+import { FuelGauge } from "@/components/FuelGauge";
+import { FuelGaugeMark } from "@/components/FuelGaugeMark";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { GALLON_PRICE } from "@/lib/constants";
@@ -21,6 +23,8 @@ function GallonIcon({ className }: { className?: string }) {
 
 function HeroSection() {
   const stats = useQuery(api.donations.platformStats);
+  const totalGallons = stats?.totalGallons ?? 0;
+  const milestone = Math.max(1000, Math.ceil((totalGallons + 1) / 1000) * 1000);
 
   return (
     <section className="relative overflow-hidden">
@@ -30,9 +34,21 @@ function HeroSection() {
 
       <div className="container relative pt-20 pb-16 sm:pt-28 sm:pb-24">
         <div className="max-w-3xl mx-auto text-center">
+          {/* Community fuel gauge */}
+          {totalGallons > 0 && (
+            <div className="flex justify-center mb-6">
+              <FuelGauge
+                value={totalGallons}
+                goal={milestone}
+                size={240}
+                subtitle={`gallons fueled · goal ${milestone.toLocaleString()}`}
+              />
+            </div>
+          )}
+
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-fuel/20 bg-fuel/5 text-fuel text-sm font-medium mb-8">
-            <Fuel className="size-3.5" />
+            <FuelGaugeMark className="size-3.5" />
             <span>Fuel the Movement</span>
           </div>
 
@@ -219,7 +235,7 @@ function WhyGiveAGallonSection() {
             {/* Right — visual */}
             <div className="relative">
               <div className="aspect-square max-w-[320px] mx-auto rounded-2xl border border-fuel/20 bg-gradient-to-br from-fuel/[0.08] to-transparent p-8 flex flex-col items-center justify-center">
-                <Fuel className="size-16 text-fuel mb-6" strokeWidth={1.5} />
+                <FuelGaugeMark className="size-16 text-fuel mb-6" />
                 <div
                   className="text-5xl font-bold text-fuel"
                   style={{ fontFamily: "var(--font-display)" }}
@@ -349,11 +365,6 @@ function CreatorCard({
     goal?: number;
   };
 }) {
-  const fillPct =
-    creator.goal && creator.goal > 0
-      ? Math.min((creator.totalGallons / creator.goal) * 100, 100)
-      : 0;
-
   return (
     <Link
       to={`/${creator.slug}`}
@@ -388,24 +399,28 @@ function CreatorCard({
       )}
 
       {/* Fuel gauge */}
-      <div className="mt-auto">
-        <div className="flex items-center justify-between text-xs mb-1.5">
-          <span className="text-fuel font-medium">
-            {creator.totalGallons} gallons
-          </span>
-          {creator.goal && (
-            <span className="text-muted-foreground">
-              of {creator.goal} goal
-            </span>
-          )}
-        </div>
-        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-          <div
-            className="h-full rounded-full bg-fuel transition-all duration-500"
-            style={{ width: `${fillPct}%` }}
+      {creator.goal && creator.goal > 0 ? (
+        <div className="mt-auto flex flex-col items-center">
+          <FuelGauge
+            value={creator.totalGallons}
+            goal={creator.goal}
+            size={140}
+            showReadout={false}
           />
+          <div className="-mt-3 text-xs text-muted-foreground">
+            <span className="text-fuel font-medium">
+              {creator.totalGallons}
+            </span>{" "}
+            of {creator.goal} gallons
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mt-auto flex items-center gap-1.5 text-xs">
+          <FuelGaugeMark className="size-3.5 text-fuel" />
+          <span className="text-fuel font-medium">{creator.totalGallons}</span>
+          <span className="text-muted-foreground">gallons received</span>
+        </div>
+      )}
     </Link>
   );
 }
