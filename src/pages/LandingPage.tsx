@@ -257,6 +257,103 @@ function HowItWorksSection() {
   );
 }
 
+function WhoItsForSection() {
+  const personas = [
+    {
+      icon: Megaphone,
+      title: "Activists",
+      tagline: "Show up. Every time.",
+      description:
+        "Protests, city-council meetings, statehouse hearings, door-to-door canvassing — activism is physical. Gas is the price of showing up. Let your community cover it.",
+      examples: [
+        "Drive to the capitol",
+        "Canvassing the district",
+        "Community organizing runs",
+      ],
+    },
+    {
+      icon: MapPin,
+      title: "Journalists",
+      tagline: "The story is always somewhere else.",
+      description:
+        "Independent journalists can't expense a tank of gas. A courthouse filing, a press conference, a protest nobody else is covering — the story requires being there.",
+      examples: [
+        "On-location reporting",
+        "Courthouse & records runs",
+        "Breaking news coverage",
+      ],
+    },
+    {
+      icon: TrendingUp,
+      title: "Content Creators",
+      tagline: "Real content happens in the real world.",
+      description:
+        "YouTube docs, podcasts with guests, street interviews, event coverage — your best content isn't filmed at a desk. Supporters can fuel every shoot.",
+      examples: [
+        "On-location shoots",
+        "Event & rally coverage",
+        "Guest interview travel",
+      ],
+    },
+  ];
+
+  return (
+    <section className="border-t border-border/30 py-20 sm:py-28">
+      <div className="container">
+        <Reveal className="mb-14 text-center">
+          <h2
+            className="text-3xl font-bold tracking-tight sm:text-4xl"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            BUILT FOR PEOPLE WHO{" "}
+            <span className="text-fuel">HAVE TO BE THERE</span>
+          </h2>
+          <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
+            The story, the vote, the rally, the interview — it always requires
+            someone willing to drive. Help them get there.
+          </p>
+        </Reveal>
+
+        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
+          {personas.map((p, i) => (
+            <Reveal key={p.title} delayMs={i * 120}>
+              <div className="group relative h-full rounded-2xl border border-border/50 bg-card/50 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-fuel/40 hover:shadow-lg hover:shadow-fuel/5">
+                <div className="mb-4 rounded-xl bg-fuel/10 p-2.5 inline-block">
+                  <p.icon className="size-5 text-fuel" />
+                </div>
+                <h3
+                  className="mb-1 text-xl font-bold tracking-tight"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  {p.title}
+                </h3>
+                <p className="mb-3 text-sm font-semibold text-fuel">
+                  {p.tagline}
+                </p>
+                <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+                  {p.description}
+                </p>
+                <ul className="space-y-1.5">
+                  {p.examples.map((ex) => (
+                    <li
+                      key={ex}
+                      className="flex items-center gap-2 text-xs text-muted-foreground"
+                    >
+                      <FuelGaugeMark className="size-3 text-fuel shrink-0" />
+                      {ex}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
 function WhyGiveAGallonSection() {
   return (
     <section className="border-t border-border/30 py-20 sm:py-28">
@@ -530,11 +627,10 @@ function CtaSection() {
             className="mb-5 text-3xl font-bold leading-tight tracking-tight sm:text-5xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            A GALLON GOES <span className="text-fuel">A LONG WAY</span>
+            THE STORY REQUIRES <span className="text-fuel">GETTING THERE</span>
           </h2>
           <p className="mx-auto mb-8 max-w-lg text-lg text-muted-foreground">
-            Whether you're on the front lines or supporting from home — every
-            gallon counts.
+            Every story told, every vote challenged, every rally covered — someone had to drive there. <span className="font-semibold text-foreground">Let your supporters cover the gas.</span>
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button
@@ -569,6 +665,7 @@ export function LandingPage() {
   return (
     <div className="flex flex-col">
       <HeroSection />
+      <WhoItsForSection />
       <HowItWorksSection />
       <WhyGiveAGallonSection />
       <FeaturedCreatorsSection />
