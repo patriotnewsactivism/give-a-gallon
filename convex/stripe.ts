@@ -1,7 +1,7 @@
 // Give a Gallon — Stripe integration (live)
 import { v } from "convex/values";
-import { action, internalMutation } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { action, internalMutation } from "./_generated/server";
 
 const GALLON_PRICE_CENTS = 425; // $4.25
 
@@ -26,27 +26,42 @@ export const createCheckoutSession = action({
     const amountCents = Math.round(args.gallons * GALLON_PRICE_CENTS);
 
     // Create a pending donation first
-    const donationId = await ctx.runMutation(internal.stripe.createPendingDonation, {
-      creatorId: args.creatorId,
-      gallons: args.gallons,
-      amountCents,
-      donorName: args.donorName,
-      donorEmail: args.donorEmail,
-      message: args.message,
-      isAnonymous: args.isAnonymous,
-    });
+    const donationId = await ctx.runMutation(
+      internal.stripe.createPendingDonation,
+      {
+        creatorId: args.creatorId,
+        gallons: args.gallons,
+        amountCents,
+        donorName: args.donorName,
+        donorEmail: args.donorEmail,
+        message: args.message,
+        isAnonymous: args.isAnonymous,
+      },
+    );
 
     const siteUrl = process.env.SITE_URL || "https://give-a-gallon.vercel.app";
 
     // Create Stripe Checkout Session via API
     const params = new URLSearchParams();
     params.append("mode", "payment");
-    params.append("success_url", `${siteUrl}/donation-success?session_id={CHECKOUT_SESSION_ID}`);
+    params.append(
+      "success_url",
+      `${siteUrl}/donation-success?session_id={CHECKOUT_SESSION_ID}`,
+    );
     params.append("cancel_url", `${siteUrl}/donation-cancel`);
     params.append("line_items[0][price_data][currency]", "usd");
-    params.append("line_items[0][price_data][unit_amount]", String(amountCents));
-    params.append("line_items[0][price_data][product_data][name]", `${args.gallons} Gallon${args.gallons > 1 ? "s" : ""} of Fuel`);
-    params.append("line_items[0][price_data][product_data][description]", "Give a Gallon — fuel an activist's fight");
+    params.append(
+      "line_items[0][price_data][unit_amount]",
+      String(amountCents),
+    );
+    params.append(
+      "line_items[0][price_data][product_data][name]",
+      `${args.gallons} Gallon${args.gallons > 1 ? "s" : ""} of Fuel`,
+    );
+    params.append(
+      "line_items[0][price_data][product_data][description]",
+      "Give a Gallon — fuel an activist's fight",
+    );
     params.append("line_items[0][quantity]", "1");
     params.append("metadata[donationId]", donationId);
     params.append("metadata[creatorId]", args.creatorId);
@@ -55,14 +70,17 @@ export const createCheckoutSession = action({
       params.append("customer_email", args.donorEmail);
     }
 
-    const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${stripeKey}`,
-        "Content-Type": "application/x-www-form-urlencoded",
+    const response = await fetch(
+      "https://api.stripe.com/v1/checkout/sessions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${stripeKey}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: params.toString(),
       },
-      body: params.toString(),
-    });
+    );
 
     if (!response.ok) {
       const error = await response.text();
@@ -71,7 +89,7 @@ export const createCheckoutSession = action({
     }
 
     const session = await response.json();
-    
+
     // Update donation with Stripe session ID
     await ctx.runMutation(internal.stripe.setStripeSessionId, {
       donationId,
@@ -127,10 +145,14 @@ export const completeDonation = internalMutation({
     stripeSessionId: v.string(),
   },
   handler: async (ctx, { stripeSessionId }) => {
-    // Find donation by stripe session ID
-    const donations = await ctx.db.query("donations").collect();
-    const donation = donations.find((d: any) => d.stripeSessionId === stripeSessionId);
-    
+    // Look up the donation directly via the by_stripeSession index
+    const donation = await ctx.db
+      .query("donations")
+      .withIndex("by_stripeSession", q =>
+        q.eq("stripeSessionId", stripeSessionId),
+      )
+      .unique();
+
     if (!donation) {
       console.error("No donation found for session:", stripeSessionId);
       return;
@@ -155,45 +177,93 @@ export const completeDonation = internalMutation({
   },
 });
 
+// How far a webhook timestamp may drift from now before we reject it (replay protection).
+const WEBHOOK_TOLERANCE_SECONDS = 300;
+
+// Constant-time comparison of two equal-length hex strings to avoid timing attacks.
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+// Verify a Stripe webhook signature using Stripe's scheme: HMAC-SHA256 over
+// `${timestamp}.${payload}`, with a timestamp tolerance and constant-time compare.
+async function verifyStripeSignature(
+  payload: string,
+  signatureHeader: string,
+  secret: string,
+): Promise<void> {
+  if (!signatureHeader) {
+    throw new Error("Missing Stripe signature header");
+  }
+
+  let timestamp: string | undefined;
+  const v1Signatures: string[] = [];
+  for (const element of signatureHeader.split(",")) {
+    const [key, value] = element.split("=");
+    const trimmedKey = key?.trim();
+    if (trimmedKey === "t") {
+      timestamp = value?.trim();
+    } else if (trimmedKey === "v1" && value) {
+      v1Signatures.push(value.trim());
+    }
+  }
+
+  if (!timestamp || v1Signatures.length === 0) {
+    throw new Error("Invalid Stripe signature header");
+  }
+
+  const timestampSeconds = Number(timestamp);
+  if (!Number.isFinite(timestampSeconds)) {
+    throw new Error("Invalid Stripe signature timestamp");
+  }
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if (Math.abs(nowSeconds - timestampSeconds) > WEBHOOK_TOLERANCE_SECONDS) {
+    throw new Error("Stripe signature timestamp outside tolerance");
+  }
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(`${timestamp}.${payload}`),
+  );
+  const expectedSig = Array.from(new Uint8Array(signature))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  const isValid = v1Signatures.some(candidate =>
+    constantTimeEqual(candidate, expectedSig),
+  );
+  if (!isValid) {
+    throw new Error("Stripe signature verification failed");
+  }
+}
+
 // Stripe webhook handler (called from http.ts)
 export const handleWebhook = action({
   args: { payload: v.string(), signature: v.string() },
   handler: async (ctx, { payload, signature }) => {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-    
-    // Parse the event
-    const event = JSON.parse(payload);
-
-    // If webhook secret is set, verify signature
-    if (webhookSecret) {
-      // Simple timestamp + signature verification
-      const elements = signature.split(",");
-      const timestampStr = elements.find((e: string) => e.startsWith("t="));
-      const sigStr = elements.find((e: string) => e.startsWith("v1="));
-      
-      if (timestampStr && sigStr) {
-        const timestamp = timestampStr.split("=")[1];
-        const expectedSig = sigStr.split("=")[1];
-        
-        // Verify using Web Crypto
-        const signedPayload = `${timestamp}.${payload}`;
-        const key = await crypto.subtle.importKey(
-          "raw",
-          new TextEncoder().encode(webhookSecret),
-          { name: "HMAC", hash: "SHA-256" },
-          false,
-          ["sign"]
-        );
-        const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signedPayload));
-        const computed = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, "0")).join("");
-        
-        if (computed !== expectedSig) {
-          throw new Error("Invalid webhook signature");
-        }
-      }
+    // Fail closed: never trust an unverified webhook that moves money.
+    if (!webhookSecret) {
+      throw new Error("Stripe webhook secret is not configured");
     }
 
-    // Handle the event
+    await verifyStripeSignature(payload, signature, webhookSecret);
+
+    const event = JSON.parse(payload);
+
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
       if (session.payment_status === "paid") {
