@@ -10,6 +10,76 @@ export function SignUp() {
   const { signIn } = useAuthActions();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  // "form" collects credentials; "verify" collects the emailed OTP code.
+  const [step, setStep] = useState<"form" | "verify">("form");
+  const [email, setEmail] = useState("");
+
+  if (step === "verify") {
+    return (
+      <Card variant="elevated">
+        <CardContent className="pt-6">
+          <form
+            onSubmit={async e => {
+              e.preventDefault();
+              setError("");
+              setLoading(true);
+              const formData = new FormData(e.currentTarget);
+              formData.set("flow", "email-verification");
+              formData.set("email", email);
+              try {
+                await signIn("password", formData);
+              } catch {
+                setError("Invalid or expired code. Please try again.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            className="space-y-4"
+          >
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">
+                We sent a 6-digit code to{" "}
+                <span className="font-medium text-foreground">{email}</span>.
+                Enter it below to verify your email.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="code">Verification code</Label>
+              <Input
+                id="code"
+                name="code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                placeholder="123456"
+                required
+                autoFocus
+              />
+            </div>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" /> Verifying…
+                </>
+              ) : (
+                "Verify email"
+              )}
+            </Button>
+            <button
+              type="button"
+              className="w-full text-center text-xs text-muted-foreground hover:text-foreground"
+              onClick={() => {
+                setStep("form");
+                setError("");
+              }}
+            >
+              Use a different email
+            </button>
+          </form>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card variant="elevated">
@@ -21,10 +91,19 @@ export function SignUp() {
             setLoading(true);
             const formData = new FormData(e.currentTarget);
             formData.set("flow", "signUp");
+            const submittedEmail = String(formData.get("email") ?? "");
             try {
-              await signIn("password", formData);
+              const result = await signIn("password", formData);
+              // When email verification is enabled, the server sends an OTP and
+              // does not sign the user in yet — advance to the code step.
+              if (!result.signingIn) {
+                setEmail(submittedEmail);
+                setStep("verify");
+              }
             } catch (err: any) {
-              setError(err?.message ?? "Could not create account. Please try again.");
+              setError(
+                err?.message ?? "Could not create account. Please try again.",
+              );
             } finally {
               setLoading(false);
             }
@@ -65,12 +144,13 @@ export function SignUp() {
               autoComplete="new-password"
             />
           </div>
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
+          {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? (
-              <><Loader2 className="mr-2 size-4 animate-spin" /> Creating account…</>
+              <>
+                <Loader2 className="mr-2 size-4 animate-spin" /> Creating
+                account…
+              </>
             ) : (
               "Create account"
             )}

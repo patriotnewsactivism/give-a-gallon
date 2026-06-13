@@ -13,7 +13,6 @@ import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { FuelGauge } from "@/components/FuelGauge";
 import { FuelGaugeMark } from "@/components/FuelGaugeMark";
-import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { GALLON_PRICE } from "@/lib/constants";
 
@@ -534,31 +533,15 @@ function CtaSection() {
   );
 }
 
-function Footer() {
-  return (
-    <footer className="border-t border-border/30 py-8">
-      <div className="container">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Logo />
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Give a Gallon. Fuel the movement.
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
 export function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col">
       <HeroSection />
       <HowItWorksSection />
       <WhyGiveAGallonSection />
       <FeaturedCreatorsSection />
       <PlatformFeeSection />
       <CtaSection />
-      <Footer />
     </div>
   );
 }

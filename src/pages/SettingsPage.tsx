@@ -290,9 +290,9 @@ function Field({
 }) {
   return (
     <div>
-      <label className="text-xs text-muted-foreground mb-1.5 block font-medium">
+      <span className="text-xs text-muted-foreground mb-1.5 block font-medium">
         {label}
-      </label>
+      </span>
       {children}
     </div>
   );
