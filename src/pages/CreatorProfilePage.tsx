@@ -67,18 +67,37 @@ export function CreatorProfilePage() {
           Browse Activists
         </Link>
 
+        {/* Cover banner */}
+        {creator.coverUrl && (
+          <div className="mb-8 overflow-hidden rounded-2xl border border-border/50">
+            <img
+              src={creator.coverUrl}
+              alt={`${creator.displayName} cover`}
+              className="h-40 w-full object-cover sm:h-56"
+            />
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-5 gap-8">
           {/* Left: Profile info */}
           <div className="lg:col-span-3 space-y-6">
             {/* Profile header */}
             <div className="flex items-start gap-4">
-              <div className="size-16 rounded-full bg-fuel/10 border border-fuel/20 flex items-center justify-center shrink-0">
-                <span
-                  className="text-fuel font-bold text-xl"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  {creator.displayName.charAt(0).toUpperCase()}
-                </span>
+              <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-fuel/20 bg-fuel/10">
+                {creator.avatarUrl ? (
+                  <img
+                    src={creator.avatarUrl}
+                    alt={creator.displayName}
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <span
+                    className="text-xl font-bold text-fuel"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {creator.displayName.charAt(0).toUpperCase()}
+                  </span>
+                )}
               </div>
               <div>
                 <h1

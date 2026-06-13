@@ -14,6 +14,7 @@ import type * as checkEnv from "../checkEnv.js";
 import type * as constants from "../constants.js";
 import type * as creators from "../creators.js";
 import type * as donations from "../donations.js";
+import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as seedTestUser from "../seedTestUser.js";
 import type * as stripe from "../stripe.js";
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   constants: typeof constants;
   creators: typeof creators;
   donations: typeof donations;
+  files: typeof files;
   http: typeof http;
   seedTestUser: typeof seedTestUser;
   stripe: typeof stripe;

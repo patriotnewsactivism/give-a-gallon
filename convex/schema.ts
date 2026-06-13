@@ -13,6 +13,8 @@ const schema = defineSchema({
     bio: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
     coverImageUrl: v.optional(v.string()),
+    avatarId: v.optional(v.id("_storage")), // uploaded avatar (Convex storage)
+    coverImageId: v.optional(v.id("_storage")), // uploaded cover image
     goal: v.optional(v.number()), // gallon goal (e.g., 100 gallons)
     totalGallons: v.number(), // total gallons received
     totalDonations: v.number(), // total donation count
@@ -26,7 +28,7 @@ const schema = defineSchema({
         twitter: v.optional(v.string()),
         website: v.optional(v.string()),
         instagram: v.optional(v.string()),
-      })
+      }),
     ),
     stripeSessionId: v.optional(v.string()),
     createdAt: v.number(),
@@ -50,7 +52,7 @@ const schema = defineSchema({
     status: v.union(
       v.literal("pending"),
       v.literal("completed"),
-      v.literal("failed")
+      v.literal("failed"),
     ),
     stripeSessionId: v.optional(v.string()),
     createdAt: v.number(),

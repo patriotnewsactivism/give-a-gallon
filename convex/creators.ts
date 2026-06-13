@@ -1,6 +1,19 @@
-import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
+import type { Doc } from "./_generated/dataModel";
+import { mutation, type QueryCtx, query } from "./_generated/server";
+
+// Resolve uploaded storage ids to served URLs, falling back to any external
+// URL fields. Returns the creator doc with `avatarUrl`/`coverUrl` populated.
+async function withImageUrls(ctx: QueryCtx, creator: Doc<"creators">) {
+  const avatarUrl = creator.avatarId
+    ? await ctx.storage.getUrl(creator.avatarId)
+    : (creator.avatarUrl ?? null);
+  const coverUrl = creator.coverImageId
+    ? await ctx.storage.getUrl(creator.coverImageId)
+    : (creator.coverImageUrl ?? null);
+  return { ...creator, avatarUrl, coverUrl };
+}
 
 // Get creator profile by slug (public)
 export const getBySlug = query({
@@ -8,23 +21,23 @@ export const getBySlug = query({
   handler: async (ctx, { slug }) => {
     const creator = await ctx.db
       .query("creators")
-      .withIndex("by_slug", (q) => q.eq("slug", slug.toLowerCase()))
+      .withIndex("by_slug", q => q.eq("slug", slug.toLowerCase()))
       .first();
-    return creator;
+    return creator ? await withImageUrls(ctx, creator) : null;
   },
 });
 
 // Get creator profile for current user
 export const getMine = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
     const creator = await ctx.db
       .query("creators")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .withIndex("by_userId", q => q.eq("userId", userId))
       .first();
-    return creator;
+    return creator ? await withImageUrls(ctx, creator) : null;
   },
 });
 
@@ -34,10 +47,10 @@ export const listActive = query({
   handler: async (ctx, { limit }) => {
     const creators = await ctx.db
       .query("creators")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active", q => q.eq("isActive", true))
       .order("desc")
       .take(limit ?? 20);
-    return creators;
+    return await Promise.all(creators.map(c => withImageUrls(ctx, c)));
   },
 });
 
@@ -56,7 +69,7 @@ export const upsert = mutation({
         twitter: v.optional(v.string()),
         website: v.optional(v.string()),
         instagram: v.optional(v.string()),
-      })
+      }),
     ),
   },
   handler: async (ctx, args) => {
@@ -69,12 +82,12 @@ export const upsert = mutation({
     // Check slug uniqueness
     const existing = await ctx.db
       .query("creators")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .withIndex("by_slug", q => q.eq("slug", slug))
       .first();
 
     const myProfile = await ctx.db
       .query("creators")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .withIndex("by_userId", q => q.eq("userId", userId))
       .first();
 
     if (existing && existing._id !== myProfile?._id) {
@@ -111,5 +124,39 @@ export const upsert = mutation({
       isActive: true,
       createdAt: Date.now(),
     });
+  },
+});
+
+// Set / replace the avatar or cover image for the current user's profile.
+// Pass a storageId to set, or null to remove. Omit a field to leave it as-is.
+export const setImages = mutation({
+  args: {
+    avatarId: v.optional(v.union(v.id("_storage"), v.null())),
+    coverImageId: v.optional(v.union(v.id("_storage"), v.null())),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const mine = await ctx.db
+      .query("creators")
+      .withIndex("by_userId", q => q.eq("userId", userId))
+      .first();
+    if (!mine) throw new Error("Create your profile first");
+
+    const patch: Partial<Doc<"creators">> = {};
+    if (args.avatarId !== undefined) {
+      if (mine.avatarId && mine.avatarId !== args.avatarId) {
+        await ctx.storage.delete(mine.avatarId);
+      }
+      patch.avatarId = args.avatarId ?? undefined;
+    }
+    if (args.coverImageId !== undefined) {
+      if (mine.coverImageId && mine.coverImageId !== args.coverImageId) {
+        await ctx.storage.delete(mine.coverImageId);
+      }
+      patch.coverImageId = args.coverImageId ?? undefined;
+    }
+    await ctx.db.patch(mine._id, patch);
   },
 });
