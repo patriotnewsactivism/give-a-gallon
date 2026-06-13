@@ -1,11 +1,13 @@
-// Give a Gallon — Stripe integration (live)
+// Give a Gallon — Stripe integration (Connect-aware)
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { action, internalMutation } from "./_generated/server";
 
 const GALLON_PRICE_CENTS = 425; // $4.25
+const PLATFORM_FEE_PCT = 0.05;  // 5%
 
-// Create a Stripe Checkout Session
+// ── Checkout ───────────────────────────────────────────────────────────────
+
 export const createCheckoutSession = action({
   args: {
     creatorId: v.id("creators"),
@@ -24,8 +26,13 @@ export const createCheckoutSession = action({
     }
 
     const amountCents = Math.round(args.gallons * GALLON_PRICE_CENTS);
+    const platformFeeCents = Math.round(amountCents * PLATFORM_FEE_PCT);
 
-    // Create a pending donation first
+    // Fetch creator to check if they have a Connect account
+    const creator = await ctx.runQuery(internal.stripe.getCreatorById, {
+      creatorId: args.creatorId,
+    });
+
     const donationId = await ctx.runMutation(
       internal.stripe.createPendingDonation,
       {
@@ -41,7 +48,6 @@ export const createCheckoutSession = action({
 
     const siteUrl = process.env.SITE_URL || "https://give-a-gallon.vercel.app";
 
-    // Create Stripe Checkout Session via API
     const params = new URLSearchParams();
     params.append("mode", "payment");
     params.append(
@@ -50,10 +56,7 @@ export const createCheckoutSession = action({
     );
     params.append("cancel_url", `${siteUrl}/donation-cancel`);
     params.append("line_items[0][price_data][currency]", "usd");
-    params.append(
-      "line_items[0][price_data][unit_amount]",
-      String(amountCents),
-    );
+    params.append("line_items[0][price_data][unit_amount]", String(amountCents));
     params.append(
       "line_items[0][price_data][product_data][name]",
       `${args.gallons} Gallon${args.gallons > 1 ? "s" : ""} of Fuel`,
@@ -70,17 +73,22 @@ export const createCheckoutSession = action({
       params.append("customer_email", args.donorEmail);
     }
 
-    const response = await fetch(
-      "https://api.stripe.com/v1/checkout/sessions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${stripeKey}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: params.toString(),
+    // If the creator has a verified Connect account, route the payment through
+    // them and collect our platform fee as an application_fee_amount.
+    if (creator?.stripeAccountId && creator?.stripeAccountStatus === "active") {
+      params.append("payment_intent_data[application_fee_amount]", String(platformFeeCents));
+      params.append("payment_intent_data[transfer_data][destination]", creator.stripeAccountId);
+      params.append("metadata[connectedAccountId]", creator.stripeAccountId);
+    }
+
+    const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${stripeKey}`,
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-    );
+      body: params.toString(),
+    });
 
     if (!response.ok) {
       const error = await response.text();
@@ -90,7 +98,6 @@ export const createCheckoutSession = action({
 
     const session = await response.json();
 
-    // Update donation with Stripe session ID
     await ctx.runMutation(internal.stripe.setStripeSessionId, {
       donationId,
       stripeSessionId: session.id,
@@ -100,7 +107,15 @@ export const createCheckoutSession = action({
   },
 });
 
-// Internal: create a pending donation record
+// ── Internal queries / mutations ───────────────────────────────────────────
+
+export const getCreatorById = internalMutation({
+  args: { creatorId: v.id("creators") },
+  handler: async (ctx, { creatorId }) => {
+    return ctx.db.get(creatorId);
+  },
+});
+
 export const createPendingDonation = internalMutation({
   args: {
     creatorId: v.id("creators"),
@@ -112,7 +127,7 @@ export const createPendingDonation = internalMutation({
     isAnonymous: v.boolean(),
   },
   handler: async (ctx, args) => {
-    const platformFeeCents = Math.round(args.amountCents * 0.05);
+    const platformFeeCents = Math.round(args.amountCents * PLATFORM_FEE_PCT);
     return await ctx.db.insert("donations", {
       creatorId: args.creatorId,
       gallons: args.gallons,
@@ -128,7 +143,6 @@ export const createPendingDonation = internalMutation({
   },
 });
 
-// Internal: store stripe session ID on donation
 export const setStripeSessionId = internalMutation({
   args: {
     donationId: v.id("donations"),
@@ -139,13 +153,12 @@ export const setStripeSessionId = internalMutation({
   },
 });
 
-// Internal: mark donation as completed after payment
 export const completeDonation = internalMutation({
   args: {
     stripeSessionId: v.string(),
+    stripePaymentIntentId: v.optional(v.string()),
   },
-  handler: async (ctx, { stripeSessionId }) => {
-    // Look up the donation directly via the by_stripeSession index
+  handler: async (ctx, { stripeSessionId, stripePaymentIntentId }) => {
     const donation = await ctx.db
       .query("donations")
       .withIndex("by_stripeSession", q =>
@@ -157,15 +170,13 @@ export const completeDonation = internalMutation({
       console.error("No donation found for session:", stripeSessionId);
       return;
     }
+    if (donation.status === "completed") return;
 
-    if (donation.status === "completed") {
-      return; // Already processed (idempotent)
-    }
+    await ctx.db.patch(donation._id, {
+      status: "completed",
+      ...(stripePaymentIntentId ? { stripePaymentIntentId } : {}),
+    });
 
-    // Mark completed
-    await ctx.db.patch(donation._id, { status: "completed" });
-
-    // Update creator totals
     const creator = await ctx.db.get(donation.creatorId);
     if (creator) {
       await ctx.db.patch(creator._id, {
@@ -177,10 +188,10 @@ export const completeDonation = internalMutation({
   },
 });
 
-// How far a webhook timestamp may drift from now before we reject it (replay protection).
+// ── Webhook ────────────────────────────────────────────────────────────────
+
 const WEBHOOK_TOLERANCE_SECONDS = 300;
 
-// Constant-time comparison of two equal-length hex strings to avoid timing attacks.
 function constantTimeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let mismatch = 0;
@@ -190,27 +201,20 @@ function constantTimeEqual(a: string, b: string): boolean {
   return mismatch === 0;
 }
 
-// Verify a Stripe webhook signature using Stripe's scheme: HMAC-SHA256 over
-// `${timestamp}.${payload}`, with a timestamp tolerance and constant-time compare.
 async function verifyStripeSignature(
   payload: string,
   signatureHeader: string,
   secret: string,
 ): Promise<void> {
-  if (!signatureHeader) {
-    throw new Error("Missing Stripe signature header");
-  }
+  if (!signatureHeader) throw new Error("Missing Stripe signature header");
 
   let timestamp: string | undefined;
   const v1Signatures: string[] = [];
   for (const element of signatureHeader.split(",")) {
     const [key, value] = element.split("=");
     const trimmedKey = key?.trim();
-    if (trimmedKey === "t") {
-      timestamp = value?.trim();
-    } else if (trimmedKey === "v1" && value) {
-      v1Signatures.push(value.trim());
-    }
+    if (trimmedKey === "t") timestamp = value?.trim();
+    else if (trimmedKey === "v1" && value) v1Signatures.push(value.trim());
   }
 
   if (!timestamp || v1Signatures.length === 0) {
@@ -218,9 +222,8 @@ async function verifyStripeSignature(
   }
 
   const timestampSeconds = Number(timestamp);
-  if (!Number.isFinite(timestampSeconds)) {
-    throw new Error("Invalid Stripe signature timestamp");
-  }
+  if (!Number.isFinite(timestampSeconds)) throw new Error("Invalid timestamp");
+
   const nowSeconds = Math.floor(Date.now() / 1000);
   if (Math.abs(nowSeconds - timestampSeconds) > WEBHOOK_TOLERANCE_SECONDS) {
     throw new Error("Stripe signature timestamp outside tolerance");
@@ -242,35 +245,52 @@ async function verifyStripeSignature(
     .map(b => b.toString(16).padStart(2, "0"))
     .join("");
 
-  const isValid = v1Signatures.some(candidate =>
-    constantTimeEqual(candidate, expectedSig),
-  );
-  if (!isValid) {
-    throw new Error("Stripe signature verification failed");
-  }
+  const isValid = v1Signatures.some(c => constantTimeEqual(c, expectedSig));
+  if (!isValid) throw new Error("Stripe signature verification failed");
 }
 
-// Stripe webhook handler (called from http.ts)
 export const handleWebhook = action({
   args: { payload: v.string(), signature: v.string() },
   handler: async (ctx, { payload, signature }) => {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-    // Fail closed: never trust an unverified webhook that moves money.
-    if (!webhookSecret) {
-      throw new Error("Stripe webhook secret is not configured");
-    }
+    if (!webhookSecret) throw new Error("Stripe webhook secret not configured");
 
     await verifyStripeSignature(payload, signature, webhookSecret);
 
     const event = JSON.parse(payload);
 
+    // ── Payment completed → mark donation done ──
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
       if (session.payment_status === "paid") {
         await ctx.runMutation(internal.stripe.completeDonation, {
           stripeSessionId: session.id,
+          stripePaymentIntentId: session.payment_intent ?? undefined,
         });
       }
+    }
+
+    // ── Connect account updated → sync KYC status ──
+    if (event.type === "account.updated") {
+      const account = event.data.object;
+      const chargesEnabled: boolean = account.charges_enabled;
+      const payoutsEnabled: boolean = account.payouts_enabled;
+      const disabled: boolean =
+        account.requirements?.disabled_reason != null;
+
+      let status: "pending" | "active" | "restricted";
+      if (chargesEnabled && payoutsEnabled) {
+        status = "active";
+      } else if (disabled) {
+        status = "restricted";
+      } else {
+        status = "pending";
+      }
+
+      await ctx.runMutation(internal.connect.setAccountStatus, {
+        stripeAccountId: account.id,
+        stripeAccountStatus: status,
+      });
     }
 
     return { received: true };

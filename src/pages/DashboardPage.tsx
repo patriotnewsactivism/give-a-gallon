@@ -1,14 +1,21 @@
-import { useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import {
+  AlertCircle,
+  ArrowDownToLine,
+  CheckCircle2,
+  Clock,
   Copy,
   ExternalLink,
   Fuel,
   Heart,
+  Loader2,
   MessageSquare,
   TrendingUp,
   Users,
+  Wallet,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { FuelGauge } from "@/components/FuelGauge";
@@ -42,6 +49,19 @@ export function DashboardPage() {
       </div>
     );
   }
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const connect = searchParams.get("connect");
+    if (connect === "complete") {
+      toast.success("Stripe account connected! You can now receive payouts.");
+      setSearchParams({});
+    } else if (connect === "refresh") {
+      toast.info("Onboarding expired — click 'Connect Stripe' to restart.");
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
 
   const profileUrl = `${window.location.origin}/${creator.slug}`;
 
@@ -134,6 +154,9 @@ export function DashboardPage() {
           Set a gallon goal to light up your fuel gauge →
         </Link>
       )}
+
+      {/* Payout panel */}
+      <PayoutPanel creator={creator} />
 
       {/* Share your link */}
       <div className="p-4 rounded-xl border border-fuel/20 bg-fuel/[0.03]">
@@ -232,6 +255,236 @@ function SetupPrompt() {
     </div>
   );
 }
+
+function PayoutPanel({ creator }: { creator: any }) {
+  const startOnboarding = useAction(api.connect.startOnboarding);
+  const getBalance = useAction(api.connect.getBalance);
+  const requestPayout = useAction(api.connect.requestPayout);
+
+  const [loading, setLoading] = useState(false);
+  const [balance, setBalance] = useState<{
+    availableCents: number;
+    pendingCents: number;
+    accountStatus: string;
+  } | null>(null);
+
+  const status = creator.stripeAccountStatus ?? "not_connected";
+
+  useEffect(() => {
+    if (status === "active") {
+      getBalance().then(setBalance).catch(console.error);
+    }
+  }, [status]);
+
+  async function handleConnect() {
+    setLoading(true);
+    try {
+      const { url } = await startOnboarding();
+      window.location.href = url;
+    } catch (e: any) {
+      toast.error(e.message ?? "Failed to start onboarding");
+      setLoading(false);
+    }
+  }
+
+  async function handlePayout(instant: boolean) {
+    if (!balance || balance.availableCents < 100) {
+      toast.error("No available balance to pay out");
+      return;
+    }
+    setLoading(true);
+    try {
+      await requestPayout({ amountCents: balance.availableCents, instant });
+      toast.success(
+        instant
+          ? "Instant payout initiated — funds arrive in ~30 min!"
+          : "Standard payout initiated — arrives next business day."
+      );
+      const updated = await getBalance();
+      setBalance(updated);
+    } catch (e: any) {
+      toast.error(e.message ?? "Payout failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Not connected yet ──
+  if (status === "not_connected") {
+    return (
+      <div className="p-5 rounded-xl border border-border/50 bg-card/50">
+        <div className="flex items-start gap-4">
+          <div className="rounded-xl bg-fuel/10 p-2.5 shrink-0">
+            <Wallet className="size-5 text-fuel" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold mb-1">Get Paid</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Connect a Stripe account to receive payouts directly to your debit
+              card — usually within 30 minutes of a donation.
+            </p>
+            <ul className="space-y-1.5 mb-4">
+              {[
+                "Quick KYC — name, DOB, SSN last-4, debit card",
+                "Donations route straight to your account",
+                "Instant Payout to debit in ~30 min (Stripe ~1% fee)",
+                "Standard next-day payout at no extra cost",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <CheckCircle2 className="size-3.5 text-fuel shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <Button
+              className="bg-fuel text-fuel-foreground hover:bg-fuel/90"
+              onClick={handleConnect}
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="size-4 mr-2 animate-spin" />
+              ) : (
+                <ArrowDownToLine className="size-4 mr-2" />
+              )}
+              Connect Stripe
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Pending KYC ──
+  if (status === "pending") {
+    return (
+      <div className="p-5 rounded-xl border border-yellow-500/20 bg-yellow-500/[0.04]">
+        <div className="flex items-start gap-4">
+          <div className="rounded-xl bg-yellow-500/10 p-2.5 shrink-0">
+            <Clock className="size-5 text-yellow-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold mb-1">Finish Stripe Onboarding</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              You started connecting Stripe but haven't finished yet. Complete
+              the quick KYC to unlock payouts.
+            </p>
+            <Button
+              variant="outline"
+              className="border-yellow-500/30 text-yellow-600 hover:bg-yellow-500/10"
+              onClick={handleConnect}
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="size-4 mr-2 animate-spin" />
+              ) : (
+                <ArrowDownToLine className="size-4 mr-2" />
+              )}
+              Resume Onboarding
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Restricted ──
+  if (status === "restricted") {
+    return (
+      <div className="p-5 rounded-xl border border-red-500/20 bg-red-500/[0.04]">
+        <div className="flex items-start gap-4">
+          <div className="rounded-xl bg-red-500/10 p-2.5 shrink-0">
+            <AlertCircle className="size-5 text-red-500" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold mb-1">Action Required</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Stripe needs more information before enabling payouts on your
+              account.
+            </p>
+            <Button
+              variant="outline"
+              className="border-red-500/30 text-red-600 hover:bg-red-500/10"
+              onClick={handleConnect}
+              disabled={loading}
+            >
+              {loading && <Loader2 className="size-4 mr-2 animate-spin" />}
+              Resolve with Stripe
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Active — show balance + payout buttons ──
+  const available = balance?.availableCents ?? 0;
+  const pending = balance?.pendingCents ?? 0;
+  const canPayout = available >= 100;
+
+  return (
+    <div className="p-5 rounded-xl border border-fuel/20 bg-fuel/[0.03]">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="rounded-xl bg-fuel/10 p-2 shrink-0">
+          <Wallet className="size-4 text-fuel" />
+        </div>
+        <h3 className="font-semibold">Your Balance</h3>
+        <span className="ml-auto flex items-center gap-1 text-xs text-fuel font-medium">
+          <CheckCircle2 className="size-3.5" /> Connected
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="rounded-lg border border-border/50 bg-card/50 p-3 text-center">
+          <div
+            className="text-2xl font-bold text-fuel"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            ${(available / 100).toFixed(2)}
+          </div>
+          <div className="text-xs text-muted-foreground mt-0.5">Available</div>
+        </div>
+        <div className="rounded-lg border border-border/50 bg-card/50 p-3 text-center">
+          <div
+            className="text-2xl font-bold"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            ${(pending / 100).toFixed(2)}
+          </div>
+          <div className="text-xs text-muted-foreground mt-0.5">Pending</div>
+        </div>
+      </div>
+
+      <div className="flex gap-2">
+        <Button
+          className="flex-1 bg-fuel text-fuel-foreground hover:bg-fuel/90"
+          onClick={() => handlePayout(true)}
+          disabled={!canPayout || loading}
+        >
+          {loading ? (
+            <Loader2 className="size-4 mr-1.5 animate-spin" />
+          ) : (
+            <ArrowDownToLine className="size-4 mr-1.5" />
+          )}
+          Instant Payout (~30 min)
+        </Button>
+        <Button
+          variant="outline"
+          className="flex-1"
+          onClick={() => handlePayout(false)}
+          disabled={!canPayout || loading}
+        >
+          Standard (Next Day)
+        </Button>
+      </div>
+      {!canPayout && (
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          Minimum payout is $1.00
+        </p>
+      )}
+    </div>
+  );
+}
+
 
 function StatCard({
   icon,
