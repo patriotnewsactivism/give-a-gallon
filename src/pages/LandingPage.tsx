@@ -24,6 +24,7 @@ import { api } from "../../convex/_generated/api";
 
 function HeroSection() {
   const stats = useQuery(api.donations.platformStats);
+  const recentDonations = useQuery(api.donations.getRecent, { limit: 6 });
   const totalGallons = stats?.totalGallons ?? 0;
   const milestone = Math.max(1000, Math.ceil((totalGallons + 1) / 1000) * 1000);
   const hasGallons = totalGallons > 0;
@@ -125,6 +126,13 @@ function HeroSection() {
               <HeroStat value={stats.totalGallons} label="Gallons Given" />
               <HeroStat value={stats.totalCreators} label="Activists" />
               <HeroStat value={stats.totalDonations} label="Donations" />
+            </div>
+          )}
+
+          {/* Live donation ticker */}
+          {recentDonations && recentDonations.length > 0 && (
+            <div className="mt-8">
+              <DonationTicker donations={recentDonations} />
             </div>
           )}
         </div>
