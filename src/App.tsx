@@ -20,6 +20,7 @@ import {
 } from "./pages";
 import { DonationSuccessPage } from "./pages/DonationSuccessPage";
 import { DonationCancelPage } from "./pages/DonationCancelPage";
+import ReferralPage from "./pages/ReferralPage";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/my-impact" element={<MyImpactPage />} />
+              <Route path="/referrals" element={<ReferralPage />} />
             </Route>
           </Route>
 

@@ -19,6 +19,7 @@ import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as milestones from "../milestones.js";
 import type * as platform from "../platform.js";
+import type * as referrals from "../referrals.js";
 import type * as seedTestUser from "../seedTestUser.js";
 import type * as stripe from "../stripe.js";
 import type * as subscriptions from "../subscriptions.js";
@@ -45,6 +46,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   milestones: typeof milestones;
   platform: typeof platform;
+  referrals: typeof referrals;
   seedTestUser: typeof seedTestUser;
   stripe: typeof stripe;
   subscriptions: typeof subscriptions;

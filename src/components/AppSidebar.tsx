@@ -2,15 +2,19 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
 import {
   ExternalLink,
+  Fuel,
+  Gift,
   LayoutDashboard,
   LogOut,
   Settings,
+  Sparkles,
   Users,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { Logo } from "./Logo";
 import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Badge } from "./ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +28,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -33,8 +38,14 @@ import {
 
 const navItems = [
   { href: "/dashboard", label: "Your Tank", icon: LayoutDashboard },
+  { href: "/my-impact", label: "My Impact", icon: Sparkles },
+  { href: "/referrals", label: "Referrals", icon: Gift, badge: "Earn ⛽" },
   { href: "/settings", label: "Profile", icon: Settings },
-  { href: "/explore", label: "Browse", icon: Users },
+];
+
+const discoverItems = [
+  { href: "/explore", label: "Browse Campaigns", icon: Users },
+  { href: "/membership", label: "Membership", icon: Fuel },
 ];
 
 function NavLink({
@@ -42,20 +53,27 @@ function NavLink({
   label,
   icon: Icon,
   isActive,
+  badge,
 }: {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   isActive: boolean;
+  badge?: string;
 }) {
   const { setOpenMobile } = useSidebar();
 
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild isActive={isActive}>
-        <Link to={href} onClick={() => setOpenMobile(false)}>
-          <Icon />
-          <span>{label}</span>
+        <Link to={href} onClick={() => setOpenMobile(false)} className="flex items-center gap-2">
+          <Icon className="size-4" />
+          <span className="flex-1">{label}</span>
+          {badge && (
+            <Badge className="text-[10px] px-1.5 py-0 bg-amber-500/20 text-amber-400 border-amber-400/30 font-medium">
+              {badge}
+            </Badge>
+          )}
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
@@ -68,9 +86,28 @@ function SidebarNav() {
   return (
     <SidebarContent>
       <SidebarGroup>
+        <SidebarGroupLabel>My Account</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
             {navItems.map((item) => (
+              <NavLink
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                icon={item.icon}
+                badge={item.badge}
+                isActive={location.pathname === item.href}
+              />
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+
+      <SidebarGroup>
+        <SidebarGroupLabel>Discover</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {discoverItems.map((item) => (
               <NavLink
                 key={item.href}
                 href={item.href}
@@ -100,7 +137,7 @@ function SidebarUserMenu() {
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton size="lg">
                 <Avatar className="size-8">
-                  <AvatarFallback className="bg-fuel/20 text-fuel text-sm font-bold">
+                  <AvatarFallback className="bg-amber-500/20 text-amber-400 text-sm font-bold">
                     {user?.name?.charAt(0).toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
