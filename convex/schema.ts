@@ -19,7 +19,6 @@ const schema = defineSchema({
     totalDonations: v.number(),
     totalAmountCents: v.number(),
     isActive: v.boolean(),
-    // Expanded category system
     category: v.optional(v.string()),
     location: v.optional(v.string()),
     socialLinks: v.optional(v.object({
@@ -46,13 +45,17 @@ const schema = defineSchema({
     )),
     verificationNote: v.optional(v.string()),
     // Campaign details
-    campaignType: v.optional(v.string()), // "ongoing" | "goal-based" | "emergency"
-    urgency: v.optional(v.string()),      // "low" | "medium" | "high" | "emergency"
+    campaignType: v.optional(v.string()),
+    urgency: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
     // Phase 5 — editorial / network
     isFeatured: v.optional(v.boolean()),
-    featuredNote: v.optional(v.string()), // editorial blurb
-    networkSource: v.optional(v.string()), // "wtpnews" | "civilrightshub" | null
+    featuredNote: v.optional(v.string()),
+    networkSource: v.optional(v.string()),
+    // Referral
+    referralCode: v.optional(v.string()),
+    referralCount: v.optional(v.number()),
+    referralGallons: v.optional(v.number()),
     createdAt: v.number(),
   })
     .index("by_stripeSession", ["stripeSessionId"])
@@ -60,7 +63,8 @@ const schema = defineSchema({
     .index("by_userId", ["userId"])
     .index("by_active", ["isActive", "totalGallons"])
     .index("by_category", ["category", "isActive"])
-    .index("by_stripeAccount", ["stripeAccountId"]),
+    .index("by_stripeAccount", ["stripeAccountId"])
+    .index("by_referralCode", ["referralCode"]),
 
   // Campaign updates posted by creators
   updates: defineTable({
@@ -69,7 +73,7 @@ const schema = defineSchema({
     body: v.string(),
     imageId: v.optional(v.id("_storage")),
     imageUrl: v.optional(v.string()),
-    impactTag: v.optional(v.string()), // e.g. "records filed", "miles driven", "case won"
+    impactTag: v.optional(v.string()),
     gallonsUsed: v.optional(v.number()),
     createdAt: v.number(),
   })
@@ -91,6 +95,7 @@ const schema = defineSchema({
     creatorId: v.id("creators"),
     donorName: v.optional(v.string()),
     donorEmail: v.optional(v.string()),
+    donorUserId: v.optional(v.id("users")),
     gallons: v.number(),
     amountCents: v.number(),
     platformFeeCents: v.number(),
@@ -104,13 +109,45 @@ const schema = defineSchema({
     stripeSessionId: v.optional(v.string()),
     stripePaymentIntentId: v.optional(v.string()),
     stripeTransferId: v.optional(v.string()),
+    // Referral tracking
+    referralCode: v.optional(v.string()),
+    referredByCreatorId: v.optional(v.id("creators")),
     createdAt: v.number(),
   })
     .index("by_stripeSession", ["stripeSessionId"])
     .index("by_creator", ["creatorId", "createdAt"])
+    .index("by_status", ["status", "createdAt"])
+    .index("by_donorUser", ["donorUserId", "createdAt"]),
+
+  // ── Subscriptions (recurring memberships) ──────────────────────────────────
+  subscriptions: defineTable({
+    userId: v.id("users"),
+    donorEmail: v.string(),
+    donorName: v.optional(v.string()),
+    tierId: v.string(),          // "fuel-supporter" | "community-builder" | "freedom-partner" | "impact-champion"
+    tierName: v.string(),
+    amountCents: v.number(),     // monthly amount
+    gallonsPerMonth: v.number(),
+    status: v.union(
+      v.literal("active"),
+      v.literal("canceled"),
+      v.literal("past_due"),
+      v.literal("paused"),
+    ),
+    stripeSubscriptionId: v.optional(v.string()),
+    stripeCustomerId: v.optional(v.string()),
+    stripePriceId: v.optional(v.string()),
+    currentPeriodEnd: v.optional(v.number()),  // unix ms
+    canceledAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_stripeSubscription", ["stripeSubscriptionId"])
+    .index("by_stripeCustomer", ["stripeCustomerId"])
     .index("by_status", ["status", "createdAt"]),
 
-  // Platform-wide stats (materialized, updated by triggers)
+  // ── Platform-wide stats (materialized) ─────────────────────────────────────
   platformStats: defineTable({
     key: v.string(), // "global"
     totalDonationsCents: v.number(),
@@ -119,9 +156,24 @@ const schema = defineSchema({
     totalCreators: v.number(),
     totalCampaigns: v.number(),
     successfulCampaigns: v.number(),
+    activeSubscriptions: v.optional(v.number()),
+    monthlyRecurringCents: v.optional(v.number()),
     updatedAt: v.number(),
   })
     .index("by_key", ["key"]),
+
+  // ── Email notification log ─────────────────────────────────────────────────
+  emailLog: defineTable({
+    to: v.string(),
+    subject: v.string(),
+    type: v.string(),  // "donation_received" | "donation_confirmation" | "subscription_confirmed" | "subscription_canceled"
+    relatedId: v.optional(v.string()),
+    status: v.union(v.literal("sent"), v.literal("failed")),
+    error: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_type", ["type", "createdAt"])
+    .index("by_to", ["to", "createdAt"]),
 });
 
 export default schema;

@@ -1,7 +1,7 @@
 // Give a Gallon — Stripe integration (Connect-aware)
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { action, internalMutation } from "./_generated/server";
+import { action, internalMutation, internalQuery } from "./_generated/server";
 
 const GALLON_PRICE_CENTS = 425; // $4.25
 const PLATFORM_FEE_PCT = 0.05;  // 5%
@@ -293,6 +293,140 @@ export const handleWebhook = action({
       });
     }
 
+
+    // ── Subscription created/updated ──
+    if (event.type === "checkout.session.completed" && event.data.object.mode === "subscription") {
+      const session = event.data.object;
+      const meta = session.metadata ?? {};
+      const userId = meta.userId;
+      const tierId = meta.tierId;
+      const tierName = meta.tierName;
+      const gallonsPerMonth = Number(meta.gallonsPerMonth ?? 0);
+      const donorName = meta.donorName || undefined;
+
+      if (userId && tierId) {
+        const subId = session.subscription;
+        // Fetch the subscription from Stripe to get period end
+        const stripeKey = process.env.STRIPE_SECRET_KEY!;
+        const subRes = await fetch(`https://api.stripe.com/v1/subscriptions/${subId}`, {
+          headers: { Authorization: `Bearer ${stripeKey}` },
+        });
+        const sub = await subRes.json();
+
+        await ctx.runMutation(internal.subscriptions.createSubscriptionRecord, {
+          userId: userId as any,
+          donorEmail: session.customer_details?.email ?? "",
+          donorName,
+          tierId,
+          tierName,
+          amountCents: sub.plan?.amount ?? 0,
+          gallonsPerMonth,
+          stripeSubscriptionId: subId,
+          stripeCustomerId: session.customer,
+          stripePriceId: sub.plan?.id,
+          currentPeriodEnd: sub.current_period_end ? sub.current_period_end * 1000 : undefined,
+        });
+
+        // Send confirmation email
+        if (session.customer_details?.email) {
+          await ctx.runAction(internal.emails.sendSubscriptionConfirmed, {
+            donorEmail: session.customer_details.email,
+            donorName: donorName ?? "there",
+            tierName,
+            gallonsPerMonth,
+            amountCents: sub.plan?.amount ?? 0,
+            currentPeriodEndMs: sub.current_period_end ? sub.current_period_end * 1000 : Date.now() + 30 * 86400 * 1000,
+          });
+        }
+      }
+    }
+
+    // ── Subscription status changes ──
+    if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
+      const sub = event.data.object;
+      const stripeKey = process.env.STRIPE_SECRET_KEY!;
+
+      let status: "active" | "canceled" | "past_due" | "paused" = "active";
+      if (sub.status === "canceled" || event.type === "customer.subscription.deleted") status = "canceled";
+      else if (sub.status === "past_due") status = "past_due";
+      else if (sub.status === "paused") status = "paused";
+
+      await ctx.runMutation(internal.subscriptions.updateSubStatus, {
+        stripeSubscriptionId: sub.id,
+        status,
+        currentPeriodEnd: sub.current_period_end ? sub.current_period_end * 1000 : undefined,
+      });
+    }
+
+    // ── One-time donation emails ──
+    if (event.type === "checkout.session.completed" && event.data.object.mode === "payment") {
+      const session = event.data.object;
+      if (session.payment_status === "paid") {
+        // Find the donation and creator to send emails
+        const stripeKey = process.env.STRIPE_SECRET_KEY!;
+        const donation = await ctx.runQuery(internal.stripe.getDonationBySession, {
+          stripeSessionId: session.id,
+        });
+        if (donation) {
+          const creator = await ctx.runQuery(internal.stripe.getCreatorByDonationId, {
+            creatorId: donation.creatorId,
+          });
+          if (creator) {
+            // Email to creator
+            const creatorUser = await ctx.runQuery(internal.stripe.getUserById, { userId: creator.userId });
+            if (creatorUser?.email) {
+              await ctx.runAction(internal.emails.sendDonationReceived, {
+                creatorEmail: creatorUser.email,
+                creatorName: creator.displayName,
+                creatorSlug: creator.slug,
+                donorName: donation.isAnonymous ? "Anonymous" : (donation.donorName ?? "Someone"),
+                gallons: donation.gallons,
+                amountCents: donation.amountCents - donation.platformFeeCents,
+                message: donation.message,
+              });
+            }
+            // Confirmation to donor
+            if (donation.donorEmail && !donation.isAnonymous) {
+              await ctx.runAction(internal.emails.sendDonationConfirmation, {
+                donorEmail: donation.donorEmail,
+                donorName: donation.donorName ?? "Supporter",
+                gallons: donation.gallons,
+                amountCents: donation.amountCents,
+                creatorName: creator.displayName,
+                creatorSlug: creator.slug,
+              });
+            }
+          }
+        }
+      }
+    }
+
     return { received: true };
+  },
+});
+
+// ── Internal helpers for webhook email dispatch ────────────────────────────────
+
+export const getDonationBySession = internalQuery({
+  args: { stripeSessionId: v.string() },
+  handler: async (ctx, { stripeSessionId }) => {
+    return ctx.db
+      .query("donations")
+      .withIndex("by_stripeSession", q => q.eq("stripeSessionId", stripeSessionId))
+      .first();
+  },
+});
+
+export const getCreatorByDonationId = internalQuery({
+  args: { creatorId: v.id("creators") },
+  handler: async (ctx, { creatorId }) => {
+    return ctx.db.get(creatorId);
+  },
+});
+
+export const getUserById = internalQuery({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    return ctx.db.get(userId);
   },
 });

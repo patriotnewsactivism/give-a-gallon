@@ -1,24 +1,24 @@
-import { Heart, useAuthActions } from "@convex-dev/auth/react";
-import { Heart, useQuery } from "convex/react";
-import { Heart,
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useQuery } from "convex/react";
+import {
   ExternalLink,
   LayoutDashboard,
   LogOut,
   Settings,
   Users,
 } from "lucide-react";
-import { Heart, Link, useLocation } from "react-router-dom";
-import { Heart, api } from "../../convex/_generated/api";
-import { Heart, Logo } from "./Logo";
-import { Heart, Avatar, AvatarFallback } from "./ui/avatar";
-import { Heart,
+import { Link, useLocation } from "react-router-dom";
+import { api } from "../../convex/_generated/api";
+import { Logo } from "./Logo";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Heart,
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,

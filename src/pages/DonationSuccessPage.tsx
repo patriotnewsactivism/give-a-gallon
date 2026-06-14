@@ -26,6 +26,7 @@ function timeAgo(ts: number) {
 export function DonationSuccessPage() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
+  const isSubscription = searchParams.get("subscription") === "1";
 
   // Poll for the donation record tied to this session
   const donation = useQuery(
@@ -37,6 +38,38 @@ export function DonationSuccessPage() {
     api.creators.getById,
     donation?.creatorId ? { id: donation.creatorId } : "skip"
   );
+
+  // ── Subscription success screen ──────────────────────────────────────────────
+  if (isSubscription) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center">
+          <Reveal>
+            <div className="inline-flex items-center justify-center size-20 rounded-2xl bg-fuel/10 border border-fuel/20 mb-6">
+              <Sparkles className="size-10 text-fuel" />
+            </div>
+            <h1 className="text-3xl font-black mb-3" style={{ fontFamily: "var(--font-display)" }}>
+              Welcome to the Movement!
+            </h1>
+            <p className="text-muted-foreground mb-8 text-base">
+              Your membership is active. A confirmation email is on its way.
+              Every month your gallons flow to the people doing the work.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button className="bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold" asChild>
+                <Link to="/dashboard">
+                  <Fuel className="size-4 mr-2" /> Go to Dashboard
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/explore">Explore Campaigns</Link>
+              </Button>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    );
+  }
 
   const [copied, setCopied] = useState(false);
   const [confettiDone, setConfettiDone] = useState(false);
