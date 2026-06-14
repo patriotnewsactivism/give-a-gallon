@@ -21,28 +21,34 @@ const schema = defineSchema({
     isActive: v.boolean(),
     category: v.optional(v.string()),
     location: v.optional(v.string()),
-    socialLinks: v.optional(v.object({
-      youtube: v.optional(v.string()),
-      twitter: v.optional(v.string()),
-      website: v.optional(v.string()),
-      instagram: v.optional(v.string()),
-    })),
+    socialLinks: v.optional(
+      v.object({
+        youtube: v.optional(v.string()),
+        twitter: v.optional(v.string()),
+        website: v.optional(v.string()),
+        instagram: v.optional(v.string()),
+      }),
+    ),
     stripeSessionId: v.optional(v.string()),
     // Stripe Connect
     stripeAccountId: v.optional(v.string()),
-    stripeAccountStatus: v.optional(v.union(
-      v.literal("pending"),
-      v.literal("active"),
-      v.literal("restricted"),
-    )),
+    stripeAccountStatus: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("active"),
+        v.literal("restricted"),
+      ),
+    ),
     // Verification system
-    verificationStatus: v.optional(v.union(
-      v.literal("unverified"),
-      v.literal("community"),
-      v.literal("journalist"),
-      v.literal("organization"),
-      v.literal("platform"),
-    )),
+    verificationStatus: v.optional(
+      v.union(
+        v.literal("unverified"),
+        v.literal("community"),
+        v.literal("journalist"),
+        v.literal("organization"),
+        v.literal("platform"),
+      ),
+    ),
     verificationNote: v.optional(v.string()),
     // Campaign details
     campaignType: v.optional(v.string()),
@@ -76,8 +82,7 @@ const schema = defineSchema({
     impactTag: v.optional(v.string()),
     gallonsUsed: v.optional(v.number()),
     createdAt: v.number(),
-  })
-    .index("by_creator", ["creatorId", "createdAt"]),
+  }).index("by_creator", ["creatorId", "createdAt"]),
 
   // Milestones on a campaign
   milestones: defineTable({
@@ -88,8 +93,7 @@ const schema = defineSchema({
     completedAt: v.optional(v.number()),
     isCompleted: v.boolean(),
     order: v.number(),
-  })
-    .index("by_creator", ["creatorId", "order"]),
+  }).index("by_creator", ["creatorId", "order"]),
 
   donations: defineTable({
     creatorId: v.id("creators"),
@@ -124,9 +128,9 @@ const schema = defineSchema({
     userId: v.id("users"),
     donorEmail: v.string(),
     donorName: v.optional(v.string()),
-    tierId: v.string(),          // "fuel-supporter" | "community-builder" | "freedom-partner" | "impact-champion"
+    tierId: v.string(), // "fuel-supporter" | "community-builder" | "freedom-partner" | "impact-champion"
     tierName: v.string(),
-    amountCents: v.number(),     // monthly amount
+    amountCents: v.number(), // monthly amount
     gallonsPerMonth: v.number(),
     status: v.union(
       v.literal("active"),
@@ -137,7 +141,7 @@ const schema = defineSchema({
     stripeSubscriptionId: v.optional(v.string()),
     stripeCustomerId: v.optional(v.string()),
     stripePriceId: v.optional(v.string()),
-    currentPeriodEnd: v.optional(v.number()),  // unix ms
+    currentPeriodEnd: v.optional(v.number()), // unix ms
     canceledAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -159,14 +163,13 @@ const schema = defineSchema({
     activeSubscriptions: v.optional(v.number()),
     monthlyRecurringCents: v.optional(v.number()),
     updatedAt: v.number(),
-  })
-    .index("by_key", ["key"]),
+  }).index("by_key", ["key"]),
 
   // ── Email notification log ─────────────────────────────────────────────────
   emailLog: defineTable({
     to: v.string(),
     subject: v.string(),
-    type: v.string(),  // "donation_received" | "donation_confirmation" | "subscription_confirmed" | "subscription_canceled"
+    type: v.string(), // "donation_received" | "donation_confirmation" | "subscription_confirmed" | "subscription_canceled"
     relatedId: v.optional(v.string()),
     status: v.union(v.literal("sent"), v.literal("failed")),
     error: v.optional(v.string()),
@@ -174,6 +177,15 @@ const schema = defineSchema({
   })
     .index("by_type", ["type", "createdAt"])
     .index("by_to", ["to", "createdAt"]),
+
+  // ── Supporter wall — messages of support on a campaign ──────────────────────
+  wallPosts: defineTable({
+    creatorId: v.id("creators"),
+    userId: v.id("users"),
+    authorName: v.string(),
+    body: v.string(),
+    createdAt: v.number(),
+  }).index("by_creator", ["creatorId", "createdAt"]),
 });
 
 export default schema;

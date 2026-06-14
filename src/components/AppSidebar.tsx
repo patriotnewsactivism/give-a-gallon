@@ -8,8 +8,9 @@ import {
   LogOut,
   Settings,
   Sparkles,
+  Trophy,
   Users,
-, Trophy } from "lucide-react";
+} from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { Logo } from "./Logo";
