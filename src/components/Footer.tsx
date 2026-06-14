@@ -9,7 +9,9 @@ export function Footer() {
           <div className="col-span-2 sm:col-span-1">
             <Logo />
             <p className="mt-3 text-xs text-muted-foreground leading-relaxed max-w-xs">
-              A trust-based fundraising ecosystem for activists, journalists, veterans, and creators.
+              A crowdsourcing &amp; crowdfunding platform by{" "}
+              <span className="text-foreground font-medium">We The People News</span>
+              {" "}— designed for those always on the go.
             </p>
           </div>
           <div>
@@ -42,7 +44,7 @@ export function Footer() {
         </div>
         <div className="border-t border-border/30 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Give-A-Gallon · <a href="https://fuel.wtpnews.org" className="hover:text-foreground transition-colors">fuel.wtpnews.org</a>
+            © {new Date().getFullYear()} Give-A-Gallon · A <span className="text-foreground/70">We The People News</span> platform · <a href="https://fuel.wtpnews.org" className="hover:text-foreground transition-colors">fuel.wtpnews.org</a>
           </p>
           <p className="text-xs text-muted-foreground">
             "One gallon can change someone's day. Many gallons can change a life."
