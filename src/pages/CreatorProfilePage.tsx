@@ -12,7 +12,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { CATEGORIES, VERIFICATION_TIERS, URGENCY_LEVELS } from "../../convex/constants";
@@ -320,6 +320,8 @@ export function CreatorProfilePage() {
 // ── Donation form ──────────────────────────────────────────────────────────
 
 function DonationForm({ creatorId, creatorName }: { creatorId: string; creatorName: string }) {
+  const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get("ref") ?? undefined;
   const createCheckout = useAction(api.stripe.createCheckoutSession);
   const [gallons, setGallons] = useState(3);
   const [customGallons, setCustomGallons] = useState("");
@@ -344,6 +346,7 @@ function DonationForm({ creatorId, creatorName }: { creatorId: string; creatorNa
         donorName: isAnonymous ? undefined : donorName.trim(),
         message: message.trim() || undefined,
         isAnonymous,
+        referralCode,
       });
       window.location.href = url;
     } catch (e: any) {

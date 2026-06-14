@@ -16,6 +16,7 @@ export const createCheckoutSession = action({
     donorEmail: v.optional(v.string()),
     message: v.optional(v.string()),
     isAnonymous: v.boolean(),
+    referralCode: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -43,6 +44,7 @@ export const createCheckoutSession = action({
         donorEmail: args.donorEmail,
         message: args.message,
         isAnonymous: args.isAnonymous,
+        referralCode: args.referralCode,
       },
     );
 
@@ -69,6 +71,9 @@ export const createCheckoutSession = action({
     params.append("metadata[donationId]", donationId);
     params.append("metadata[creatorId]", args.creatorId);
     params.append("metadata[gallons]", String(args.gallons));
+    if (args.referralCode) {
+      params.append("metadata[referralCode]", args.referralCode);
+    }
     if (args.donorEmail) {
       params.append("customer_email", args.donorEmail);
     }
@@ -125,6 +130,7 @@ export const createPendingDonation = internalMutation({
     donorEmail: v.optional(v.string()),
     message: v.optional(v.string()),
     isAnonymous: v.boolean(),
+    referralCode: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const platformFeeCents = Math.round(args.amountCents * PLATFORM_FEE_PCT);
@@ -138,6 +144,7 @@ export const createPendingDonation = internalMutation({
       message: args.message,
       isAnonymous: args.isAnonymous,
       status: "pending",
+      referralCode: args.referralCode,
       createdAt: Date.now(),
     });
   },
@@ -183,6 +190,15 @@ export const completeDonation = internalMutation({
         totalGallons: creator.totalGallons + donation.gallons,
         totalDonations: creator.totalDonations + 1,
         totalAmountCents: creator.totalAmountCents + donation.amountCents,
+      });
+    }
+
+    // Credit the referrer if this donation came via a referral link
+    if (donation.referralCode) {
+      await ctx.runMutation(internal.referrals.creditReferral, {
+        referralCode: donation.referralCode,
+        gallons: donation.gallons,
+        donationId: donation._id,
       });
     }
   },
