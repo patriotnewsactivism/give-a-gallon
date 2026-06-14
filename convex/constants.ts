@@ -28,3 +28,5 @@ export const URGENCY_LEVELS = {
   high:      { label: "Urgent",    color: "text-amber-400" },
   emergency: { label: "Emergency", color: "text-red-400" },
 } as const;
+
+export const APP_NAME = "Give-A-Gallon";

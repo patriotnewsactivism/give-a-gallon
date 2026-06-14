@@ -109,7 +109,7 @@ export const createCheckoutSession = action({
 
 // ── Internal queries / mutations ───────────────────────────────────────────
 
-export const getCreatorById = internalMutation({
+export const getCreatorById = internalQuery({
   args: { creatorId: v.id("creators") },
   handler: async (ctx, { creatorId }) => {
     return ctx.db.get(creatorId);
