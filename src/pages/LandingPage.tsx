@@ -689,8 +689,17 @@ function FounderStorySection() {
                   WTP
                 </div>
                 <div>
-                  <div className="text-sm font-semibold">We The People News</div>
-                  <div className="text-xs text-muted-foreground">Founder · fuel.wtpnews.org</div>
+                  <div className="text-sm font-semibold">
+                    <a href="https://wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
+                      We The People News
+                    </a>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Founder ·{" "}
+                    <a href="https://fuel.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
+                      fuel.wtpnews.org
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
