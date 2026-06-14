@@ -7,7 +7,6 @@ import {
   Heart,
   MapPin,
   MessageSquare,
-  Share2,
   Shield,
   TrendingUp,
   Zap,
@@ -20,6 +19,7 @@ import { CATEGORIES, VERIFICATION_TIERS, URGENCY_LEVELS } from "../../convex/con
 import { FuelGauge } from "@/components/FuelGauge";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
+import { ShareSheet } from "@/components/ShareSheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GALLON_PRICE, GALLON_PRESETS } from "@/lib/constants";
@@ -265,9 +265,11 @@ export function CreatorProfilePage() {
 
             {/* Share */}
             <Reveal>
-              <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied!"); }}>
-                <Share2 className="size-3.5 mr-1.5" /> Share This Campaign
-              </Button>
+              <ShareSheet
+                url={window.location.href}
+                title={`Fuel ${creator.displayName} on Give-A-Gallon`}
+                description={`${creator.displayName} needs your support. Give a gallon and fuel the fight. ${window.location.href}`}
+              />
             </Reveal>
 
             {/* Donor wall */}

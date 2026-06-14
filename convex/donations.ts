@@ -123,3 +123,14 @@ export const platformStats = query({
     };
   },
 });
+
+// Get a single donation by its Stripe session ID (for success page)
+export const getByStripeSession = query({
+  args: { sessionId: v.string() },
+  handler: async (ctx, { sessionId }) => {
+    return ctx.db
+      .query("donations")
+      .withIndex("by_stripeSession", q => q.eq("stripeSessionId", sessionId))
+      .first();
+  },
+});

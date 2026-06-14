@@ -6,3 +6,4 @@ export { SettingsPage } from "./SettingsPage";
 export { ExplorePage } from "./ExplorePage";
 export { CreatorProfilePage } from "./CreatorProfilePage";
 export { ImpactPage } from "./ImpactPage";
+export { MembershipPage } from "./MembershipPage";

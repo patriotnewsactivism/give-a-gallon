@@ -18,6 +18,7 @@ export function Footer() {
               <li><Link to="/explore" className="hover:text-foreground transition-colors">Browse Campaigns</Link></li>
               <li><Link to="/impact" className="hover:text-foreground transition-colors">Impact Dashboard</Link></li>
               <li><Link to="/signup" className="hover:text-foreground transition-colors">Start a Campaign</Link></li>
+              <li><Link to="/membership" className="hover:text-foreground transition-colors">Membership</Link></li>
             </ul>
           </div>
           <div>

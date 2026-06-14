@@ -163,3 +163,12 @@ export const setImages = mutation({
     await ctx.db.patch(mine._id, patch);
   },
 });
+
+// Get creator by ID (public — used on donation success page)
+export const getById = query({
+  args: { id: v.id("creators") },
+  handler: async (ctx, { id }) => {
+    const creator = await ctx.db.get(id);
+    return creator ? await withImageUrls(ctx, creator) : null;
+  },
+});

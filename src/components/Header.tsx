@@ -1,5 +1,5 @@
 import { useConvexAuth } from "convex/react";
-import { ArrowRight, BarChart3, Menu, X } from "lucide-react";
+import { ArrowRight, BarChart3, Menu, Star, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Logo } from "./Logo";
@@ -30,6 +30,12 @@ export function Header() {
               <Link to="/impact">
                 <BarChart3 className="size-3.5 mr-1" />
                 Impact
+              </Link>
+            </Button>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" asChild>
+              <Link to="/membership">
+                <Star className="size-3.5 mr-1" />
+                Membership
               </Link>
             </Button>
 
@@ -72,6 +78,9 @@ export function Header() {
             </Link>
             <Link to="/impact" className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 flex items-center gap-2" onClick={() => setMobileOpen(false)}>
               <BarChart3 className="size-3.5" /> Impact Dashboard
+            </Link>
+            <Link to="/membership" className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+              <Star className="size-3.5" /> Membership
             </Link>
             {isAuthenticated ? (
               <Link to="/dashboard" className="px-3 py-2 text-sm font-medium text-fuel" onClick={() => setMobileOpen(false)}>

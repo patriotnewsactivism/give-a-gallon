@@ -11,8 +11,10 @@ import {
   DashboardPage,
   ExplorePage,
   ImpactPage,
+  MembershipPage,
   LandingPage,
   LoginPage,
+  MembershipPage,
   SettingsPage,
   SignupPage,
 } from "./pages";
@@ -29,6 +31,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/impact" element={<ImpactPage />} />
+            <Route path="/membership" element={<MembershipPage />} />
             <Route element={<PublicOnlyRoute />}>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
