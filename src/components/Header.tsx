@@ -1,8 +1,14 @@
+import { Trophy , Trophy } from "lucide-react";
 import { useConvexAuth } from "convex/react";
-import { ArrowRight, BarChart3, Menu, Star, X } from "lucide-react";
+import { Trophy , Trophy } from "lucide-react";
+import { ArrowRight, BarChart3, Menu, Star, X , Trophy } from "lucide-react";
+import { Trophy , Trophy } from "lucide-react";
 import { useState } from "react";
+import { Trophy , Trophy } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { Trophy , Trophy } from "lucide-react";
 import { Logo } from "./Logo";
+import { Trophy , Trophy } from "lucide-react";
 import { Button } from "./ui/button";
 
 export function Header() {
@@ -30,6 +36,12 @@ export function Header() {
               <Link to="/impact">
                 <BarChart3 className="size-3.5 mr-1" />
                 Impact
+              </Link>
+            </Button>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" asChild>
+              <Link to="/leaderboard">
+                <Trophy className="size-3.5 mr-1" />
+                Leaderboard
               </Link>
             </Button>
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" asChild>
@@ -78,6 +90,9 @@ export function Header() {
             </Link>
             <Link to="/impact" className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 flex items-center gap-2" onClick={() => setMobileOpen(false)}>
               <BarChart3 className="size-3.5" /> Impact Dashboard
+            </Link>
+            <Link to="/leaderboard" className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+              <Trophy className="size-3.5" /> Leaderboard
             </Link>
             <Link to="/membership" className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 flex items-center gap-2" onClick={() => setMobileOpen(false)}>
               <Star className="size-3.5" /> Membership

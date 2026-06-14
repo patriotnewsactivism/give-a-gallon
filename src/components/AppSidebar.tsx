@@ -9,7 +9,7 @@ import {
   Settings,
   Sparkles,
   Users,
-} from "lucide-react";
+, Trophy } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { Logo } from "./Logo";
@@ -45,6 +45,7 @@ const navItems = [
 
 const discoverItems = [
   { href: "/explore", label: "Browse Campaigns", icon: Users },
+  { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/membership", label: "Membership", icon: Fuel },
 ];
 

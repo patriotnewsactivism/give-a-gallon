@@ -187,3 +187,24 @@ export const listFeatured = query({
     return await Promise.all(featured.map((c) => withImageUrls(ctx, c)));
   },
 });
+
+// Platform-wide aggregate stats for the public leaderboard page
+export const getPlatformStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const creators = await ctx.db
+      .query("creators")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .collect();
+
+    const donations = await ctx.db.query("donations").collect();
+    const completed = donations.filter((d) => d.status === "completed");
+
+    return {
+      totalCreators: creators.length,
+      totalGallons: creators.reduce((s, c) => s + (c.totalGallons ?? 0), 0),
+      totalDonations: completed.length,
+      totalAmountCents: completed.reduce((s, d) => s + (d.amountCents ?? 0), 0),
+    };
+  },
+});

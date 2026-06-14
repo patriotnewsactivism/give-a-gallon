@@ -39,6 +39,7 @@ function App() {
             </Route>
             <Route path="/donation-success" element={<DonationSuccessPage />} />
             <Route path="/donation-cancel" element={<DonationCancelPage />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
             {/* Public creator profile — must be last in public routes */}
             <Route path="/:slug" element={<CreatorProfilePage />} />
           </Route>
