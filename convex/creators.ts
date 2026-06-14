@@ -71,6 +71,7 @@ export const upsert = mutation({
         instagram: v.optional(v.string()),
       }),
     ),
+    urgency: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -104,6 +105,7 @@ export const upsert = mutation({
         category: args.category,
         location: args.location,
         socialLinks: args.socialLinks,
+        urgency: args.urgency,
       });
       return myProfile._id;
     }
@@ -118,6 +120,7 @@ export const upsert = mutation({
       category: args.category,
       location: args.location,
       socialLinks: args.socialLinks,
+      urgency: args.urgency,
       totalGallons: 0,
       totalDonations: 0,
       totalAmountCents: 0,

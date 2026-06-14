@@ -9,18 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GALLON_PRICE } from "@/lib/constants";
+import { CATEGORIES as CATEGORY_LIST } from "../../convex/constants";
 
-const CATEGORIES = [
-  "First Amendment",
-  "Civil Rights",
-  "Government Accountability",
-  "Police Accountability",
-  "Legal Defense",
-  "Journalism",
-  "Community Organizing",
-  "Environmental",
-  "Other",
-];
+
 
 export function SettingsPage() {
   const creator = useQuery(api.creators.getMine);
@@ -37,6 +28,7 @@ export function SettingsPage() {
   const [twitter, setTwitter] = useState("");
   const [website, setWebsite] = useState("");
   const [instagram, setInstagram] = useState("");
+  const [urgency, setUrgency] = useState("");
   const [saving, setSaving] = useState(false);
 
   // Populate from existing profile
@@ -52,6 +44,7 @@ export function SettingsPage() {
       setTwitter(creator.socialLinks?.twitter ?? "");
       setWebsite(creator.socialLinks?.website ?? "");
       setInstagram(creator.socialLinks?.instagram ?? "");
+      setUrgency(creator.urgency ?? "");
     }
   }, [creator]);
 
@@ -95,6 +88,7 @@ export function SettingsPage() {
           website: website.trim() || undefined,
           instagram: instagram.trim() || undefined,
         },
+        urgency: urgency || undefined,
       });
       toast.success("Profile saved!");
       navigate("/dashboard");

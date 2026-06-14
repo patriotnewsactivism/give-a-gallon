@@ -1,4 +1,4 @@
-import { useAction, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import {
   AlertCircle,
   ArrowDownToLine,
@@ -10,6 +10,7 @@ import {
   Heart,
   Loader2,
   MessageSquare,
+  Plus,
   TrendingUp,
   Users,
   Wallet,
@@ -20,6 +21,8 @@ import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { FuelGauge } from "@/components/FuelGauge";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { GALLON_PRICE } from "@/lib/constants";
 
 export function DashboardPage() {
@@ -155,6 +158,9 @@ export function DashboardPage() {
         </Link>
       )}
 
+      {/* Post update */}
+      <PostUpdatePanel />
+
       {/* Payout panel */}
       <PayoutPanel creator={creator} />
 
@@ -255,6 +261,82 @@ function SetupPrompt() {
     </div>
   );
 }
+
+function PostUpdatePanel() {
+  const postUpdate = useMutation(api.updates.create);
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [impactTag, setImpactTag] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  async function handlePost() {
+    if (!title.trim() || !body.trim()) return;
+    setSaving(true);
+    try {
+      await postUpdate({ title: title.trim(), body: body.trim(), impactTag: impactTag.trim() || undefined });
+      toast.success("Update posted!");
+      setTitle(""); setBody(""); setImpactTag(""); setOpen(false);
+    } catch (e: any) {
+      toast.error(e.message ?? "Failed to post update");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="w-full flex items-center gap-2 p-4 rounded-xl border border-dashed border-border/50 text-muted-foreground hover:border-fuel/40 hover:text-foreground hover:bg-fuel/[0.02] transition-all text-sm"
+      >
+        <Plus className="size-4 text-fuel" />
+        Post a campaign update…
+      </button>
+    );
+  }
+
+  return (
+    <div className="p-5 rounded-xl border border-fuel/20 bg-card/50 space-y-3">
+      <h3 className="font-semibold text-sm flex items-center gap-2">
+        <Plus className="size-4 text-fuel" /> New Update
+      </h3>
+      <Input
+        placeholder="Update title (e.g. 'Records filed!')"
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+        className="bg-background border-border/50 text-sm"
+      />
+      <Textarea
+        placeholder="Tell supporters what happened. Be specific — what did the fuel make possible?"
+        value={body}
+        onChange={e => setBody(e.target.value)}
+        rows={3}
+        className="bg-background border-border/50 text-sm resize-none"
+      />
+      <Input
+        placeholder="Impact tag (optional — e.g. 'Records request filed', 'Case won')"
+        value={impactTag}
+        onChange={e => setImpactTag(e.target.value)}
+        className="bg-background border-border/50 text-sm"
+      />
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          className="bg-fuel text-fuel-foreground hover:bg-fuel/90"
+          onClick={handlePost}
+          disabled={saving || !title.trim() || !body.trim()}
+        >
+          {saving ? <Loader2 className="size-3.5 mr-1.5 animate-spin" /> : <Plus className="size-3.5 mr-1.5" />}
+          Post Update
+        </Button>
+        <Button size="sm" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+      </div>
+    </div>
+  );
+}
+
 
 function PayoutPanel({ creator }: { creator: any }) {
   const startOnboarding = useAction(api.connect.startOnboarding);
