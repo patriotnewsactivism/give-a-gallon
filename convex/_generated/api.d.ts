@@ -27,6 +27,7 @@ import type * as testAuth from "../testAuth.js";
 import type * as updates from "../updates.js";
 import type * as users from "../users.js";
 import type * as viktorTools from "../viktorTools.js";
+import type * as wall from "../wall.js";
 
 import type {
   ApiFromModules,
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   updates: typeof updates;
   users: typeof users;
   viktorTools: typeof viktorTools;
+  wall: typeof wall;
 }>;
 
 /**

@@ -18,6 +18,7 @@ import { api } from "../../convex/_generated/api";
 import { CATEGORIES, VERIFICATION_TIERS, URGENCY_LEVELS } from "../../convex/constants";
 import { FuelGauge } from "@/components/FuelGauge";
 import { Reveal } from "@/components/Reveal";
+import { WallSection } from "@/components/WallSection";
 import { Button } from "@/components/ui/button";
 import { ShareSheet } from "@/components/ShareSheet";
 import { Input } from "@/components/ui/input";
@@ -303,6 +304,14 @@ export function CreatorProfilePage() {
                   ))}
                 </div>
               )}
+            </Reveal>
+
+            {/* Wall of support — signed-in supporters leave messages */}
+            <Reveal>
+              <WallSection
+                creatorId={creator._id}
+                creatorOwnerId={creator.userId}
+              />
             </Reveal>
           </div>
 
