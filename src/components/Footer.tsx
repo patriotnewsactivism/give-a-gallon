@@ -10,8 +10,9 @@ export function Footer() {
             <Logo />
             <p className="mt-3 text-xs text-muted-foreground leading-relaxed max-w-xs">
               A crowdsourcing &amp; crowdfunding platform by{" "}
-              <a href="https://wtpnews.org" target="_blank" rel="noopener noreferrer" className="text-foreground font-medium hover:text-fuel transition-colors">We The People News</a>
-              {" "}— designed for those always on the go.
+              <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="text-foreground font-medium hover:text-fuel transition-colors">We The People News</a>
+              {" "}— designed for those always on the go. A sister platform to{" "}
+              <a href="https://www.civilrightshub.org" target="_blank" rel="noopener noreferrer" className="text-foreground font-medium hover:text-fuel transition-colors">Civil Rights Hub</a>.
             </p>
           </div>
           <div>
@@ -44,7 +45,11 @@ export function Footer() {
         </div>
         <div className="border-t border-border/30 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Give-A-Gallon · A <a href="https://wtpnews.org" target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-fuel transition-colors">We The People News</a> platform · <a href="https://fuel.wtpnews.org" className="hover:text-foreground transition-colors">fuel.wtpnews.org</a>
+            © {new Date().getFullYear()} Give-A-Gallon · A{" "}
+            <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-fuel transition-colors">We The People News</a>
+            {" "}platform ·{" "}
+            <a href="https://www.civilrightshub.org" target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-fuel transition-colors">Civil Rights Hub</a>
+            {" "}· <a href="https://fuel.wtpnews.org" className="hover:text-foreground transition-colors">fuel.wtpnews.org</a>
           </p>
           <p className="text-xs text-muted-foreground">
             "One gallon can change someone's day. Many gallons can change a life."

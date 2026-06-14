@@ -690,15 +690,26 @@ function FounderStorySection() {
                 </div>
                 <div>
                   <div className="text-sm font-semibold">
-                    <a href="https://wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
+                    <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
                       We The People News
                     </a>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    Founder ·{" "}
-                    <a href="https://fuel.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
-                      fuel.wtpnews.org
-                    </a>
+                  <div className="text-xs text-muted-foreground space-y-0.5">
+                    <div>
+                      Founder ·{" "}
+                      <a href="https://fuel.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
+                        fuel.wtpnews.org
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
+                        wtpnews.org
+                      </a>
+                      <span className="text-muted-foreground/40">·</span>
+                      <a href="https://www.civilrightshub.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
+                        civilrightshub.org
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
