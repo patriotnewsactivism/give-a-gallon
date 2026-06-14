@@ -662,6 +662,45 @@ function CtaSection() {
   );
 }
 
+function FounderStorySection() {
+  return (
+    <section className="border-t border-border/30 py-16 sm:py-20">
+      <div className="container max-w-3xl">
+        <Reveal>
+          <div className="rounded-2xl border border-fuel/15 bg-fuel/[0.03] p-7 sm:p-10 relative overflow-hidden">
+            {/* Subtle background glow */}
+            <div className="pointer-events-none absolute -top-10 -right-10 size-48 rounded-full bg-fuel/[0.06] blur-3xl" />
+
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-fuel/10 text-fuel text-xs font-semibold mb-5">
+                <Fuel className="size-3" /> WHY WE BUILT THIS
+              </div>
+
+              <blockquote className="text-xl sm:text-2xl font-medium leading-relaxed text-foreground mb-5">
+                "I built Give-A-Gallon because{" "}
+                <span className="text-fuel">I needed it.</span>{" "}
+                Being on the road constantly — covering stories, getting to hearings, showing up where it matters —
+                costs money that most people don't have.
+                If it solved the problem for me, I knew it would solve it for many."
+              </blockquote>
+
+              <div className="flex items-center gap-3">
+                <div className="size-9 rounded-full bg-fuel/15 flex items-center justify-center text-sm font-bold text-fuel border border-fuel/20">
+                  WTP
+                </div>
+                <div>
+                  <div className="text-sm font-semibold">We The People News</div>
+                  <div className="text-xs text-muted-foreground">Founder · fuel.wtpnews.org</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 function CategoryBrowseSection() {
   return (
     <section className="border-t border-border/30 py-16 sm:py-20">
@@ -710,6 +749,7 @@ export function LandingPage() {
     <div className="flex flex-col">
       <HeroSection />
       <CategoryBrowseSection />
+      <FounderStorySection />
       <WhoItsForSection />
       <HowItWorksSection />
       <WhyGiveAGallonSection />
