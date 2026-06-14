@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   Fuel,
   Heart,
+  Link2,
   Share2,
   Sparkles,
   Twitter,
@@ -21,6 +22,36 @@ function timeAgo(ts: number) {
   const m = Math.floor(s / 60);
   if (m < 60) return `${m}m ago`;
   return `${Math.floor(m / 60)}h ago`;
+}
+
+function ReferralShare({ slug, code }: { slug: string; code: string }) {
+  const [copied, setCopied] = useState(false);
+  const refUrl = `${window.location.origin}/${slug}?ref=${code}`;
+
+  function copy() {
+    navigator.clipboard.writeText(refUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  function shareNative() {
+    if (navigator.share) {
+      navigator.share({ title: "Give a Gallon", url: refUrl }).catch(() => {});
+    } else {
+      copy();
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <code className="flex-1 truncate rounded-lg bg-muted/30 border border-border/30 px-2.5 py-1.5 text-xs font-mono text-muted-foreground">
+        {refUrl}
+      </code>
+      <Button size="sm" variant="outline" onClick={shareNative} className="shrink-0">
+        {copied ? "Copied!" : <><Share2 className="size-3.5 mr-1" />Share</>}
+      </Button>
+    </div>
+  );
 }
 
 export function DonationSuccessPage() {
@@ -181,6 +212,24 @@ export function DonationSuccessPage() {
             </Button>
           </div>
         </Reveal>
+
+        {/* Referral nudge — share the creator's referral link */}
+        {creator?.referralCode && (
+          <Reveal className="rounded-2xl border border-border/40 bg-card/40 p-5 mb-4">
+            <div className="flex items-start gap-3">
+              <div className="shrink-0 size-9 rounded-full bg-fuel/10 border border-fuel/20 flex items-center justify-center">
+                <Link2 className="size-4 text-fuel" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold mb-0.5">Earn gallons for every friend you fuel</p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Share {creator.displayName}'s referral link — you both get credit when friends donate.
+                </p>
+                <ReferralShare slug={creator.slug} code={creator.referralCode} />
+              </div>
+            </div>
+          </Reveal>
+        )}
 
         {/* Secondary actions */}
         <Reveal className="flex flex-col gap-2">

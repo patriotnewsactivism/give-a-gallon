@@ -12,7 +12,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { CATEGORIES, VERIFICATION_TIERS, URGENCY_LEVELS } from "../../convex/constants";
@@ -23,6 +23,7 @@ import { ShareSheet } from "@/components/ShareSheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GALLON_PRICE, GALLON_PRESETS } from "@/lib/constants";
+import { useReferral, clearReferral } from "@/hooks/useReferral";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -320,8 +321,7 @@ export function CreatorProfilePage() {
 // ── Donation form ──────────────────────────────────────────────────────────
 
 function DonationForm({ creatorId, creatorName }: { creatorId: string; creatorName: string }) {
-  const [searchParams] = useSearchParams();
-  const referralCode = searchParams.get("ref") ?? undefined;
+  const { referralCode } = useReferral();
   const createCheckout = useAction(api.stripe.createCheckoutSession);
   const [gallons, setGallons] = useState(3);
   const [customGallons, setCustomGallons] = useState("");
@@ -348,6 +348,7 @@ function DonationForm({ creatorId, creatorName }: { creatorId: string; creatorNa
         isAnonymous,
         referralCode,
       });
+      clearReferral();
       window.location.href = url;
     } catch (e: any) {
       toast.error(e.message ?? "Something went wrong");
