@@ -5,7 +5,6 @@ import { v } from "convex/values";
 const schema = defineSchema({
   ...authTables,
 
-  // Creator profiles — activists who receive donations
   creators: defineTable({
     userId: v.id("users"),
     slug: v.string(),
@@ -20,24 +19,36 @@ const schema = defineSchema({
     totalDonations: v.number(),
     totalAmountCents: v.number(),
     isActive: v.boolean(),
+    // Expanded category system
     category: v.optional(v.string()),
     location: v.optional(v.string()),
-    socialLinks: v.optional(
-      v.object({
-        youtube: v.optional(v.string()),
-        twitter: v.optional(v.string()),
-        website: v.optional(v.string()),
-        instagram: v.optional(v.string()),
-      }),
-    ),
+    socialLinks: v.optional(v.object({
+      youtube: v.optional(v.string()),
+      twitter: v.optional(v.string()),
+      website: v.optional(v.string()),
+      instagram: v.optional(v.string()),
+    })),
     stripeSessionId: v.optional(v.string()),
-    // Stripe Connect Express fields
-    stripeAccountId: v.optional(v.string()),       // acct_xxx
+    // Stripe Connect
+    stripeAccountId: v.optional(v.string()),
     stripeAccountStatus: v.optional(v.union(
-      v.literal("pending"),     // onboarding link created, not yet completed
-      v.literal("active"),      // KYC complete, can receive payouts
-      v.literal("restricted"),  // Stripe requires more info
+      v.literal("pending"),
+      v.literal("active"),
+      v.literal("restricted"),
     )),
+    // Verification system
+    verificationStatus: v.optional(v.union(
+      v.literal("unverified"),
+      v.literal("community"),
+      v.literal("journalist"),
+      v.literal("organization"),
+      v.literal("platform"),
+    )),
+    verificationNote: v.optional(v.string()),
+    // Campaign details
+    campaignType: v.optional(v.string()), // "ongoing" | "goal-based" | "emergency"
+    urgency: v.optional(v.string()),      // "low" | "medium" | "high" | "emergency"
+    tags: v.optional(v.array(v.string())),
     createdAt: v.number(),
   })
     .index("by_stripeSession", ["stripeSessionId"])
@@ -47,7 +58,31 @@ const schema = defineSchema({
     .index("by_category", ["category", "isActive"])
     .index("by_stripeAccount", ["stripeAccountId"]),
 
-  // Individual donations
+  // Campaign updates posted by creators
+  updates: defineTable({
+    creatorId: v.id("creators"),
+    title: v.string(),
+    body: v.string(),
+    imageId: v.optional(v.id("_storage")),
+    imageUrl: v.optional(v.string()),
+    impactTag: v.optional(v.string()), // e.g. "records filed", "miles driven", "case won"
+    gallonsUsed: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_creator", ["creatorId", "createdAt"]),
+
+  // Milestones on a campaign
+  milestones: defineTable({
+    creatorId: v.id("creators"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    targetCents: v.number(),
+    completedAt: v.optional(v.number()),
+    isCompleted: v.boolean(),
+    order: v.number(),
+  })
+    .index("by_creator", ["creatorId", "order"]),
+
   donations: defineTable({
     creatorId: v.id("creators"),
     donorName: v.optional(v.string()),
@@ -63,7 +98,6 @@ const schema = defineSchema({
       v.literal("failed"),
     ),
     stripeSessionId: v.optional(v.string()),
-    // Connect transfer tracking
     stripePaymentIntentId: v.optional(v.string()),
     stripeTransferId: v.optional(v.string()),
     createdAt: v.number(),
@@ -71,6 +105,19 @@ const schema = defineSchema({
     .index("by_stripeSession", ["stripeSessionId"])
     .index("by_creator", ["creatorId", "createdAt"])
     .index("by_status", ["status", "createdAt"]),
+
+  // Platform-wide stats (materialized, updated by triggers)
+  platformStats: defineTable({
+    key: v.string(), // "global"
+    totalDonationsCents: v.number(),
+    totalGallons: v.number(),
+    totalDonors: v.number(),
+    totalCreators: v.number(),
+    totalCampaigns: v.number(),
+    successfulCampaigns: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_key", ["key"]),
 });
 
 export default schema;

@@ -10,6 +10,7 @@ import {
   CreatorProfilePage,
   DashboardPage,
   ExplorePage,
+  ImpactPage,
   LandingPage,
   LoginPage,
   SettingsPage,
@@ -27,6 +28,7 @@ function App() {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<LandingPage />} />
             <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/impact" element={<ImpactPage />} />
             <Route element={<PublicOnlyRoute />}>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />

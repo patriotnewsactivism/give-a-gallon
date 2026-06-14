@@ -1,5 +1,5 @@
 import { useConvexAuth } from "convex/react";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight, BarChart3, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Logo } from "./Logo";
@@ -17,31 +17,24 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border/30 bg-background/80 backdrop-blur-md">
       <div className="container">
         <div className="flex h-14 items-center justify-between">
-          {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-          >
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Logo wordmarkClassName="hidden sm:inline" />
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden sm:flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-foreground"
-              asChild
-            >
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" asChild>
               <Link to="/explore">Browse</Link>
+            </Button>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" asChild>
+              <Link to="/impact">
+                <BarChart3 className="size-3.5 mr-1" />
+                Impact
+              </Link>
             </Button>
 
             {isLoading ? null : isAuthenticated ? (
-              <Button
-                size="sm"
-                className="bg-fuel text-fuel-foreground hover:bg-fuel/90"
-                asChild
-              >
+              <Button size="sm" className="bg-fuel text-fuel-foreground hover:bg-fuel/90" asChild>
                 <Link to="/dashboard">
                   Dashboard
                   <ArrowRight className="size-3.5 ml-1" />
@@ -50,27 +43,18 @@ export function Header() {
             ) : (
               !isAuthPage && (
                 <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-foreground"
-                    asChild
-                  >
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" asChild>
                     <Link to="/login">Sign In</Link>
                   </Button>
-                  <Button
-                    size="sm"
-                    className="bg-fuel text-fuel-foreground hover:bg-fuel/90"
-                    asChild
-                  >
-                    <Link to="/signup">Start Receiving</Link>
+                  <Button size="sm" className="bg-fuel text-fuel-foreground hover:bg-fuel/90" asChild>
+                    <Link to="/signup">Start a Campaign</Link>
                   </Button>
                 </>
               )
             )}
           </nav>
 
-          {/* Mobile menu toggle */}
+          {/* Mobile toggle */}
           <button
             type="button"
             className="sm:hidden p-2 text-muted-foreground hover:text-foreground"
@@ -82,37 +66,24 @@ export function Header() {
 
         {/* Mobile nav */}
         {mobileOpen && (
-          <div className="sm:hidden pb-4 pt-2 border-t border-border/30 flex flex-col gap-2">
-            <Link
-              to="/explore"
-              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50"
-              onClick={() => setMobileOpen(false)}
-            >
-              Browse Activists
+          <div className="sm:hidden pb-4 pt-2 border-t border-border/30 flex flex-col gap-1">
+            <Link to="/explore" className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50" onClick={() => setMobileOpen(false)}>
+              Browse Campaigns
+            </Link>
+            <Link to="/impact" className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50 flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+              <BarChart3 className="size-3.5" /> Impact Dashboard
             </Link>
             {isAuthenticated ? (
-              <Link
-                to="/dashboard"
-                className="px-3 py-2 text-sm font-medium text-fuel"
-                onClick={() => setMobileOpen(false)}
-              >
+              <Link to="/dashboard" className="px-3 py-2 text-sm font-medium text-fuel" onClick={() => setMobileOpen(false)}>
                 Dashboard →
               </Link>
             ) : (
               <>
-                <Link
-                  to="/login"
-                  className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50"
-                  onClick={() => setMobileOpen(false)}
-                >
+                <Link to="/login" className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50" onClick={() => setMobileOpen(false)}>
                   Sign In
                 </Link>
-                <Link
-                  to="/signup"
-                  className="px-3 py-2 text-sm font-medium text-fuel"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Start Receiving →
+                <Link to="/signup" className="px-3 py-2 text-sm font-medium text-fuel" onClick={() => setMobileOpen(false)}>
+                  Start a Campaign →
                 </Link>
               </>
             )}

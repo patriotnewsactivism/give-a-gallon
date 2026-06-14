@@ -22,6 +22,7 @@ import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 import { GALLON_PRICE } from "@/lib/constants";
 import { api } from "../../convex/_generated/api";
+import { CATEGORIES } from "../../convex/constants";
 
 function HeroSection() {
   const stats = useQuery(api.donations.platformStats);
@@ -661,10 +662,54 @@ function CtaSection() {
   );
 }
 
+function CategoryBrowseSection() {
+  return (
+    <section className="border-t border-border/30 py-16 sm:py-20">
+      <div className="container">
+        <Reveal className="mb-10 text-center">
+          <h2
+            className="text-3xl font-bold tracking-tight sm:text-4xl"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            EVERY <span className="text-fuel">CAUSE</span>
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-muted-foreground">
+            From veteran transport to investigative journalism — if you need to
+            get somewhere to make a difference, there's a category for it.
+          </p>
+        </Reveal>
+        <div className="mx-auto grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {CATEGORIES.map((cat, i) => (
+            <Reveal key={cat.id} delayMs={i * 50}>
+              <Link
+                to={`/explore?category=${cat.id}`}
+                className="group flex flex-col items-center gap-2 rounded-xl border border-border/50 bg-card/40 p-4 text-center transition-all hover:-translate-y-0.5 hover:border-fuel/40 hover:bg-fuel/[0.04] hover:shadow-md"
+              >
+                <span className="text-2xl">{cat.icon}</span>
+                <span className="text-xs font-semibold leading-tight">{cat.label}</span>
+                <span className="text-xs text-muted-foreground leading-snug hidden sm:block">{cat.description}</span>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal className="mt-8 text-center">
+          <Link
+            to="/explore"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-fuel hover:text-fuel/80 transition-colors"
+          >
+            Browse all campaigns <ChevronRight className="size-4" />
+          </Link>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 export function LandingPage() {
   return (
     <div className="flex flex-col">
       <HeroSection />
+      <CategoryBrowseSection />
       <WhoItsForSection />
       <HowItWorksSection />
       <WhyGiveAGallonSection />
