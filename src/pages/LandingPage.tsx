@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CountUp } from "@/components/CountUp";
+import { DonationTicker } from "@/components/DonationTicker";
 import { FuelGauge } from "@/components/FuelGauge";
 import { FuelGaugeMark } from "@/components/FuelGaugeMark";
 import { Reveal } from "@/components/Reveal";
