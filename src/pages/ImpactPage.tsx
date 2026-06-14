@@ -55,11 +55,24 @@ export function ImpactPage() {
   const stats = useQuery(api.platform.getStats);
   const creators = useQuery(api.creators.listActive, { limit: 100 });
 
+  const isLoading = stats === undefined || creators === undefined;
+
   const totalRaised = stats ? (stats.totalDonationsCents / 100) : 0;
   const gallons = stats?.totalGallons ?? 0;
   const campaigns = stats?.totalCampaigns ?? 0;
   const successful = stats?.successfulCampaigns ?? 0;
   const successRate = campaigns > 0 ? Math.round((successful / campaigns) * 100) : 0;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="size-8 rounded-full border-2 border-fuel border-t-transparent animate-spin" />
+          <p className="text-sm text-muted-foreground">Loading platform stats…</p>
+        </div>
+      </div>
+    );
+  }
   const platformFeeCollected = totalRaised * 0.05;
 
   // Category breakdown

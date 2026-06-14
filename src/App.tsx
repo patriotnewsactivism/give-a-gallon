@@ -14,7 +14,7 @@ import {
   MembershipPage,
   LandingPage,
   LoginPage,
-  MembershipPage,
+  MyImpactPage,
   SettingsPage,
   SignupPage,
 } from "./pages";
