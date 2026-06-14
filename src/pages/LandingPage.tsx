@@ -2,11 +2,13 @@ import { useQuery } from "convex/react";
 import {
   ArrowRight,
   ChevronRight,
+  Clapperboard,
   Fuel,
   Gavel,
   Heart,
   MapPin,
   Megaphone,
+  Newspaper,
   Scale,
   Shield,
   Sparkles,
@@ -43,7 +45,7 @@ function HeroSection() {
           {/* Eyebrow */}
           <div className="mb-7 inline-flex animate-in fade-in slide-in-from-bottom-2 items-center gap-2 rounded-full border border-fuel/20 bg-fuel/5 px-3 py-1.5 text-sm font-medium text-fuel duration-700">
             <Sparkles className="size-3.5" />
-            <span>Fundraising, by the gallon</span>
+            <span>For activists, journalists &amp; creators</span>
           </div>
 
           {/* Headline */}
@@ -60,12 +62,12 @@ function HeroSection() {
 
           {/* Subheadline */}
           <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            The fundraising platform built for activists. Supporters fuel your
-            fight{" "}
+            Fundraising for the people who show up — activists, journalists, and
+            creators. Supporters cover your gas{" "}
             <span className="font-semibold text-foreground">
-              one gallon of gas at a time
-            </span>{" "}
-            — because a gallon goes a long way when you're on the move.
+              one gallon at a time
+            </span>
+            , so the story gets told and the trip gets made.
           </p>
 
           {/* CTAs */}
@@ -162,11 +164,13 @@ function HeroStat({ value, label }: { value: number; label: string }) {
 const MARQUEE_ITEMS = [
   "the drive to the courthouse",
   "miles to the protest",
-  "gas for the city-council run",
-  "the trip to file the records request",
-  "fuel for the audit",
+  "getting to the story first",
+  "the trip to the records office",
+  "fuel for the shoot",
   "the road to the statehouse",
-  "getting to the community meeting",
+  "miles to the scene",
+  "the drive to the source",
+  "getting to the interview",
 ];
 
 function GallonMarquee() {
@@ -271,9 +275,9 @@ function WhyGiveAGallonSection() {
               </h2>
               <div className="space-y-4 leading-relaxed text-muted-foreground">
                 <p>
-                  Every activist knows the cost. It's not just the fight — it's
-                  the drive to get there. The gas to reach the courthouse, the
-                  city council, the protest, the audit.
+                  Every activist, reporter, and creator knows the cost. It's not
+                  just the work — it's the drive to get there. The gas to reach
+                  the courthouse, the scene, the protest, the shoot.
                 </p>
                 <p>
                   A gallon of gas is real. It's tangible. It's not some abstract
@@ -564,10 +568,79 @@ function CtaSection() {
   );
 }
 
+const AUDIENCES = [
+  {
+    icon: Megaphone,
+    title: "Activism",
+    line: "Get to the protest, the city council, the courthouse, the audit.",
+    punch: "A gallon makes sure you're in the room where it happens.",
+  },
+  {
+    icon: Newspaper,
+    title: "Journalism",
+    line: "The story doesn't break itself — reach the source, the scene, the records office.",
+    punch: "A gallon makes sure the story actually gets reported.",
+  },
+  {
+    icon: Clapperboard,
+    title: "Content Creation",
+    line: "The camera rolls where you go — the shoot, the interview, the location.",
+    punch: "A gallon makes sure the content gets made.",
+  },
+];
+
+function WhoItsForSection() {
+  return (
+    <section className="border-t border-border/30 py-20 sm:py-28">
+      <div className="container">
+        <Reveal className="mb-14 text-center">
+          <h2
+            className="text-3xl font-bold tracking-tight sm:text-4xl"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            FUEL THE <span className="text-fuel">STORY</span>
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+            Activism, journalism, and content creation all run on the same
+            thing: showing up. Gallons cover the one cost between you and the
+            story — getting there.
+          </p>
+        </Reveal>
+
+        <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-3">
+          {AUDIENCES.map((a, i) => (
+            <Reveal key={a.title} delayMs={i * 120}>
+              <div className="flex h-full flex-col rounded-2xl border border-border/50 bg-card/50 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-fuel/40 hover:shadow-lg hover:shadow-fuel/5">
+                <div className="mb-4 w-fit rounded-xl bg-fuel/10 p-2.5">
+                  <a.icon className="size-5 text-fuel" />
+                </div>
+                <h3
+                  className="mb-2 text-lg font-bold tracking-tight"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  {a.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {a.line}
+                </p>
+                <p className="mt-3 flex items-start gap-1.5 text-sm font-medium text-fuel">
+                  <FuelGaugeMark className="mt-0.5 size-4 shrink-0" />
+                  {a.punch}
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function LandingPage() {
   return (
     <div className="flex flex-col">
       <HeroSection />
+      <WhoItsForSection />
       <HowItWorksSection />
       <WhyGiveAGallonSection />
       <FeaturedCreatorsSection />
