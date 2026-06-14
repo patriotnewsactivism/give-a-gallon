@@ -134,3 +134,96 @@ export const getByStripeSession = query({
       .first();
   },
 });
+
+// Get all donations by a logged-in donor (by email)
+export const getMyDonations = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), identity.email))
+      .first();
+    if (!user) return [];
+
+    // Match donations by email
+    const donations = await ctx.db
+      .query("donations")
+      .withIndex("by_status", (q) => q.eq("status", "completed"))
+      .order("desc")
+      .collect();
+
+    const myDonations = donations.filter(
+      (d) => d.donorEmail && d.donorEmail.toLowerCase() === (identity.email ?? "").toLowerCase()
+    );
+
+    const withCreators = await Promise.all(
+      myDonations.map(async (d) => {
+        const creator = await ctx.db.get(d.creatorId);
+        // Get updates posted after this donation
+        const updates = creator
+          ? await ctx.db
+              .query("updates")
+              .withIndex("by_creator", (q) =>
+                q.eq("creatorId", d.creatorId).gt("createdAt", d.createdAt)
+              )
+              .take(3)
+          : [];
+
+        return {
+          _id: d._id,
+          gallons: d.gallons,
+          amountCents: d.amountCents,
+          message: d.message,
+          createdAt: d.createdAt,
+          creatorId: d.creatorId,
+          creatorSlug: creator?.slug ?? "",
+          creatorName: creator?.displayName ?? "",
+          creatorCategory: creator?.category ?? "",
+          creatorVerification: creator?.verificationStatus ?? "unverified",
+          recentUpdates: updates.map((u) => ({
+            _id: u._id,
+            title: u.title,
+            impactTag: u.impactTag,
+            createdAt: u.createdAt,
+          })),
+        };
+      })
+    );
+
+    return withCreators;
+  },
+});
+
+// Donor impact summary
+export const getMyImpactSummary = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    const donations = await ctx.db
+      .query("donations")
+      .withIndex("by_status", (q) => q.eq("status", "completed"))
+      .collect();
+
+    const myDonations = donations.filter(
+      (d) => d.donorEmail && d.donorEmail.toLowerCase() === (identity.email ?? "").toLowerCase()
+    );
+
+    const totalGallons = myDonations.reduce((sum, d) => sum + d.gallons, 0);
+    const totalAmountCents = myDonations.reduce((sum, d) => sum + d.amountCents, 0);
+    const uniqueCreators = new Set(myDonations.map((d) => d.creatorId.toString())).size;
+    const estimatedMiles = Math.round(totalGallons * 30); // ~30 miles per gallon
+
+    return {
+      totalGallons,
+      totalAmountCents,
+      totalDonations: myDonations.length,
+      uniqueCreators,
+      estimatedMiles,
+    };
+  },
+});

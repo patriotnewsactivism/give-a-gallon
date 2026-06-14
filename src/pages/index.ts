@@ -7,3 +7,5 @@ export { ExplorePage } from "./ExplorePage";
 export { CreatorProfilePage } from "./CreatorProfilePage";
 export { ImpactPage } from "./ImpactPage";
 export { MembershipPage } from "./MembershipPage";
+
+export { MyImpactPage } from "./MyImpactPage";

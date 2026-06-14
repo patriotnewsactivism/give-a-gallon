@@ -46,6 +46,7 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/my-impact" element={<MyImpactPage />} />
             </Route>
           </Route>
 
