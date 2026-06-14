@@ -172,3 +172,18 @@ export const getById = query({
     return creator ? await withImageUrls(ctx, creator) : null;
   },
 });
+
+// Get editorially featured campaigns (Phase 5)
+export const listFeatured = query({
+  args: {},
+  handler: async (ctx) => {
+    const creators = await ctx.db
+      .query("creators")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .order("desc")
+      .collect();
+
+    const featured = creators.filter((c) => c.isFeatured === true);
+    return await Promise.all(featured.map((c) => withImageUrls(ctx, c)));
+  },
+});

@@ -49,6 +49,10 @@ const schema = defineSchema({
     campaignType: v.optional(v.string()), // "ongoing" | "goal-based" | "emergency"
     urgency: v.optional(v.string()),      // "low" | "medium" | "high" | "emergency"
     tags: v.optional(v.array(v.string())),
+    // Phase 5 — editorial / network
+    isFeatured: v.optional(v.boolean()),
+    featuredNote: v.optional(v.string()), // editorial blurb
+    networkSource: v.optional(v.string()), // "wtpnews" | "civilrightshub" | null
     createdAt: v.number(),
   })
     .index("by_stripeSession", ["stripeSessionId"])

@@ -19,6 +19,8 @@ import { FuelGauge } from "@/components/FuelGauge";
 import { FuelGaugeMark } from "@/components/FuelGaugeMark";
 import { DonationTicker } from "@/components/DonationTicker";
 import { Reveal } from "@/components/Reveal";
+import { NetworkBanner } from "@/components/NetworkBanner";
+import { FeaturedCampaigns } from "@/components/FeaturedCampaigns";
 import { Button } from "@/components/ui/button";
 import { GALLON_PRICE } from "@/lib/constants";
 import { api } from "../../convex/_generated/api";
@@ -770,6 +772,8 @@ export function LandingPage() {
       <HeroSection />
       <CategoryBrowseSection />
       <FounderStorySection />
+      <FeaturedCampaigns />
+      <NetworkBanner />
       <WhoItsForSection />
       <HowItWorksSection />
       <WhyGiveAGallonSection />
