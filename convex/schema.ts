@@ -71,6 +71,26 @@ const schema = defineSchema({
     .index("by_stripeSession", ["stripeSessionId"])
     .index("by_creator", ["creatorId", "createdAt"])
     .index("by_status", ["status", "createdAt"]),
+
+  // Creator updates — the story timeline (text + video link + photo/document media)
+  updates: defineTable({
+    creatorId: v.id("creators"),
+    title: v.optional(v.string()),
+    body: v.string(),
+    videoUrl: v.optional(v.string()), // YouTube / Vimeo link, embedded inline
+    attachments: v.optional(
+      v.array(
+        v.object({
+          storageId: v.id("_storage"),
+          name: v.string(),
+          contentType: v.string(),
+          kind: v.union(v.literal("image"), v.literal("document")),
+          size: v.number(),
+        }),
+      ),
+    ),
+    createdAt: v.number(),
+  }).index("by_creator", ["creatorId", "createdAt"]),
 });
 
 export default schema;

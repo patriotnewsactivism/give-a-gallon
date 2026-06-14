@@ -19,6 +19,7 @@ import type * as http from "../http.js";
 import type * as seedTestUser from "../seedTestUser.js";
 import type * as stripe from "../stripe.js";
 import type * as testAuth from "../testAuth.js";
+import type * as updates from "../updates.js";
 import type * as users from "../users.js";
 import type * as viktorTools from "../viktorTools.js";
 
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   seedTestUser: typeof seedTestUser;
   stripe: typeof stripe;
   testAuth: typeof testAuth;
+  updates: typeof updates;
   users: typeof users;
   viktorTools: typeof viktorTools;
 }>;

@@ -1,7 +1,7 @@
 // Give a Gallon — Stripe integration (Connect-aware)
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { action, internalMutation } from "./_generated/server";
+import { action, internalMutation, internalQuery } from "./_generated/server";
 
 const GALLON_PRICE_CENTS = 425; // $4.25
 const PLATFORM_FEE_PCT = 0.05;  // 5%
@@ -109,7 +109,7 @@ export const createCheckoutSession = action({
 
 // ── Internal queries / mutations ───────────────────────────────────────────
 
-export const getCreatorById = internalMutation({
+export const getCreatorById = internalQuery({
   args: { creatorId: v.id("creators") },
   handler: async (ctx, { creatorId }) => {
     return ctx.db.get(creatorId);

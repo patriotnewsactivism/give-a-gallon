@@ -14,6 +14,7 @@ import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { FuelGauge } from "@/components/FuelGauge";
+import { UpdatesSection } from "@/components/UpdatesSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +29,8 @@ export function CreatorProfilePage() {
     api.donations.listForCreator,
     creator ? { creatorId: creator._id, limit: 20 } : "skip"
   );
+  const me = useQuery(api.auth.currentUser);
+  const isOwner = !!me && !!creator && me._id === creator.userId;
 
   if (creator === undefined) {
     return (
@@ -194,6 +197,9 @@ export function CreatorProfilePage() {
               <Share2 className="size-3.5 mr-1" />
               Share This Page
             </Button>
+
+            {/* Updates feed (story timeline) */}
+            <UpdatesSection creatorId={creator._id} isOwner={isOwner} />
 
             {/* Recent supporters */}
             <div>
