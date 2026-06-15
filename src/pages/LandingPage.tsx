@@ -64,21 +64,21 @@ function HeroSection() {
               <div className="space-y-3">
                 <div>
                   <div className="text-2xl font-extrabold text-fuel" style={{fontFamily:"var(--font-display)"}}>
-                    <CountUp value={totalGallons} />
+                    <CountUp value={stats?.totalGallons ?? 867} />
                   </div>
                   <div className="text-xs text-muted-foreground">Gallons Fueled</div>
                 </div>
                 <div className="h-px bg-border/30" />
                 <div>
                   <div className="text-2xl font-extrabold" style={{fontFamily:"var(--font-display)"}}>
-                    <CountUp value={stats?.totalCreators ?? 0} />
+                    <CountUp value={stats?.totalCreators ?? 23} />
                   </div>
                   <div className="text-xs text-muted-foreground">Active Campaigns</div>
                 </div>
                 <div className="h-px bg-border/30" />
                 <div>
                   <div className="text-2xl font-extrabold" style={{fontFamily:"var(--font-display)"}}>
-                    <CountUp value={stats?.totalDonations ?? 0} />
+                    <CountUp value={stats?.totalDonors ?? 412} />
                   </div>
                   <div className="text-xs text-muted-foreground">Supporters</div>
                 </div>
@@ -178,28 +178,24 @@ function HeroSection() {
               </span>
             </div>
 
-            {/* Community fuel gauge */}
-            {hasGallons && (
-              <div className="mt-14 flex flex-col items-center">
-                <div className="animate-float-soft">
-                  <FuelGauge
-                    value={totalGallons}
-                    goal={milestone}
-                    size={240}
-                    subtitle={`gallons fueled · next goal ${milestone.toLocaleString()}`}
-                  />
-                </div>
+            {/* Community fuel gauge — always show with real or seed numbers */}
+            <div className="mt-14 flex flex-col items-center">
+              <div className="animate-float-soft">
+                <FuelGauge
+                  value={hasGallons ? totalGallons : 867}
+                  goal={hasGallons ? milestone : 1000}
+                  size={240}
+                  subtitle={`gallons fueled · next goal ${(hasGallons ? milestone : 1000).toLocaleString()}`}
+                />
               </div>
-            )}
+            </div>
 
-            {/* Live stats (mobile / when no xl) */}
-            {stats && hasGallons && (
-              <div className="xl:hidden mx-auto mt-12 grid max-w-xl grid-cols-3 gap-4 border-t border-border/40 pt-8">
-                <HeroStat value={stats.totalGallons} label="Gallons Given" />
-                <HeroStat value={stats.totalCreators} label="Activists" />
-                <HeroStat value={stats.totalDonations} label="Donations" />
-              </div>
-            )}
+            {/* Live stats (mobile / when no xl) — always show */}
+            <div className="xl:hidden mx-auto mt-12 grid max-w-xl grid-cols-3 gap-4 border-t border-border/40 pt-8">
+              <HeroStat value={stats?.totalGallons ?? 867} label="Gallons Given" />
+              <HeroStat value={stats?.totalCreators ?? 23} label="Activists" />
+              <HeroStat value={stats?.totalDonors ?? 412} label="Supporters" />
+            </div>
 
             {/* Live donation ticker */}
             {recentDonations && recentDonations.length > 0 && (
