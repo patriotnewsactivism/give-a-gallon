@@ -346,6 +346,7 @@ function PayoutPanel({ creator }: { creator: any }) {
   const requestPayout = useAction(api.connect.requestPayout);
 
   const [loading, setLoading] = useState(false);
+  const [payoutSuccess, setPayoutSuccess] = useState<string | null>(null);
   const [balance, setBalance] = useState<{
     availableCents: number;
     pendingCents: number;
@@ -371,19 +372,19 @@ function PayoutPanel({ creator }: { creator: any }) {
     }
   }
 
-  async function handlePayout(instant: boolean) {
+  async function handlePayout() {
     if (!balance || balance.availableCents < 100) {
       toast.error("No available balance to pay out");
       return;
     }
     setLoading(true);
+    setPayoutSuccess(null);
     try {
-      await requestPayout({ amountCents: balance.availableCents, instant });
-      toast.success(
-        instant
-          ? "Instant payout initiated — funds arrive in ~30 min!"
-          : "Standard payout initiated — arrives next business day."
-      );
+      const { payoutId } = await requestPayout({ amountCents: balance.availableCents });
+      const msg = `Standard payout initiated — $${(balance.availableCents / 100).toFixed(2)} arrives in 1–2 business days. (ID: ${payoutId})`;
+      setPayoutSuccess(msg);
+      toast.success("Payout initiated! Check your bank in 1–2 business days.");
+      // Refresh balance
       const updated = await getBalance();
       setBalance(updated);
     } catch (e: any) {
@@ -404,15 +405,14 @@ function PayoutPanel({ creator }: { creator: any }) {
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold mb-1">Get Paid</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Connect a Stripe account to receive payouts directly to your debit
-              card — usually within 30 minutes of a donation.
+              Connect a Stripe account to receive payouts directly to your bank account — standard 1–2 business day transfers, no extra fees.
             </p>
             <ul className="space-y-1.5 mb-4">
               {[
-                "Quick KYC — name, DOB, SSN last-4, debit card",
-                "Donations route straight to your account",
-                "Instant Payout to debit in ~30 min (Stripe ~1% fee)",
-                "Standard next-day payout at no extra cost",
+                "Quick KYC — name, DOB, SSN last-4, bank account",
+                "Donations route straight to your connected account",
+                "Standard payouts — 1–2 business days, no extra fee",
+                "You control when you request a payout",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-2 text-xs text-muted-foreground">
                   <CheckCircle2 className="size-3.5 text-fuel shrink-0" />
@@ -500,13 +500,14 @@ function PayoutPanel({ creator }: { creator: any }) {
     );
   }
 
-  // ── Active — show balance + payout buttons ──
+  // ── Active — show balance + single standard payout button ──
   const available = balance?.availableCents ?? 0;
   const pending = balance?.pendingCents ?? 0;
   const canPayout = available >= 100;
 
   return (
     <div className="p-5 rounded-xl border border-fuel/20 bg-fuel/[0.03]">
+      {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <div className="rounded-xl bg-fuel/10 p-2 shrink-0">
           <Wallet className="size-4 text-fuel" />
@@ -517,53 +518,64 @@ function PayoutPanel({ creator }: { creator: any }) {
         </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="rounded-lg border border-border/50 bg-card/50 p-3 text-center">
-          <div
-            className="text-2xl font-bold text-fuel"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
+      {/* Balance cards */}
+      <div className="grid grid-cols-2 gap-3 mb-1">
+        <div className="rounded-lg border border-fuel/20 bg-fuel/[0.06] p-3 text-center">
+          <div className="text-2xl font-bold text-fuel" style={{ fontFamily: "var(--font-display)" }}>
             ${(available / 100).toFixed(2)}
           </div>
-          <div className="text-xs text-muted-foreground mt-0.5">Available</div>
+          <div className="text-xs text-muted-foreground mt-0.5">Available to pay out</div>
         </div>
         <div className="rounded-lg border border-border/50 bg-card/50 p-3 text-center">
-          <div
-            className="text-2xl font-bold"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
+          <div className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
             ${(pending / 100).toFixed(2)}
           </div>
-          <div className="text-xs text-muted-foreground mt-0.5">Pending</div>
+          <div className="text-xs text-muted-foreground mt-0.5">Pending (processing)</div>
         </div>
       </div>
 
-      <div className="flex gap-2">
-        <Button
-          className="flex-1 bg-fuel text-fuel-foreground hover:bg-fuel/90"
-          onClick={() => handlePayout(true)}
-          disabled={!canPayout || loading}
-        >
-          {loading ? (
-            <Loader2 className="size-4 mr-1.5 animate-spin" />
-          ) : (
-            <ArrowDownToLine className="size-4 mr-1.5" />
-          )}
-          Instant Payout (~30 min)
-        </Button>
-        <Button
-          variant="outline"
-          className="flex-1"
-          onClick={() => handlePayout(false)}
-          disabled={!canPayout || loading}
-        >
-          Standard (Next Day)
-        </Button>
-      </div>
-      {!canPayout && (
-        <p className="text-xs text-muted-foreground mt-2 text-center">
-          Minimum payout is $1.00
+      {/* Minimum notice */}
+      {!canPayout && available > 0 && (
+        <p className="text-xs text-yellow-500 text-center mt-2 mb-3">
+          Minimum payout is $1.00 — keep collecting!
         </p>
+      )}
+      {!canPayout && available === 0 && (
+        <p className="text-xs text-muted-foreground text-center mt-2 mb-3">
+          No available balance yet. Pending funds clear in 2 business days.
+        </p>
+      )}
+      {canPayout && (
+        <p className="text-xs text-muted-foreground text-center mt-2 mb-3">
+          Full available balance will be sent to your bank.
+        </p>
+      )}
+
+      {/* Single payout button */}
+      <Button
+        className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90"
+        onClick={handlePayout}
+        disabled={!canPayout || loading}
+      >
+        {loading ? (
+          <Loader2 className="size-4 mr-1.5 animate-spin" />
+        ) : (
+          <ArrowDownToLine className="size-4 mr-1.5" />
+        )}
+        {canPayout
+          ? `Request Payout — $${(available / 100).toFixed(2)}`
+          : "Request Payout"}
+      </Button>
+
+      <p className="text-xs text-muted-foreground text-center mt-2">
+        Standard transfer · arrives in 1–2 business days · no extra fee
+      </p>
+
+      {/* Success confirmation */}
+      {payoutSuccess && (
+        <div className="mt-3 rounded-lg border border-fuel/20 bg-fuel/5 p-3 text-xs text-fuel">
+          ✓ {payoutSuccess}
+        </div>
       )}
     </div>
   );

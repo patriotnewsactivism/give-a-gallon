@@ -87,15 +87,14 @@ export const startOnboarding = action({
 });
 
 /**
- * Trigger an Instant Payout for the creator (to their debit card on file).
- * Stripe charges ~1% for instant payouts.
+ * Request a standard payout for the creator to their connected bank account.
+ * Standard payouts arrive in 2 business days with no additional fee.
  */
 export const requestPayout = action({
   args: {
-    amountCents: v.number(), // amount to pay out
-    instant: v.boolean(),    // true = instant (~30 min), false = standard (next day)
+    amountCents: v.number(), // amount to pay out in cents
   },
-  handler: async (ctx, { amountCents, instant }): Promise<{ payoutId: string }> => {
+  handler: async (ctx, { amountCents }): Promise<{ payoutId: string }> => {
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeKey) throw new Error("Stripe not configured");
 
@@ -107,18 +106,8 @@ export const requestPayout = action({
     }
     if (amountCents < 100) throw new Error("Minimum payout is $1.00");
 
-    const params: Record<string, string> = {
-      amount: String(amountCents),
-      currency: "usd",
-    };
-    if (instant) {
-      params.method = "instant";
-    }
-
-    const payout = await stripePost("/payouts", stripeKey, params);
-
-    // Note: this fetch is authenticated as the connected account via the
-    // Stripe-Account header set below — we call the raw fetch ourselves
+    // POST directly to the creator's connected account using Stripe-Account header.
+    // This is the ONLY payout call — do not duplicate it.
     const payoutRes = await fetch("https://api.stripe.com/v1/payouts", {
       method: "POST",
       headers: {
@@ -126,7 +115,11 @@ export const requestPayout = action({
         "Stripe-Account": creator.stripeAccountId,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams(params).toString(),
+      body: new URLSearchParams({
+        amount: String(amountCents),
+        currency: "usd",
+        method: "standard", // 2-business-day bank transfer, no extra fee
+      }).toString(),
     });
 
     if (!payoutRes.ok) {
