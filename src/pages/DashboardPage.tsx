@@ -1,6 +1,7 @@
 import { useAction, useMutation, useQuery } from "convex/react";
 import {
   AlertCircle,
+  Zap,
   ArrowDownToLine,
   CheckCircle2,
   Clock,
@@ -346,7 +347,9 @@ function PayoutPanel({ creator }: { creator: any }) {
   const requestPayout = useAction(api.connect.requestPayout);
 
   const [loading, setLoading] = useState(false);
-  const [payoutSuccess, setPayoutSuccess] = useState<string | null>(null);
+  const [payoutResult, setPayoutResult] = useState<{
+    payoutId: string; feeCents: number; netCents: number; method: string;
+  } | null>(null);
   const [balance, setBalance] = useState<{
     availableCents: number;
     pendingCents: number;
@@ -372,19 +375,21 @@ function PayoutPanel({ creator }: { creator: any }) {
     }
   }
 
-  async function handlePayout() {
+  async function handlePayout(instant: boolean) {
     if (!balance || balance.availableCents < 100) {
       toast.error("No available balance to pay out");
       return;
     }
     setLoading(true);
-    setPayoutSuccess(null);
+    setPayoutResult(null);
     try {
-      const { payoutId } = await requestPayout({ amountCents: balance.availableCents });
-      const msg = `Standard payout initiated — $${(balance.availableCents / 100).toFixed(2)} arrives in 1–2 business days. (ID: ${payoutId})`;
-      setPayoutSuccess(msg);
-      toast.success("Payout initiated! Check your bank in 1–2 business days.");
-      // Refresh balance
+      const result = await requestPayout({ amountCents: balance.availableCents, instant });
+      setPayoutResult(result);
+      toast.success(
+        instant
+          ? `⚡ $${(result.netCents / 100).toFixed(2)} on its way — hits your card in ~30 min!`
+          : `Payout initiated — $${(result.netCents / 100).toFixed(2)} arrives in 1–2 business days.`
+      );
       const updated = await getBalance();
       setBalance(updated);
     } catch (e: any) {
@@ -397,42 +402,43 @@ function PayoutPanel({ creator }: { creator: any }) {
   // ── Not connected yet ──
   if (status === "not_connected") {
     return (
-      <div className="p-5 rounded-xl border border-border/50 bg-card/50">
-        <div className="flex items-start gap-4">
-          <div className="rounded-xl bg-fuel/10 p-2.5 shrink-0">
-            <Wallet className="size-5 text-fuel" />
+      <div className="rounded-xl border border-fuel/30 bg-fuel/[0.04] overflow-hidden">
+        {/* Instant payout hero banner */}
+        <div className="bg-gradient-to-r from-fuel/20 to-fuel/5 px-5 py-4 border-b border-fuel/20">
+          <div className="flex items-center gap-2 mb-1">
+            <Zap className="size-4 text-fuel fill-fuel" />
+            <span className="text-xs font-black tracking-widest text-fuel uppercase">Instant Payouts Available</span>
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold mb-1">Get Paid</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Connect a Stripe account to receive payouts directly to your bank account — standard 1–2 business day transfers, no extra fees.
-            </p>
-            <ul className="space-y-1.5 mb-4">
-              {[
-                "Quick KYC — name, DOB, SSN last-4, bank account",
-                "Donations route straight to your connected account",
-                "Standard payouts — 1–2 business days, no extra fee",
-                "You control when you request a payout",
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <CheckCircle2 className="size-3.5 text-fuel shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Button
-              className="bg-fuel text-fuel-foreground hover:bg-fuel/90"
-              onClick={handleConnect}
-              disabled={loading}
-            >
-              {loading ? (
-                <Loader2 className="size-4 mr-2 animate-spin" />
-              ) : (
-                <ArrowDownToLine className="size-4 mr-2" />
-              )}
-              Connect Stripe
-            </Button>
-          </div>
+          <p className="text-sm font-semibold">
+            Get your money in <span className="text-fuel">~30 minutes.</span> Not days.
+          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Other platforms make you wait 2–5 days. We don't. Gas when you need it — <em>now.</em>
+          </p>
+        </div>
+        <div className="p-5">
+          <h3 className="font-semibold mb-3">Connect Stripe to Get Paid</h3>
+          <ul className="space-y-1.5 mb-4">
+            {[
+              { icon: "⚡", text: "Instant payout — ~30 min to your debit card (1% fee, min $0.50)" },
+              { icon: "🏦", text: "Standard payout — 1–2 business days, no fee" },
+              { icon: "🔒", text: "Quick KYC — name, DOB, SSN last-4, debit card" },
+              { icon: "💸", text: "Donations route straight to your account" },
+            ].map((item) => (
+              <li key={item.text} className="flex items-start gap-2 text-xs text-muted-foreground">
+                <span className="shrink-0 mt-px">{item.icon}</span>
+                {item.text}
+              </li>
+            ))}
+          </ul>
+          <Button
+            className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold"
+            onClick={handleConnect}
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Zap className="size-4 mr-2" />}
+            Connect Stripe — Start Getting Paid
+          </Button>
         </div>
       </div>
     );
@@ -447,22 +453,18 @@ function PayoutPanel({ creator }: { creator: any }) {
             <Clock className="size-5 text-yellow-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold mb-1">Finish Stripe Onboarding</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              You started connecting Stripe but haven't finished yet. Complete
-              the quick KYC to unlock payouts.
+            <h3 className="font-semibold mb-1">Almost There — Finish Setup</h3>
+            <p className="text-sm text-muted-foreground mb-1">
+              Complete your Stripe onboarding to unlock payouts — including instant.
             </p>
+            <p className="text-xs text-fuel font-medium mb-4">⚡ Instant payouts unlock once verified.</p>
             <Button
               variant="outline"
               className="border-yellow-500/30 text-yellow-600 hover:bg-yellow-500/10"
               onClick={handleConnect}
               disabled={loading}
             >
-              {loading ? (
-                <Loader2 className="size-4 mr-2 animate-spin" />
-              ) : (
-                <ArrowDownToLine className="size-4 mr-2" />
-              )}
+              {loading ? <Loader2 className="size-4 mr-2 animate-spin" /> : <ArrowDownToLine className="size-4 mr-2" />}
               Resume Onboarding
             </Button>
           </div>
@@ -482,15 +484,9 @@ function PayoutPanel({ creator }: { creator: any }) {
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold mb-1">Action Required</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Stripe needs more information before enabling payouts on your
-              account.
+              Stripe needs more information before enabling payouts on your account.
             </p>
-            <Button
-              variant="outline"
-              className="border-red-500/30 text-red-600 hover:bg-red-500/10"
-              onClick={handleConnect}
-              disabled={loading}
-            >
+            <Button variant="outline" className="border-red-500/30 text-red-600 hover:bg-red-500/10" onClick={handleConnect} disabled={loading}>
               {loading && <Loader2 className="size-4 mr-2 animate-spin" />}
               Resolve with Stripe
             </Button>
@@ -500,81 +496,120 @@ function PayoutPanel({ creator }: { creator: any }) {
     );
   }
 
-  // ── Active — show balance + single standard payout button ──
+  // ── Active — full payout UI ──
   const available = balance?.availableCents ?? 0;
   const pending = balance?.pendingCents ?? 0;
   const canPayout = available >= 100;
 
+  // Instant fee preview: 1%, min $0.50, max $10
+  const instantFeeCents = canPayout
+    ? Math.min(1000, Math.max(50, Math.round(available * 0.01)))
+    : 50;
+  const instantNetCents = available - instantFeeCents;
+
   return (
-    <div className="p-5 rounded-xl border border-fuel/20 bg-fuel/[0.03]">
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-4">
-        <div className="rounded-xl bg-fuel/10 p-2 shrink-0">
-          <Wallet className="size-4 text-fuel" />
+    <div className="rounded-xl border border-fuel/20 bg-fuel/[0.03] overflow-hidden">
+      {/* Balance header */}
+      <div className="px-5 pt-4 pb-3 border-b border-border/30">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="rounded-xl bg-fuel/10 p-2 shrink-0">
+            <Wallet className="size-4 text-fuel" />
+          </div>
+          <h3 className="font-semibold">Your Balance</h3>
+          <span className="ml-auto flex items-center gap-1 text-xs text-fuel font-medium">
+            <CheckCircle2 className="size-3.5" /> Connected
+          </span>
         </div>
-        <h3 className="font-semibold">Your Balance</h3>
-        <span className="ml-auto flex items-center gap-1 text-xs text-fuel font-medium">
-          <CheckCircle2 className="size-3.5" /> Connected
-        </span>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-lg border border-fuel/20 bg-fuel/[0.08] p-3 text-center">
+            <div className="text-2xl font-bold text-fuel" style={{ fontFamily: "var(--font-display)" }}>
+              ${(available / 100).toFixed(2)}
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">Available</div>
+          </div>
+          <div className="rounded-lg border border-border/50 bg-card/50 p-3 text-center">
+            <div className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
+              ${(pending / 100).toFixed(2)}
+            </div>
+            <div className="text-xs text-muted-foreground mt-0.5">Pending</div>
+          </div>
+        </div>
       </div>
 
-      {/* Balance cards */}
-      <div className="grid grid-cols-2 gap-3 mb-1">
-        <div className="rounded-lg border border-fuel/20 bg-fuel/[0.06] p-3 text-center">
-          <div className="text-2xl font-bold text-fuel" style={{ fontFamily: "var(--font-display)" }}>
-            ${(available / 100).toFixed(2)}
-          </div>
-          <div className="text-xs text-muted-foreground mt-0.5">Available to pay out</div>
+      {/* ⚡ INSTANT PAYOUT — hero option */}
+      <div className="p-4 border-b border-border/20 bg-gradient-to-r from-fuel/10 to-transparent">
+        <div className="flex items-center gap-1.5 mb-1">
+          <Zap className="size-3.5 text-fuel fill-fuel" />
+          <span className="text-xs font-black tracking-wider text-fuel uppercase">Instant Payout</span>
+          <span className="ml-auto text-xs text-muted-foreground">~30 min</span>
         </div>
-        <div className="rounded-lg border border-border/50 bg-card/50 p-3 text-center">
-          <div className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
-            ${(pending / 100).toFixed(2)}
-          </div>
-          <div className="text-xs text-muted-foreground mt-0.5">Pending (processing)</div>
-        </div>
+        <p className="text-xs text-muted-foreground mb-3">
+          Money on your debit card in about 30 minutes. No waiting days.
+          {canPayout && (
+            <span className="text-foreground/70">
+              {" "}Stripe fee: <strong>${(instantFeeCents / 100).toFixed(2)}</strong> → you receive <strong className="text-fuel">${(instantNetCents / 100).toFixed(2)}</strong>.
+            </span>
+          )}
+        </p>
+        <Button
+          className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold"
+          onClick={() => handlePayout(true)}
+          disabled={!canPayout || loading}
+        >
+          {loading ? (
+            <Loader2 className="size-4 mr-1.5 animate-spin" />
+          ) : (
+            <Zap className="size-4 mr-1.5 fill-current" />
+          )}
+          {canPayout
+            ? `⚡ Get $${(instantNetCents / 100).toFixed(2)} Now`
+            : "⚡ Instant Payout"}
+        </Button>
       </div>
 
-      {/* Minimum notice */}
-      {!canPayout && available > 0 && (
-        <p className="text-xs text-yellow-500 text-center mt-2 mb-3">
-          Minimum payout is $1.00 — keep collecting!
-        </p>
-      )}
-      {!canPayout && available === 0 && (
-        <p className="text-xs text-muted-foreground text-center mt-2 mb-3">
-          No available balance yet. Pending funds clear in 2 business days.
-        </p>
-      )}
-      {canPayout && (
-        <p className="text-xs text-muted-foreground text-center mt-2 mb-3">
-          Full available balance will be sent to your bank.
-        </p>
-      )}
+      {/* Standard payout — secondary option */}
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Standard Payout</span>
+          <span className="text-xs text-muted-foreground">1–2 business days · free</span>
+        </div>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => handlePayout(false)}
+          disabled={!canPayout || loading}
+        >
+          {loading ? (
+            <Loader2 className="size-4 mr-1.5 animate-spin" />
+          ) : (
+            <ArrowDownToLine className="size-4 mr-1.5" />
+          )}
+          {canPayout
+            ? `Transfer $${(available / 100).toFixed(2)} to Bank`
+            : "Transfer to Bank"}
+        </Button>
 
-      {/* Single payout button */}
-      <Button
-        className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90"
-        onClick={handlePayout}
-        disabled={!canPayout || loading}
-      >
-        {loading ? (
-          <Loader2 className="size-4 mr-1.5 animate-spin" />
-        ) : (
-          <ArrowDownToLine className="size-4 mr-1.5" />
+        {!canPayout && available === 0 && (
+          <p className="text-xs text-muted-foreground text-center mt-2">
+            No available balance. Pending funds clear in ~2 business days.
+          </p>
         )}
-        {canPayout
-          ? `Request Payout — $${(available / 100).toFixed(2)}`
-          : "Request Payout"}
-      </Button>
+        {!canPayout && available > 0 && (
+          <p className="text-xs text-yellow-500 text-center mt-2">
+            Minimum payout is $1.00 — you're almost there.
+          </p>
+        )}
+      </div>
 
-      <p className="text-xs text-muted-foreground text-center mt-2">
-        Standard transfer · arrives in 1–2 business days · no extra fee
-      </p>
-
-      {/* Success confirmation */}
-      {payoutSuccess && (
-        <div className="mt-3 rounded-lg border border-fuel/20 bg-fuel/5 p-3 text-xs text-fuel">
-          ✓ {payoutSuccess}
+      {/* Post-payout confirmation */}
+      {payoutResult && (
+        <div className={`mx-4 mb-4 rounded-lg border p-3 text-xs ${payoutResult.method === "instant" ? "border-fuel/30 bg-fuel/5 text-fuel" : "border-border/50 bg-card/50 text-muted-foreground"}`}>
+          {payoutResult.method === "instant" ? (
+            <>⚡ <strong>${(payoutResult.netCents / 100).toFixed(2)}</strong> is on its way — ~30 min to your card. (Stripe fee: ${(payoutResult.feeCents / 100).toFixed(2)})</>
+          ) : (
+            <>✓ <strong>${(payoutResult.netCents / 100).toFixed(2)}</strong> transfer initiated — arrives in 1–2 business days.</>
+          )}
+          <div className="text-muted-foreground/60 mt-0.5">Payout ID: {payoutResult.payoutId}</div>
         </div>
       )}
     </div>

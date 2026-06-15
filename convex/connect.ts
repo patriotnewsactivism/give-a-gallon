@@ -87,14 +87,22 @@ export const startOnboarding = action({
 });
 
 /**
- * Request a standard payout for the creator to their connected bank account.
- * Standard payouts arrive in 2 business days with no additional fee.
+ * Request a payout for the creator.
+ * standard = 1-2 business days, no fee.
+ * instant   = ~30 min to debit card, Stripe charges ~1% (min $0.50, max $10).
+ *             We pass Stripe's fee through transparently — no markup.
  */
 export const requestPayout = action({
   args: {
-    amountCents: v.number(), // amount to pay out in cents
+    amountCents: v.number(),
+    instant: v.boolean(),
   },
-  handler: async (ctx, { amountCents }): Promise<{ payoutId: string }> => {
+  handler: async (ctx, { amountCents, instant }): Promise<{
+    payoutId: string;
+    feeCents: number;
+    netCents: number;
+    method: string;
+  }> => {
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeKey) throw new Error("Stripe not configured");
 
@@ -106,8 +114,16 @@ export const requestPayout = action({
     }
     if (amountCents < 100) throw new Error("Minimum payout is $1.00");
 
-    // POST directly to the creator's connected account using Stripe-Account header.
-    // This is the ONLY payout call — do not duplicate it.
+    // Calculate Stripe instant payout fee: 1%, min $0.50, max $10.00
+    // We pass this through at cost — zero markup.
+    let feeCents = 0;
+    if (instant) {
+      feeCents = Math.round(amountCents * 0.01);
+      if (feeCents < 50) feeCents = 50;
+      if (feeCents > 1000) feeCents = 1000;
+    }
+    const netCents = amountCents - feeCents;
+
     const payoutRes = await fetch("https://api.stripe.com/v1/payouts", {
       method: "POST",
       headers: {
@@ -118,7 +134,7 @@ export const requestPayout = action({
       body: new URLSearchParams({
         amount: String(amountCents),
         currency: "usd",
-        method: "standard", // 2-business-day bank transfer, no extra fee
+        method: instant ? "instant" : "standard",
       }).toString(),
     });
 
@@ -128,7 +144,12 @@ export const requestPayout = action({
     }
 
     const payoutData = await payoutRes.json();
-    return { payoutId: payoutData.id };
+    return {
+      payoutId: payoutData.id,
+      feeCents,
+      netCents,
+      method: instant ? "instant" : "standard",
+    };
   },
 });
 
