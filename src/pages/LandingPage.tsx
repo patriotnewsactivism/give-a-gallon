@@ -678,11 +678,7 @@ function FounderStorySection() {
               </div>
 
               <blockquote className="text-xl sm:text-2xl font-medium leading-relaxed text-foreground mb-6">
-                "I built Give-A-Gallon because{" "}
-                <span className="text-fuel">I needed it.</span>{" "}
-                Being on the road constantly — covering stories, getting to hearings, showing up where it matters —
-                costs money that most people don&#39;t have.
-                If it solved the problem for me, I knew it would solve it for many."
+                &#8220;I built Give-A-Gallon because I needed it. Being on the road constantly &#8212; covering stories, getting to hearings, showing up where it matters &#8212; costs money that most people don&#39;t have. I knew if there was a way I could help my own situation, it would most certainly be a way I could help others.&#8221;
               </blockquote>
 
               <div className="flex items-center gap-3">
@@ -692,13 +688,9 @@ function FounderStorySection() {
                 <div>
                   <div className="text-sm font-semibold text-foreground">Matthew Reardon</div>
                   <div className="text-xs text-muted-foreground mt-0.5">
-                    Founder,{" "}
+                    Founder of We The People News{" "}·{" "}
                     <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors font-medium text-foreground/80">
-                      We The People News
-                    </a>
-                    {" "}·{" "}
-                    <a href="https://fuel.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
-                      fuel.wtpnews.org
+                      wtpnews.org
                     </a>
                   </div>
                 </div>
