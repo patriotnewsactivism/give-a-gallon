@@ -7,7 +7,7 @@ import { v } from "convex/values";
 
 declare const process: { env: Record<string, string | undefined> };
 
-const FROM = "Give-A-Gallon <fuel@give.wtpnews.org>";
+const FROM = "Give-A-Gallon <give-a-gallon@wtpnews.org>";
 const SITE = "https://give.wtpnews.org";
 const FUEL_COLOR = "#f97316";
 
