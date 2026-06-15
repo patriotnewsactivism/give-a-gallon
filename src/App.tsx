@@ -11,6 +11,7 @@ import {
   DashboardPage,
   ExplorePage,
   ImpactPage,
+  LeaderboardPage,
   MembershipPage,
   LandingPage,
   LoginPage,
