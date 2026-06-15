@@ -668,49 +668,38 @@ function FounderStorySection() {
     <section className="border-t border-border/30 py-16 sm:py-20">
       <div className="container max-w-3xl">
         <Reveal>
-          <div className="rounded-2xl border border-fuel/15 bg-fuel/[0.03] p-7 sm:p-10 relative overflow-hidden">
+          <div className="rounded-2xl border border-fuel/25 bg-fuel/[0.04] p-7 sm:p-10 relative overflow-hidden shadow-sm shadow-black/30">
             {/* Subtle background glow */}
-            <div className="pointer-events-none absolute -top-10 -right-10 size-48 rounded-full bg-fuel/[0.06] blur-3xl" />
+            <div className="pointer-events-none absolute -top-10 -right-10 size-48 rounded-full bg-fuel/[0.08] blur-3xl" />
 
             <div className="relative">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-fuel/10 text-fuel text-xs font-semibold mb-5">
                 <Fuel className="size-3" /> WHY WE BUILT THIS
               </div>
 
-              <blockquote className="text-xl sm:text-2xl font-medium leading-relaxed text-foreground mb-5">
+              <blockquote className="text-xl sm:text-2xl font-medium leading-relaxed text-foreground mb-6">
                 "I built Give-A-Gallon because{" "}
                 <span className="text-fuel">I needed it.</span>{" "}
                 Being on the road constantly — covering stories, getting to hearings, showing up where it matters —
-                costs money that most people don't have.
+                costs money that most people don&#39;t have.
                 If it solved the problem for me, I knew it would solve it for many."
               </blockquote>
 
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-full bg-fuel/15 flex items-center justify-center text-sm font-bold text-fuel border border-fuel/25">
+                <div className="size-10 rounded-full bg-fuel/15 flex items-center justify-center text-sm font-bold text-fuel border border-fuel/25 shrink-0">
                   MR
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-foreground">
-                    Matthew Reardon
-                  </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-sm font-semibold text-foreground">Matthew Reardon</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
                     Founder,{" "}
                     <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors font-medium text-foreground/80">
                       We The People News
-                    </a>{" "}·{" "}
-                      <a href="https://fuel.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
-                        fuel.wtpnews.org
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
-                        wtpnews.org
-                      </a>
-                      <span className="text-muted-foreground/40">·</span>
-                      <a href="https://www.civilrightshub.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
-                        civilrightshub.org
-                      </a>
-                    </div>
+                    </a>
+                    {" "}·{" "}
+                    <a href="https://fuel.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
+                      fuel.wtpnews.org
+                    </a>
                   </div>
                 </div>
               </div>
