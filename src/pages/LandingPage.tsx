@@ -686,18 +686,18 @@ function FounderStorySection() {
               </blockquote>
 
               <div className="flex items-center gap-3">
-                <div className="size-9 rounded-full bg-fuel/15 flex items-center justify-center text-sm font-bold text-fuel border border-fuel/20">
-                  WTP
+                <div className="size-10 rounded-full bg-fuel/15 flex items-center justify-center text-sm font-bold text-fuel border border-fuel/25">
+                  MR
                 </div>
                 <div>
-                  <div className="text-sm font-semibold">
-                    <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
-                      We The People News
-                    </a>
+                  <div className="text-sm font-semibold text-foreground">
+                    Matthew Reardon
                   </div>
-                  <div className="text-xs text-muted-foreground space-y-0.5">
-                    <div>
-                      Founder ·{" "}
+                  <div className="text-xs text-muted-foreground">
+                    Founder,{" "}
+                    <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors font-medium text-foreground/80">
+                      We The People News
+                    </a>{" "}·{" "}
                       <a href="https://fuel.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors">
                         fuel.wtpnews.org
                       </a>
