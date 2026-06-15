@@ -58,9 +58,9 @@
   --sidebar-width-icon: 3rem;
 
   /* Crimson fuel accent — slightly brighter to pop on dark */
-  --fuel: oklch(0.55 0.20 25);
+  --fuel: oklch(0.62 0.23 25);
   --fuel-foreground: oklch(0.98 0 0);
-  --fuel-muted: oklch(0.45 0.13 25);
+  --fuel-muted: oklch(0.50 0.15 25);
 
   --primary: oklch(0.55 0.20 25);
   --primary-foreground: oklch(0.98 0 0);
@@ -84,15 +84,15 @@
 
   /* Deep dark base — near-black with very slight warm tint */
   --background: oklch(0.10 0.006 25);
-  --foreground: oklch(0.97 0.004 60);
-  --card: oklch(0.13 0.007 25);
+  --foreground: oklch(0.99 0.003 60);
+  --card: oklch(0.14 0.008 25);
   --card-foreground: oklch(0.97 0.004 60);
   --popover: oklch(0.13 0.007 25);
   --popover-foreground: oklch(0.97 0.004 60);
   --secondary: oklch(0.16 0.007 25);
   --secondary-foreground: oklch(0.88 0.006 60);
   --muted: oklch(0.16 0.007 25);
-  --muted-foreground: oklch(0.68 0.01 60);
+  --muted-foreground: oklch(0.72 0.01 60);
   --accent: oklch(0.18 0.025 25);
   --accent-foreground: oklch(0.88 0.10 25);
   --destructive: oklch(0.55 0.22 25);
@@ -243,4 +243,19 @@
       animation: none;
     }
   }
+}
+
+/* ── Visibility utilities ─────────────────────────────── */
+.text-glow-fuel {
+  text-shadow: 0 0 28px oklch(0.62 0.23 25 / 0.55), 0 0 60px oklch(0.62 0.23 25 / 0.25);
+}
+.shadow-glow-fuel {
+  box-shadow: 0 0 24px oklch(0.62 0.23 25 / 0.35), 0 4px 20px oklch(0.62 0.23 25 / 0.20);
+}
+@keyframes hero-pulse {
+  0%, 100% { opacity: 0.06; }
+  50%       { opacity: 0.12; }
+}
+.animate-hero-pulse {
+  animation: hero-pulse 6s ease-in-out infinite;
 }
