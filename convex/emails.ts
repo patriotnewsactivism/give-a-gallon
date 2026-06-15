@@ -47,17 +47,26 @@ function wrap(content: string) {
 
 async function send(to: string, subject: string, html: string): Promise<void> {
   const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error("RESEND_API_KEY not configured");
+  if (!key) {
+    // Email not configured — log but do NOT throw. Donation already completed.
+    console.warn("RESEND_API_KEY not set — skipping email to", to);
+    return;
+  }
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html }),
-  });
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: FROM, to: [to], subject, html }),
+    });
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Resend error: ${err}`);
+    if (!res.ok) {
+      const err = await res.text();
+      // Log but don't throw — email failure must never block donation completion
+      console.error(`Resend error sending to ${to}:`, err);
+    }
+  } catch (err) {
+    console.error(`Email send exception for ${to}:`, err);
   }
 }
 

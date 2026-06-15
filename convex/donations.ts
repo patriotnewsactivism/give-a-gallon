@@ -104,22 +104,38 @@ export const getRecent = query({
   },
 });
 
-// Get platform stats (public)
+// Get platform stats (public) — reads from materialized platformStats table
 export const platformStats = query({
   args: {},
   handler: async (ctx) => {
+    // Try the fast materialized record first
+    const stats = await ctx.db
+      .query("platformStats")
+      .withIndex("by_key", (q) => q.eq("key", "global"))
+      .first();
+
+    if (stats) {
+      return {
+        totalCreators: stats.totalCreators,
+        totalGallons: stats.totalGallons,
+        totalDonations: stats.totalCampaigns,
+        totalDonors: stats.totalDonors,
+        totalAmountCents: stats.totalDonationsCents,
+      };
+    }
+
+    // Fallback: compute from creators (no stats record yet)
     const creators = await ctx.db.query("creators").collect();
     const activeCreators = creators.filter((c) => c.isActive);
     const totalGallons = creators.reduce((sum, c) => sum + c.totalGallons, 0);
-    const totalDonations = creators.reduce(
-      (sum, c) => sum + c.totalDonations,
-      0
-    );
+    const totalDonations = creators.reduce((sum, c) => sum + c.totalDonations, 0);
 
     return {
       totalCreators: activeCreators.length,
       totalGallons,
       totalDonations,
+      totalDonors: totalDonations, // best guess without stats table
+      totalAmountCents: 0,
     };
   },
 });

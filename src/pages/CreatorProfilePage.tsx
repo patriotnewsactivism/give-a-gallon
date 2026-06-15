@@ -433,16 +433,16 @@ function DonationForm({ creatorId, creatorName }: { creatorId: string; creatorNa
       {effectiveGallons > 0 && (
         <div className="rounded-lg bg-muted/30 border border-border/30 p-3 space-y-1 text-xs">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">{effectiveGallons} gallon{effectiveGallons !== 1 ? "s" : ""}</span>
-            <span>${totalAmount.toFixed(2)}</span>
+            <span className="text-muted-foreground">You pay</span>
+            <span className="font-semibold">${totalAmount.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-muted-foreground/70">
             <span>Platform fee (5%)</span>
-            <span>${platformFee.toFixed(2)}</span>
+            <span>−${platformFee.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between font-semibold border-t border-border/30 pt-1 mt-1">
-            <span>Total</span>
-            <span className="text-fuel">${totalAmount.toFixed(2)}</span>
+          <div className="flex justify-between font-semibold border-t border-border/30 pt-1 mt-1 text-green-400">
+            <span>Creator receives</span>
+            <span>${(totalAmount - platformFee).toFixed(2)}</span>
           </div>
         </div>
       )}

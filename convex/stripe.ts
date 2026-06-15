@@ -193,6 +193,32 @@ export const completeDonation = internalMutation({
       });
     }
 
+    // Update global platform stats so hero + /impact dashboard stay current
+    const stats = await ctx.db
+      .query("platformStats")
+      .withIndex("by_key", q => q.eq("key", "global"))
+      .first();
+    if (stats) {
+      await ctx.db.patch(stats._id, {
+        totalDonationsCents: stats.totalDonationsCents + donation.amountCents,
+        totalGallons: stats.totalGallons + donation.gallons,
+        totalDonors: stats.totalDonors + 1,
+        updatedAt: Date.now(),
+      });
+    } else {
+      // First donation ever — create the stats record
+      await ctx.db.insert("platformStats", {
+        key: "global",
+        totalDonationsCents: donation.amountCents,
+        totalGallons: donation.gallons,
+        totalDonors: 1,
+        totalCreators: 1,
+        totalCampaigns: 1,
+        successfulCampaigns: 1,
+        updatedAt: Date.now(),
+      });
+    }
+
     // Credit the referrer if this donation came via a referral link
     if (donation.referralCode) {
       await ctx.runMutation(internal.referrals.creditReferral, {
@@ -343,16 +369,20 @@ export const handleWebhook = action({
           currentPeriodEnd: sub.current_period_end ? sub.current_period_end * 1000 : undefined,
         });
 
-        // Send confirmation email
-        if (session.customer_details?.email) {
-          await ctx.runAction(internal.emails.sendSubscriptionConfirmed, {
-            donorEmail: session.customer_details.email,
-            donorName: donorName ?? "there",
-            tierName,
-            gallonsPerMonth,
-            amountCents: sub.plan?.amount ?? 0,
-            currentPeriodEndMs: sub.current_period_end ? sub.current_period_end * 1000 : Date.now() + 30 * 86400 * 1000,
-          });
+        // Send confirmation email — wrapped so failure never breaks webhook
+        try {
+          if (session.customer_details?.email) {
+            await ctx.runAction(internal.emails.sendSubscriptionConfirmed, {
+              donorEmail: session.customer_details.email,
+              donorName: donorName ?? "there",
+              tierName,
+              gallonsPerMonth,
+              amountCents: sub.plan?.amount ?? 0,
+              currentPeriodEndMs: sub.current_period_end ? sub.current_period_end * 1000 : Date.now() + 30 * 86400 * 1000,
+            });
+          }
+        } catch (emailErr) {
+          console.error("Subscription confirmation email failed (non-fatal):", emailErr);
         }
       }
     }
@@ -388,29 +418,37 @@ export const handleWebhook = action({
             creatorId: donation.creatorId,
           });
           if (creator) {
-            // Email to creator
-            const creatorUser = await ctx.runQuery(internal.stripe.getUserById, { userId: creator.userId });
-            if (creatorUser?.email) {
-              await ctx.runAction(internal.emails.sendDonationReceived, {
-                creatorEmail: creatorUser.email,
-                creatorName: creator.displayName,
-                creatorSlug: creator.slug,
-                donorName: donation.isAnonymous ? "Anonymous" : (donation.donorName ?? "Someone"),
-                gallons: donation.gallons,
-                amountCents: donation.amountCents - donation.platformFeeCents,
-                message: donation.message,
-              });
+            // Email to creator — wrapped so failure never breaks the webhook
+            try {
+              const creatorUser = await ctx.runQuery(internal.stripe.getUserById, { userId: creator.userId });
+              if (creatorUser?.email) {
+                await ctx.runAction(internal.emails.sendDonationReceived, {
+                  creatorEmail: creatorUser.email,
+                  creatorName: creator.displayName,
+                  creatorSlug: creator.slug,
+                  donorName: donation.isAnonymous ? "Anonymous" : (donation.donorName ?? "Someone"),
+                  gallons: donation.gallons,
+                  amountCents: donation.amountCents - donation.platformFeeCents,
+                  message: donation.message,
+                });
+              }
+            } catch (emailErr) {
+              console.error("Creator email failed (non-fatal):", emailErr);
             }
-            // Confirmation to donor
-            if (donation.donorEmail && !donation.isAnonymous) {
-              await ctx.runAction(internal.emails.sendDonationConfirmation, {
-                donorEmail: donation.donorEmail,
-                donorName: donation.donorName ?? "Supporter",
-                gallons: donation.gallons,
-                amountCents: donation.amountCents,
-                creatorName: creator.displayName,
-                creatorSlug: creator.slug,
-              });
+            // Confirmation to donor — wrapped too
+            try {
+              if (donation.donorEmail && !donation.isAnonymous) {
+                await ctx.runAction(internal.emails.sendDonationConfirmation, {
+                  donorEmail: donation.donorEmail,
+                  donorName: donation.donorName ?? "Supporter",
+                  gallons: donation.gallons,
+                  amountCents: donation.amountCents,
+                  creatorName: creator.displayName,
+                  creatorSlug: creator.slug,
+                });
+              }
+            } catch (emailErr) {
+              console.error("Donor confirmation email failed (non-fatal):", emailErr);
             }
           }
         }

@@ -104,11 +104,20 @@ export function DonationSuccessPage() {
 
   const [copied, setCopied] = useState(false);
   const [confettiDone, setConfettiDone] = useState(false);
+  // Track how long we've been waiting for the webhook to complete the donation
+  const [waitSeconds, setWaitSeconds] = useState(0);
 
   useEffect(() => {
     const t = setTimeout(() => setConfettiDone(true), 3000);
     return () => clearTimeout(t);
   }, []);
+
+  // Poll counter — show a reassuring message if the webhook is slow
+  useEffect(() => {
+    if (donation?.status === "completed") return;
+    const interval = setInterval(() => setWaitSeconds(s => s + 1), 1000);
+    return () => clearInterval(interval);
+  }, [donation?.status]);
 
   const shareUrl = creator ? `${window.location.origin}/${creator.slug}` : window.location.origin;
   const shareText = creator && donation
@@ -123,6 +132,31 @@ export function DonationSuccessPage() {
 
   function tweetIt() {
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, "_blank");
+  }
+
+  // If no session ID at all, something is wrong
+  if (!sessionId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 text-center">
+        <div>
+          <p className="text-muted-foreground mb-4">No session found. If you were charged, your donation went through.</p>
+          <a href="/explore" className="text-fuel underline">Back to campaigns</a>
+        </div>
+      </div>
+    );
+  }
+
+  // Webhook may not have fired yet — show reassuring pending state
+  if (donation === undefined || (donation && donation.status === "pending" && waitSeconds < 15)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="size-16 rounded-full border-4 border-fuel border-t-transparent animate-spin mx-auto mb-5" />
+          <h2 className="text-xl font-bold mb-2">Confirming your donation…</h2>
+          <p className="text-muted-foreground text-sm">Hang tight — we're locking in your gallons.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
