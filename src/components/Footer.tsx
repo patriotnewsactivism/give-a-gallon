@@ -3,7 +3,25 @@ import { Logo } from "./Logo";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border/30 py-10">
+    <>
+  {/* Pre-footer CTA */}
+      <div className="border-t border-fuel/20 bg-fuel/[0.04] py-10">
+        <div className="container text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-fuel mb-2">Ready to fuel the fight?</p>
+          <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-4" style={{ fontFamily: "var(--font-display)" }}>
+            Every gallon gets someone there.
+          </h3>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="/signup" className="inline-flex items-center justify-center gap-2 h-11 px-7 rounded-lg bg-fuel text-fuel-foreground font-semibold text-sm shadow-lg shadow-fuel/25 hover:bg-fuel/90 transition-colors">
+              Start a Campaign
+            </a>
+            <a href="/explore" className="inline-flex items-center justify-center gap-2 h-11 px-7 rounded-lg border border-border/60 text-sm font-medium hover:border-fuel/40 hover:text-fuel transition-colors">
+              Fuel an Activist
+            </a>
+          </div>
+        </div>
+      </div>
+  <footer className="border-t border-border/30 py-10">
       <div className="container">
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 mb-8">
           <div className="col-span-2 sm:col-span-1">
@@ -57,6 +75,8 @@ export function Footer() {
         </div>
       </div>
     </footer>
+  );
+  </>
   );
 }
 
