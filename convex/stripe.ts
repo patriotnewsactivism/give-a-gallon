@@ -48,7 +48,7 @@ export const createCheckoutSession = action({
       },
     );
 
-    const siteUrl = process.env.SITE_URL || "https://give-a-gallon.vercel.app";
+    const siteUrl = process.env.SITE_URL || "https://give.wtpnews.org";
 
     const params = new URLSearchParams();
     params.append("mode", "payment");

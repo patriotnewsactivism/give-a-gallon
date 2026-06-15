@@ -3,7 +3,7 @@
  *
  * Flow:
  *  1. Creator gets a unique referral code (auto-generated on first access)
- *  2. Referral link: https://fuel.wtpnews.org/?ref=THEIRCODE
+ *  2. Referral link: https://give.wtpnews.org/?ref=THEIRCODE
  *  3. When a donation completes, referral is credited to the referrer
  *  4. Referrer earns bonus gallons / leaderboard position
  */

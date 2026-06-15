@@ -69,7 +69,7 @@ export function Footer() {
               <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-fuel transition-colors">We The People News</a>
               {" "}platform ·{" "}
               <a href="https://www.civilrightshub.org" target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-fuel transition-colors">Civil Rights Hub</a>
-              {" "}· <a href="https://fuel.wtpnews.org" className="hover:text-foreground transition-colors">fuel.wtpnews.org</a>
+              {" "}· <a href="https://give.wtpnews.org" className="hover:text-foreground transition-colors">give.wtpnews.org</a>
             </p>
             <p className="text-xs text-muted-foreground">
               "One gallon can change someone&#39;s day. Many gallons can change a life."

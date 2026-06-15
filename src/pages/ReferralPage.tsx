@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
-const SITE_URL = "https://fuel.wtpnews.org";
+const SITE_URL = "https://give.wtpnews.org";
 
 // Simple bar chart component
 function MiniBarChart({
