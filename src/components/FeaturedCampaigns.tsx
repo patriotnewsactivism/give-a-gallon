@@ -29,7 +29,7 @@ export function FeaturedCampaigns() {
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-fuel/10 text-fuel text-xs font-semibold mb-2">
                 <Star className="size-3 fill-current" /> EDITORIAL PICKS
               </div>
-              <h2 className="text-xl sm:text-2xl font-black tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
                 Campaigns We Believe In
               </h2>
             </div>
@@ -53,7 +53,7 @@ export function FeaturedCampaigns() {
               <Reveal key={creator._id}>
                 <Link
                   to={`/${creator.slug}`}
-                  className="group block rounded-2xl border border-fuel/15 bg-fuel/[0.03] hover:border-fuel/30 hover:bg-fuel/[0.06] transition-all overflow-hidden"
+                  className="group block rounded-2xl border border-fuel/25 bg-fuel/[0.04] hover:border-fuel/50 hover:bg-fuel/[0.08] transition-all overflow-hidden shadow-sm shadow-black/30 hover:shadow-md hover:shadow-fuel/10"
                 >
                   {/* Cover */}
                   {creator.coverUrl ? (
@@ -65,7 +65,7 @@ export function FeaturedCampaigns() {
                       />
                     </div>
                   ) : (
-                    <div className="h-10 bg-gradient-to-r from-fuel/10 to-transparent" />
+                    <div className="h-10 bg-gradient-to-r from-fuel/20 to-transparent" />
                   )}
 
                   <div className="p-4">
