@@ -61,6 +61,7 @@ const TIERS = [
     perks: [
       "7 gallons/month across campaigns",
       "Freedom Partner badge",
+      "⚡ Instant payouts — fee waived (members only)",
       "Direct creator updates in feed",
       "Vote on platform features",
       "Monthly transparency report",
@@ -81,6 +82,7 @@ const TIERS = [
     perks: [
       "17 gallons/month — maximum impact",
       "Impact Champion badge",
+      "⚡ Instant payouts — fee waived (members only)",
       "Named in campaign updates",
       "Direct line to platform team",
       "Annual impact report with your name",
@@ -193,6 +195,31 @@ export function MembershipPage() {
             </div>
           </Reveal>
         )}
+
+        {/* Instant payout creator callout */}
+        <Reveal className="mb-10">
+          <div className="rounded-2xl border border-fuel/30 bg-gradient-to-r from-fuel/10 to-fuel/[0.03] p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="rounded-xl bg-fuel/15 p-3 shrink-0">
+              <Zap className="size-6 text-fuel fill-fuel" />
+            </div>
+            <div className="flex-1">
+              <div className="text-xs font-black tracking-widest text-fuel uppercase mb-1">For Creators & Campaigners</div>
+              <h3 className="font-bold text-lg leading-tight mb-1">
+                Get your money in <span className="text-fuel">30 minutes.</span> Not days.
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Every other platform makes you wait 2–5 business days. Give-A-Gallon offers instant payouts to your debit card — gas when you need it most.
+                <strong className="text-foreground"> Freedom Partner and Impact Champion members get the Stripe instant payout fee waived.</strong>
+              </p>
+            </div>
+            <Link to="/signup" className="shrink-0">
+              <Button className="bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold whitespace-nowrap">
+                <Zap className="size-4 mr-1.5 fill-current" />
+                Start a Campaign
+              </Button>
+            </Link>
+          </div>
+        </Reveal>
 
         {/* Tiers */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-14">

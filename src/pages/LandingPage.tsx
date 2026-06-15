@@ -1,6 +1,7 @@
 import { useQuery } from "convex/react";
 import {
   ArrowRight,
+  Zap,
   ChevronRight,
   Fuel,
   Gavel,
@@ -103,6 +104,9 @@ function HeroSection() {
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Fuel className="size-3.5 text-fuel" /> 92% to activists
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-fuel font-bold">
+              <Zap className="size-3.5 fill-fuel text-fuel" /> Instant payouts
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Sparkles className="size-3.5 text-fuel" /> Live in 60 seconds
@@ -563,6 +567,83 @@ function CreatorCard({
   );
 }
 
+
+function InstantPayoutSection() {
+  return (
+    <section className="py-16 sm:py-20">
+      <div className="container">
+        <div className="mx-auto max-w-4xl rounded-3xl border border-fuel/30 bg-gradient-to-br from-fuel/[0.12] via-fuel/[0.04] to-transparent overflow-hidden">
+          <div className="grid sm:grid-cols-2 gap-0">
+            {/* Left — headline */}
+            <div className="p-8 sm:p-10 flex flex-col justify-center">
+              <div className="inline-flex items-center gap-2 text-xs font-black tracking-widest text-fuel uppercase mb-4">
+                <Zap className="size-4 fill-fuel text-fuel" />
+                INSTANT PAYOUTS
+              </div>
+              <h2
+                className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight mb-4"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                GAS WHEN YOU
+                <br />
+                <span className="text-fuel">NEED IT MOST.</span>
+                <br />
+                NOT DAYS LATER.
+              </h2>
+              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed mb-6">
+                Other platforms hold your money for 2–5 business days. We think that's wrong.
+                When a supporter fuels your fight, that money should reach you <strong className="text-foreground">within 30 minutes</strong> — not next week.
+              </p>
+              <Link to="/signup">
+                <Button className="bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold w-full sm:w-auto">
+                  <Zap className="size-4 mr-1.5 fill-current" />
+                  Start a Campaign
+                </Button>
+              </Link>
+            </div>
+            {/* Right — comparison */}
+            <div className="p-8 sm:p-10 border-t sm:border-t-0 sm:border-l border-fuel/20 flex flex-col justify-center gap-4">
+              {/* Them */}
+              <div className="rounded-xl border border-border/40 bg-card/40 p-4">
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Other Platforms</div>
+                {[
+                  { label: "Payout speed", val: "2–5 business days", bad: true },
+                  { label: "Instant option", val: "Usually not available", bad: true },
+                  { label: "You wait", val: "Up to a week", bad: true },
+                ].map(row => (
+                  <div key={row.label} className="flex items-center justify-between py-1.5 text-sm border-b border-border/20 last:border-0">
+                    <span className="text-muted-foreground">{row.label}</span>
+                    <span className="text-red-400 font-medium text-xs">{row.val}</span>
+                  </div>
+                ))}
+              </div>
+              {/* Us */}
+              <div className="rounded-xl border border-fuel/30 bg-fuel/[0.06] p-4">
+                <div className="text-xs font-black text-fuel uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                  <Zap className="size-3.5 fill-fuel" /> Give-A-Gallon
+                </div>
+                {[
+                  { label: "Standard payout", val: "1–2 business days · free" },
+                  { label: "⚡ Instant payout", val: "~30 minutes · 1% fee" },
+                  { label: "You wait", val: "Only if you want to" },
+                ].map(row => (
+                  <div key={row.label} className="flex items-center justify-between py-1.5 text-sm border-b border-fuel/10 last:border-0">
+                    <span className="text-muted-foreground">{row.label}</span>
+                    <span className="text-fuel font-semibold text-xs">{row.val}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
+                Instant payout fee waived for Freedom Partner &amp; Impact Champion members.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function PlatformFeeSection() {
   const tiers = [
     { value: "92%", label: "To the Activist", accent: "text-fuel" },
@@ -756,6 +837,7 @@ export function LandingPage() {
       <NetworkBanner />
       <WhoItsForSection />
       <HowItWorksSection />
+      <InstantPayoutSection />
       <WhyGiveAGallonSection />
       <FeaturedCreatorsSection />
       <PlatformFeeSection />
