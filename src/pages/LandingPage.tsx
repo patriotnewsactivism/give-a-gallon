@@ -37,8 +37,8 @@ function HeroSection() {
     <section className="relative overflow-hidden">
       {/* Layered background glows */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-fuel/[0.07] via-transparent to-transparent" />
-        <div className="absolute -top-24 left-1/2 h-[640px] w-[900px] -translate-x-1/2 rounded-full bg-fuel/[0.06] blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-fuel/[0.12] via-fuel/[0.03] to-transparent" />
+        <div className="absolute -top-24 left-1/2 h-[640px] w-[900px] -translate-x-1/2 rounded-full bg-fuel/[0.10] blur-3xl animate-hero-pulse" />
         <div className="absolute top-40 right-[12%] h-72 w-72 rounded-full bg-fuel/[0.05] blur-3xl" />
       </div>
 
@@ -47,7 +47,7 @@ function HeroSection() {
           {/* Eyebrow */}
           <div className="mb-7 inline-flex animate-in fade-in slide-in-from-bottom-2 items-center gap-2 rounded-full border border-fuel/20 bg-fuel/5 px-3 py-1.5 text-sm font-medium text-fuel duration-700">
             <Sparkles className="size-3.5" />
-            <span>Fundraising, by the gallon</span>
+            <span className="font-bold tracking-wide">FUNDRAISING, BY THE GALLON</span>
           </div>
 
           {/* Headline */}
@@ -56,7 +56,7 @@ function HeroSection() {
             style={{ fontFamily: "var(--font-display)" }}
           >
             <span className="text-foreground">GIVE A</span>{" "}
-            <span className="relative text-fuel">
+            <span className="relative text-fuel text-glow-fuel">
               GALLON
               <span className="absolute -bottom-2 left-0 h-1 w-full rounded-full bg-fuel/30" />
             </span>
@@ -64,19 +64,18 @@ function HeroSection() {
 
           {/* Subheadline */}
           <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            The fundraising platform built for activists. Supporters fuel your
-            fight{" "}
+            Supporters fuel your fight{" "}
             <span className="font-semibold text-foreground">
-              one gallon of gas at a time
+              one gallon of gas at a time.
             </span>{" "}
-            — because a gallon goes a long way when you're on the move.
+            No platform politics. No gatekeepers. Just fuel for the people who show up.
           </p>
 
           {/* CTAs */}
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button
               size="lg"
-              className="h-12 w-full bg-fuel px-8 text-base font-semibold text-fuel-foreground shadow-lg shadow-fuel/20 transition-transform hover:translate-y-px hover:bg-fuel/90 sm:w-auto"
+              className="h-12 w-full bg-fuel px-8 text-base font-semibold text-fuel-foreground shadow-lg shadow-fuel/30 shadow-glow-fuel transition-transform hover:-translate-y-0.5 hover:bg-fuel/95 hover:shadow-fuel/50 sm:w-auto"
               asChild
             >
               <Link to="/signup">
@@ -98,7 +97,7 @@ function HeroSection() {
           </div>
 
           {/* Trust strip */}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-muted-foreground">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground/90 font-medium">
             <span className="inline-flex items-center gap-1.5">
               <Shield className="size-3.5 text-fuel" /> Secured by Stripe
             </span>
@@ -151,7 +150,7 @@ function HeroStat({ value, label }: { value: number; label: string }) {
   return (
     <div className="text-center">
       <div
-        className="text-3xl font-bold text-fuel sm:text-4xl"
+        className="text-4xl font-bold text-fuel sm:text-5xl text-glow-fuel"
         style={{ fontFamily: "var(--font-display)" }}
       >
         <CountUp value={value} />
@@ -222,7 +221,7 @@ function HowItWorksSection() {
       <div className="container">
         <Reveal className="mb-14 text-center">
           <h2
-            className="text-3xl font-bold tracking-tight sm:text-4xl"
+            className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
             HOW IT WORKS
@@ -235,13 +234,13 @@ function HowItWorksSection() {
         <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-3">
           {steps.map((step, i) => (
             <Reveal key={step.num} delayMs={i * 120}>
-              <div className="group relative h-full rounded-2xl border border-border/50 bg-card/50 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-fuel/40 hover:shadow-lg hover:shadow-fuel/5">
+              <div className="group relative h-full rounded-2xl border border-border/50 bg-card/50 p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-fuel/50 hover:shadow-xl hover:shadow-fuel/10 hover:bg-card/80">
                 <div className="mb-4 flex items-start justify-between">
                   <div className="rounded-xl bg-fuel/10 p-2.5">
                     <step.icon className="size-5 text-fuel" />
                   </div>
                   <span
-                    className="text-4xl font-bold text-fuel/15"
+                    className="text-4xl font-bold text-fuel/25"
                     style={{ fontFamily: "var(--font-display)" }}
                   >
                     {step.num}
@@ -305,7 +304,7 @@ function WhoItsForSection() {
       <div className="container">
         <Reveal className="mb-14 text-center">
           <h2
-            className="text-3xl font-bold tracking-tight sm:text-4xl"
+            className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
             BUILT FOR PEOPLE WHO{" "}
@@ -320,7 +319,7 @@ function WhoItsForSection() {
         <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
           {personas.map((p, i) => (
             <Reveal key={p.title} delayMs={i * 120}>
-              <div className="group relative h-full rounded-2xl border border-border/50 bg-card/50 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-fuel/40 hover:shadow-lg hover:shadow-fuel/5">
+              <div className="group relative h-full rounded-2xl border border-border/50 bg-card/50 p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-fuel/50 hover:shadow-xl hover:shadow-fuel/10 hover:bg-card/80">
                 <div className="mb-4 rounded-xl bg-fuel/10 p-2.5 inline-block">
                   <p.icon className="size-5 text-fuel" />
                 </div>
