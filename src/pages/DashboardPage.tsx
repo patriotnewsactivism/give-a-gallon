@@ -547,7 +547,7 @@ function PayoutPanel({ creator }: { creator: any }) {
           Money on your debit card in about 30 minutes. No waiting days.
           {canPayout && (
             <span className="text-foreground/70">
-              {" "}Stripe fee: <strong>${(instantFeeCents / 100).toFixed(2)}</strong> → you receive <strong className="text-fuel">${(instantNetCents / 100).toFixed(2)}</strong>.
+              {" "}Stripe charges <strong>${(instantFeeCents / 100).toFixed(2)}</strong> to process instantly — you receive <strong className="text-fuel">${(instantNetCents / 100).toFixed(2)}</strong>. We keep nothing.
             </span>
           )}
         </p>
@@ -605,7 +605,7 @@ function PayoutPanel({ creator }: { creator: any }) {
       {payoutResult && (
         <div className={`mx-4 mb-4 rounded-lg border p-3 text-xs ${payoutResult.method === "instant" ? "border-fuel/30 bg-fuel/5 text-fuel" : "border-border/50 bg-card/50 text-muted-foreground"}`}>
           {payoutResult.method === "instant" ? (
-            <>⚡ <strong>${(payoutResult.netCents / 100).toFixed(2)}</strong> is on its way — ~30 min to your card. (Stripe fee: ${(payoutResult.feeCents / 100).toFixed(2)})</>
+            <>⚡ <strong>${(payoutResult.netCents / 100).toFixed(2)}</strong> is on its way — ~30 min to your card. (Stripe processing fee: ${(payoutResult.feeCents / 100).toFixed(2)} — passed through at cost)</>
           ) : (
             <>✓ <strong>${(payoutResult.netCents / 100).toFixed(2)}</strong> transfer initiated — arrives in 1–2 business days.</>
           )}

@@ -61,7 +61,7 @@ const TIERS = [
     perks: [
       "7 gallons/month across campaigns",
       "Freedom Partner badge",
-      "⚡ Instant payouts — fee waived (members only)",
+      "⚡ Instant payouts — get paid in ~30 min, not days",
       "Direct creator updates in feed",
       "Vote on platform features",
       "Monthly transparency report",
@@ -82,7 +82,7 @@ const TIERS = [
     perks: [
       "17 gallons/month — maximum impact",
       "Impact Champion badge",
-      "⚡ Instant payouts — fee waived (members only)",
+      "⚡ Instant payouts — get paid in ~30 min, not days",
       "Named in campaign updates",
       "Direct line to platform team",
       "Annual impact report with your name",
@@ -209,7 +209,8 @@ export function MembershipPage() {
               </h3>
               <p className="text-sm text-muted-foreground">
                 Every other platform makes you wait 2–5 business days. Give-A-Gallon offers instant payouts to your debit card — gas when you need it most.
-                <strong className="text-foreground"> Freedom Partner and Impact Champion members get the Stripe instant payout fee waived.</strong>
+                Stripe charges a small processing fee (~1%) for instant transfers.{" "}
+                <strong className="text-foreground">We pass it through at cost — Give-A-Gallon keeps nothing extra.</strong>
               </p>
             </div>
             <Link to="/signup" className="shrink-0">

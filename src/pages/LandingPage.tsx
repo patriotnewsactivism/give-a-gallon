@@ -36,11 +36,26 @@ function HeroSection() {
 
   return (
     <section className="relative overflow-hidden">
-      {/* Layered background glows */}
+      {/* Rich layered background — fills desktop horizontal space */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-fuel/[0.12] via-fuel/[0.03] to-transparent" />
-        <div className="absolute -top-24 left-1/2 h-[640px] w-[900px] -translate-x-1/2 rounded-full bg-fuel/[0.10] blur-3xl animate-hero-pulse" />
-        <div className="absolute top-40 right-[12%] h-72 w-72 rounded-full bg-fuel/[0.05] blur-3xl" />
+        {/* Full-width top gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-fuel/[0.18] via-fuel/[0.05] to-transparent" />
+        {/* Noise texture overlay */}
+        <div className="absolute inset-0 opacity-[0.03] bg-[url('data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\'/%3E%3C/svg%3E')]" />
+        {/* Center mega-glow */}
+        <div className="absolute -top-24 left-1/2 h-[700px] w-[1100px] -translate-x-1/2 rounded-full bg-fuel/[0.13] blur-3xl animate-hero-pulse" />
+        {/* Left edge glow */}
+        <div className="absolute top-0 left-0 h-full w-[30%] bg-gradient-to-r from-fuel/[0.07] to-transparent" />
+        {/* Right edge glow */}
+        <div className="absolute top-0 right-0 h-full w-[30%] bg-gradient-to-l from-fuel/[0.07] to-transparent" />
+        {/* Left floating orb */}
+        <div className="absolute top-20 left-[5%] h-80 w-80 rounded-full bg-fuel/[0.08] blur-3xl" />
+        {/* Right floating orb */}
+        <div className="absolute top-32 right-[5%] h-64 w-64 rounded-full bg-fuel/[0.08] blur-3xl" />
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-background to-transparent" />
+        {/* Subtle grid lines — desktop depth effect */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{backgroundImage: "linear-gradient(oklch(0.62 0.23 25) 1px, transparent 1px), linear-gradient(90deg, oklch(0.62 0.23 25) 1px, transparent 1px)", backgroundSize: "80px 80px"}} />
       </div>
 
       <div className="container relative pt-16 pb-16 sm:pt-24 sm:pb-24">
@@ -593,6 +608,7 @@ function InstantPayoutSection() {
               <p className="text-muted-foreground text-sm sm:text-base leading-relaxed mb-6">
                 Other platforms hold your money for 2–5 business days. We think that's wrong.
                 When a supporter fuels your fight, that money should reach you <strong className="text-foreground">within 30 minutes</strong> — not next week.
+                Stripe charges a small processing fee for instant transfers. <strong className="text-foreground">We pass it straight through — no markup, no cut.</strong>
               </p>
               <Link to="/signup">
                 <Button className="bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold w-full sm:w-auto">
@@ -624,8 +640,8 @@ function InstantPayoutSection() {
                 </div>
                 {[
                   { label: "Standard payout", val: "1–2 business days · free" },
-                  { label: "⚡ Instant payout", val: "~30 minutes · 1% fee" },
-                  { label: "You wait", val: "Only if you want to" },
+                  { label: "⚡ Instant payout", val: "~30 min · Stripe fee only" },
+                  { label: "We charge you", val: "Nothing extra. Ever." },
                 ].map(row => (
                   <div key={row.label} className="flex items-center justify-between py-1.5 text-sm border-b border-fuel/10 last:border-0">
                     <span className="text-muted-foreground">{row.label}</span>
@@ -634,7 +650,7 @@ function InstantPayoutSection() {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                Instant payout fee waived for Freedom Partner &amp; Impact Champion members.
+                Instant payout uses Stripe&apos;s ~1% processing fee (min $0.50) — passed to you at cost. Give-A-Gallon keeps nothing.
               </p>
             </div>
           </div>
