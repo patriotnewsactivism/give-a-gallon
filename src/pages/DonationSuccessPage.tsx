@@ -14,7 +14,6 @@ import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
-import { GALLON_PRICE } from "@/lib/constants";
 
 function timeAgo(ts: number) {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -70,6 +69,23 @@ export function DonationSuccessPage() {
     donation?.creatorId ? { id: donation.creatorId } : "skip"
   );
 
+  const [copied, setCopied] = useState(false);
+  const [confettiDone, setConfettiDone] = useState(false);
+  // Track how long we've been waiting for the webhook to complete the donation
+  const [waitSeconds, setWaitSeconds] = useState(0);
+
+  useEffect(() => {
+    const t = setTimeout(() => setConfettiDone(true), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Poll counter — show a reassuring message if the webhook is slow
+  useEffect(() => {
+    if (donation?.status === "completed") return;
+    const interval = setInterval(() => setWaitSeconds(s => s + 1), 1000);
+    return () => clearInterval(interval);
+  }, [donation?.status]);
+
   // ── Subscription success screen ──────────────────────────────────────────────
   if (isSubscription) {
     return (
@@ -101,23 +117,6 @@ export function DonationSuccessPage() {
       </div>
     );
   }
-
-  const [copied, setCopied] = useState(false);
-  const [confettiDone, setConfettiDone] = useState(false);
-  // Track how long we've been waiting for the webhook to complete the donation
-  const [waitSeconds, setWaitSeconds] = useState(0);
-
-  useEffect(() => {
-    const t = setTimeout(() => setConfettiDone(true), 3000);
-    return () => clearTimeout(t);
-  }, []);
-
-  // Poll counter — show a reassuring message if the webhook is slow
-  useEffect(() => {
-    if (donation?.status === "completed") return;
-    const interval = setInterval(() => setWaitSeconds(s => s + 1), 1000);
-    return () => clearInterval(interval);
-  }, [donation?.status]);
 
   const shareUrl = creator ? `${window.location.origin}/${creator.slug}` : window.location.origin;
   const shareText = creator && donation
