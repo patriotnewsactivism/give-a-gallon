@@ -155,8 +155,6 @@ export function CreatorProfilePage() {
 
   const catInfo = CATEGORIES.find(c => c.id === creator.category);
   const completedDonations = (donations ?? []).filter((d: any) => d.status === "completed");
-  const pct = creator.goal ? Math.min(100, Math.round((creator.totalGallons / creator.goal) * 100)) : null;
-  const completedMilestones = (milestones ?? []).filter((m: any) => m.isCompleted);
 
   return (
     <div className="min-h-screen">
@@ -247,8 +245,7 @@ export function CreatorProfilePage() {
                   <TrendingUp className="size-4 text-fuel" /> MILESTONES
                 </h2>
                 <div className="space-y-2">
-                  {(milestones as any[]).map((m, i) => {
-                    const targetGallons = Math.ceil(m.targetCents / (GALLON_PRICE * 100));
+                  {(milestones as any[]).map((m, _i) => {
                     const done = creator.totalAmountCents >= m.targetCents;
                     const mpct = Math.min(100, Math.round((creator.totalAmountCents / m.targetCents) * 100));
                     return (
@@ -282,7 +279,7 @@ export function CreatorProfilePage() {
                   <Fuel className="size-4 text-fuel" /> UPDATES
                 </h2>
                 <div className="relative pl-4 border-l-2 border-border/30 space-y-4">
-                  {(updates as any[]).map((u, i) => (
+                  {(updates as any[]).map((u, _i) => (
                     <div key={u._id} className="relative">
                       <div className="absolute -left-[1.35rem] top-1 size-3 rounded-full bg-fuel/80 border-2 border-background" />
                       <div className="p-3 rounded-lg border border-border/30 bg-card/40">
