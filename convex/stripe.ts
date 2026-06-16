@@ -19,7 +19,7 @@ export const createCheckoutSession = action({
     referralCode: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    const _stripeKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeKey) throw new Error("Stripe not configured");
 
     if (args.gallons < 1 || args.gallons > 1000) {
@@ -349,7 +349,7 @@ export const handleWebhook = action({
       if (userId && tierId) {
         const subId = session.subscription;
         // Fetch the subscription from Stripe to get period end
-        const stripeKey = process.env.STRIPE_SECRET_KEY!;
+        const _stripeKey = process.env.STRIPE_SECRET_KEY!;
         const subRes = await fetch(`https://api.stripe.com/v1/subscriptions/${subId}`, {
           headers: { Authorization: `Bearer ${stripeKey}` },
         });
@@ -409,7 +409,7 @@ export const handleWebhook = action({
       const session = event.data.object;
       if (session.payment_status === "paid") {
         // Find the donation and creator to send emails
-        const stripeKey = process.env.STRIPE_SECRET_KEY!;
+        const _stripeKey = process.env.STRIPE_SECRET_KEY!;
         const donation = await ctx.runQuery(internal.stripe.getDonationBySession, {
           stripeSessionId: session.id,
         });
