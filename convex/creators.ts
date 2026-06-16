@@ -208,3 +208,18 @@ export const getPlatformStats = query({
     };
   },
 });
+
+// Newest active creator profiles — for the landing page "Just Joined" strip
+export const listNewest = query({
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, { limit }) => {
+    const creators = await ctx.db
+      .query("creators")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .order("desc")
+      .take(limit ?? 12);
+    // Sort by createdAt descending so newest appear first
+    const sorted = creators.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+    return await Promise.all(sorted.map((c) => withImageUrls(ctx, c)));
+  },
+});

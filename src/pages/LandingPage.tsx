@@ -22,6 +22,7 @@ import { DonationTicker } from "@/components/DonationTicker";
 import { Reveal } from "@/components/Reveal";
 import { NetworkBanner } from "@/components/NetworkBanner";
 import { FeaturedCampaigns } from "@/components/FeaturedCampaigns";
+import { NewestCreators } from "@/components/NewestCreators";
 import { Button } from "@/components/ui/button";
 import { GALLON_PRICE } from "@/lib/constants";
 import { api } from "../../convex/_generated/api";
@@ -973,6 +974,7 @@ export function LandingPage() {
       <HeroSection />
       <CategoryBrowseSection />
       <FounderStorySection />
+      <NewestCreators />
       <FeaturedCampaigns />
       <NetworkBanner />
       <WhoItsForSection />
