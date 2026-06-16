@@ -73,7 +73,7 @@ async function send(to: string, subject: string, html: string): Promise<void> {
 // ── Email templates ───────────────────────────────────────────────────────────
 
 function donationReceivedHtml({
-  creatorName, donorName, gallons, amountDollars, message, creatorSlug,
+  creatorName: _creatorName, donorName, gallons, amountDollars, message, creatorSlug,
 }: { creatorName: string; donorName: string; gallons: number; amountDollars: string; message?: string; creatorSlug: string }) {
   return wrap(`
     <div style="padding:28px 28px 0;">
