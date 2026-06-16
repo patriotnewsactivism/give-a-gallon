@@ -18,7 +18,6 @@ import { api } from "../../convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 const SITE_URL = "https://give.wtpnews.org";
 
@@ -78,7 +77,7 @@ export default function ReferralPage() {
     try {
       await generateCode({});
       toast.success("Referral code generated!");
-    } catch (e) {
+    } catch (_e) {
       toast.error("Failed to generate code");
     } finally {
       setGenerating(false);
