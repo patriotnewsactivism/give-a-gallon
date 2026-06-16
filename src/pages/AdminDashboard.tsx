@@ -53,14 +53,14 @@ type SortKey = "createdAt" | "totalGallons" | "lastLoginAt" | "lastDonationAt" |
 
 // ── Main component ─────────────────────────────────────────────────────────
 export function AdminDashboard() {
-  const isAdmin = useQuery(api.admin.isAdmin);
-  const overview = useQuery(isAdmin ? api.admin.getPlatformOverview : api.notifications.getRecentPublic);
-  const creators = useQuery(isAdmin ? api.admin.listAllCreators : api.notifications.getRecentPublic);
-  const recentDonations = useQuery(isAdmin ? api.admin.listAllDonations : api.notifications.getRecentPublic, isAdmin ? { limit: 50 } : undefined);
-  const notifications = useQuery(api.notifications.getRecent);
-  const sendNotification = useMutation(api.admin.sendNotification);
-  const toggleActive = useMutation(api.admin.toggleCreatorActive);
-  const toggleFeatured = useMutation(api.admin.toggleCreatorFeatured);
+  const isAdmin = useQuery((api as any).admin.isAdmin);
+  const overview = useQuery(isAdmin ? (api as any).admin.getPlatformOverview : (api as any).notifications.getRecentPublic);
+  const creators = useQuery(isAdmin ? (api as any).admin.listAllCreators : (api as any).notifications.getRecentPublic);
+  const recentDonations = useQuery(isAdmin ? (api as any).admin.listAllDonations : (api as any).notifications.getRecentPublic, isAdmin ? { limit: 50 } : undefined);
+  const notifications = useQuery((api as any).notifications.getRecent);
+  const sendNotification = useMutation((api as any).admin.sendNotification);
+  const toggleActive = useMutation((api as any).admin.toggleCreatorActive);
+  const toggleFeatured = useMutation((api as any).admin.toggleCreatorFeatured);
 
   const [tab, setTab] = useState<"overview" | "creators" | "donations" | "notifications">("overview");
   const [search, setSearch] = useState("");
