@@ -9,7 +9,7 @@
  */
 import { useQuery } from "convex/react";
 import { Fuel, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 
@@ -31,6 +31,12 @@ export function SocialProofBar() {
   const [toast, setToast] = useState<ToastDonation | null>(null);
   const [visible, setVisible] = useState(false);
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function dismiss() {
+    setVisible(false);
+    setTimeout(() => setToast(null), 350); // wait for slide-out
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+  }
 
   useEffect(() => {
     if (!donations || donations.length === 0) return;
@@ -57,13 +63,7 @@ export function SocialProofBar() {
     requestAnimationFrame(() => setVisible(true));
 
     dismissTimer.current = setTimeout(() => dismiss(), DISMISS_MS);
-  }, [donations]);
-
-  function dismiss() {
-    setVisible(false);
-    setTimeout(() => setToast(null), 350); // wait for slide-out
-    if (dismissTimer.current) clearTimeout(dismissTimer.current);
-  }
+  }, [donations, dismiss]);
 
   if (!toast) return null;
 
