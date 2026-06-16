@@ -29,9 +29,9 @@ export function ShareSheet({ url, title, description, compact = false }: ShareSh
       return;
     }
     const urls: Record<string, string> = {
-      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text + " " + fullUrl)}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${text} ${fullUrl}`)}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullUrl)}`,
-      sms: `sms:?body=${encodeURIComponent(text + " " + fullUrl)}`,
+      sms: `sms:?body=${encodeURIComponent(`${text} ${fullUrl}`)}`,
     };
     window.open(urls[platform], "_blank");
   }
