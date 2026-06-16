@@ -360,8 +360,7 @@ function PayoutPanel({ creator }: { creator: any }) {
     if (status === "active") {
       getBalance().then(setBalance).catch(console.error);
     }
-  // biome-ignore lint/correctness/useExhaustiveDependencies: getBalance is stable action
-  }, [status]);
+  }, [status, getBalance]);
 
   async function handleConnect() {
     setLoading(true);
