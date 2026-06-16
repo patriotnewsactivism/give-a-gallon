@@ -9,7 +9,7 @@
  */
 import { useQuery } from "convex/react";
 import { Fuel, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 
