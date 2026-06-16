@@ -62,7 +62,7 @@ export function NewestCreators() {
             const joined = creator.createdAt ? timeAgo(creator.createdAt) : null;
 
             return (
-              <Reveal key={creator._id} delay={i * 40}>
+              <Reveal key={creator._id} delayMs={i * 40}>
                 <Link
                   to={`/${creator.slug}`}
                   className="group flex-shrink-0 w-56 sm:w-auto snap-start block rounded-2xl border border-border/40 bg-card/60 hover:border-fuel/40 hover:bg-fuel/[0.04] transition-all overflow-hidden shadow-sm shadow-black/20 hover:shadow-md hover:shadow-fuel/10"
