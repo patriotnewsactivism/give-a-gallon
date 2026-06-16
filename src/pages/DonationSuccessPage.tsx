@@ -15,13 +15,6 @@ import { api } from "../../convex/_generated/api";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 
-function timeAgo(ts: number) {
-  const s = Math.floor((Date.now() - ts) / 1000);
-  if (s < 60) return "just now";
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
-  return `${Math.floor(m / 60)}h ago`;
-}
 
 function ReferralShare({ slug, code }: { slug: string; code: string }) {
   const [copied, setCopied] = useState(false);
