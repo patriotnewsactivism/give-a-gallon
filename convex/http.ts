@@ -32,3 +32,21 @@ http.route({
 });
 
 export default http;
+
+// Recent donations endpoint (for automations / webhooks)
+http.route({
+  path: "/api/recent-donations",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const limit = new URL(request.url).searchParams.get("limit") || "50";
+    const donations = await ctx.runQuery(api.donations.getRecent, {
+      limit: parseInt(limit),
+    });
+    return new Response(JSON.stringify(donations), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+export default http;
