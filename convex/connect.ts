@@ -26,16 +26,6 @@ async function stripePost(path: string, key: string, params: Record<string, stri
   return res.json();
 }
 
-async function _stripeGet(path: string, key: string) {
-  const res = await fetch(`https://api.stripe.com/v1${path}`, {
-    headers: { Authorization: `Bearer ${key}` },
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Stripe ${path} error: ${err}`);
-  }
-  return res.json();
-}
 
 // ── public actions ─────────────────────────────────────────────────────────
 
