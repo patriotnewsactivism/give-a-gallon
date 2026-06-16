@@ -185,7 +185,7 @@ export function SettingsPage() {
             className="w-full h-10 rounded-md border border-border/50 bg-background px-3 text-sm"
           >
             <option value="">Select a category...</option>
-            {CATEGORIES.map((cat) => (
+            {CATEGORY_LIST.map((cat) => (
               <option key={cat} value={cat}>
                 {cat}
               </option>
