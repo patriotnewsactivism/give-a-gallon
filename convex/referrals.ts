@@ -10,14 +10,12 @@
 
 import { v } from "convex/values";
 import {
-  action,
   internalMutation,
   internalQuery,
   mutation,
   query,
 } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { internal } from "./_generated/api";
 
 // ── Generate a short unique code ──────────────────────────────────────────────
 function generateCode(slug: string): string {
