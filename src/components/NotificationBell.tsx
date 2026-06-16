@@ -6,11 +6,11 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Bell, Megaphone, Trophy, AlertTriangle, ExternalLink } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
-const TYPE_ICON: Record<string, JSX.Element> = {
+const TYPE_ICON: Record<string, React.ReactElement> = {
   announcement: <Megaphone className="size-3.5 text-blue-400" />,
   milestone: <Trophy className="size-3.5 text-yellow-400" />,
   alert: <AlertTriangle className="size-3.5 text-red-400" />,
