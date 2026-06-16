@@ -7,7 +7,6 @@ import { api } from "../../convex/_generated/api";
 import { Link } from "react-router-dom";
 import { Fuel, Star, ExternalLink } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
-import { FuelGaugeMark } from "@/components/FuelGaugeMark";
 import { VERIFICATION_TIERS } from "../../convex/constants";
 
 const NETWORK_LABEL: Record<string, { label: string; color: string }> = {
