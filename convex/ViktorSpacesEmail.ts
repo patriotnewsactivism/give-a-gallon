@@ -23,7 +23,9 @@ async function sendEmail({
   description: string;
 }) {
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.RESEND_FROM_EMAIL ?? "noreply@give-a-gallon.com";
+  // Fall back to the verified sender domain — must match a domain verified in
+  // your Resend account. Update RESEND_FROM_EMAIL in Convex env to override.
+  const fromEmail = process.env.RESEND_FROM_EMAIL ?? "noreply@donmatthews.live";
 
   if (!apiKey) {
     throw new Error("RESEND_API_KEY is not set. Add it to your Convex environment variables.");
