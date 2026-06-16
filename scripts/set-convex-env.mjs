@@ -4,7 +4,10 @@ import { execSync } from "child_process";
 const envVars = {
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-  SITE_URL: "https://give-a-gallon.vercel.app",
+  // Use the env var if set, otherwise fall back to the real production domain.
+  // Do NOT hardcode a stale URL here — it would override whatever is set in
+  // the Convex dashboard on every deploy.
+  SITE_URL: process.env.SITE_URL ?? "https://give.wtpnews.org",
 };
 
 for (const [key, value] of Object.entries(envVars)) {
