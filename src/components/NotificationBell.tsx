@@ -55,7 +55,7 @@ export function NotificationBell() {
   };
 
   const markAllRead = () => {
-    notifications?.forEach((n: any) => markRead(n._id));
+    notifications?.forEach((n: any) => { void markRead(n._id); });
   };
 
   // Fire toast for genuinely new notifications
@@ -94,7 +94,7 @@ export function NotificationBell() {
 
       {open && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="fixed inset-0 z-40" role="button" tabIndex={-1} aria-label="Close" onClick={() => setOpen(false)} onKeyDown={e => { if (e.key === "Escape") setOpen(false); }} />
           <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl border border-border/50 bg-card shadow-2xl shadow-black/30 z-50 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
               <span className="text-sm font-semibold">Notifications</span>
