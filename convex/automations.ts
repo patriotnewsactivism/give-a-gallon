@@ -52,13 +52,21 @@ export const getRecentCreatorsForAlert = internalQuery({
 
     const recent = creators.filter((c) => (c.createdAt ?? 0) >= cutoffTime);
 
-    return recent.map((c) => ({
-      _id: c._id,
-      displayName: c.displayName,
-      slug: c.slug,
-      category: c.category || "General",
-      createdAt: c.createdAt,
-      userEmail: c.userEmail,
-    }));
+    // Look up user email via userId — creators don't store email directly
+    const enriched = await Promise.all(
+      recent.map(async (c) => {
+        const user = await ctx.db.get(c.userId);
+        return {
+          _id: c._id,
+          displayName: c.displayName,
+          slug: c.slug,
+          category: c.category || "General",
+          createdAt: c.createdAt,
+          userEmail: user?.email ?? null,
+        };
+      })
+    );
+
+    return enriched;
   },
 });
