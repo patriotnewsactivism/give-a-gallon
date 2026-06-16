@@ -6,11 +6,11 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Bell, Megaphone, Trophy, AlertTriangle, ExternalLink } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { type ReactElement, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
-const TYPE_ICON: Record<string, React.ReactElement> = {
+const TYPE_ICON: Record<string, ReactElement> = {
   announcement: <Megaphone className="size-3.5 text-blue-400" />,
   milestone: <Trophy className="size-3.5 text-yellow-400" />,
   alert: <AlertTriangle className="size-3.5 text-red-400" />,
@@ -34,7 +34,7 @@ function timeAgo(ts: number) {
 
 export function NotificationBell() {
   // Always call this hook unconditionally — notifications are public
-  const notifications = useQuery(api.notifications.getRecent);
+  const notifications = useQuery((api as any).notifications.getRecent);
 
   const seenLatestId = useRef<string | null>(null);
   const [open, setOpen] = useState(false);
