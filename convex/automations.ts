@@ -1,36 +1,64 @@
 /**
- * Automation helper functions — expose data for CRON and event-triggered tasks
+ * Automations — scheduled tasks triggered by Base44 Superagent
  */
+import { internalQuery } from "./_generated/server";
 import { v } from "convex/values";
-import { action } from "./_generated/server";
 
-/**
- * Get creators created in the last N milliseconds
- * Used by the "New Creator Profile Alert" automation
- */
-export const getNewCreators = action({
-  args: { windowMs: v.number() },
-  handler: async (ctx, { windowMs }) => {
-    const since = Date.now() - windowMs;
-    
-    // Query all active creators, sorted newest first
-    const creators = await ctx.db
-      .query("creators")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+// Query to fetch recent completed donations with creator details
+export const getRecentDonationsForAlert = internalQuery({
+  args: { minutesAgo: v.number() },
+  handler: async (ctx, args: { minutesAgo: number }) => {
+    const cutoffTime = Date.now() - args.minutesAgo * 60 * 1000;
+
+    const donations = await ctx.db
+      .query("donations")
+      .withIndex("by_status", (q) => q.eq("status", "completed"))
       .order("desc")
       .take(100);
-    
-    // Filter to only those created in the window
-    const newOnes = creators
-      .filter(c => (c.createdAt ?? 0) > since)
-      .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
-    
-    return newOnes.map(c => ({
+
+    const recent = donations.filter((d) => d.createdAt >= cutoffTime);
+
+    const enriched = await Promise.all(
+      recent.map(async (d) => {
+        const creator = await ctx.db.get(d.creatorId);
+        return {
+          _id: d._id,
+          gallons: d.gallons,
+          amountCents: d.amountCents,
+          donorName: d.isAnonymous ? "Anonymous" : (d.donorName || "Someone"),
+          donorEmail: d.donorEmail || "",
+          message: d.message || "",
+          createdAt: d.createdAt,
+          creatorSlug: creator?.slug ?? "",
+          creatorName: creator?.displayName ?? "",
+        };
+      })
+    );
+
+    return enriched;
+  },
+});
+
+// Query to fetch recent creators for alert
+export const getRecentCreatorsForAlert = internalQuery({
+  args: { minutesAgo: v.number() },
+  handler: async (ctx, args: { minutesAgo: number }) => {
+    const cutoffTime = Date.now() - args.minutesAgo * 60 * 1000;
+
+    const creators = await ctx.db
+      .query("creators")
+      .order("desc")
+      .take(100);
+
+    const recent = creators.filter((c) => (c.createdAt ?? 0) >= cutoffTime);
+
+    return recent.map((c) => ({
       _id: c._id,
-      name: c.name,
+      displayName: c.displayName,
       slug: c.slug,
-      category: c.category,
+      category: c.category || "General",
       createdAt: c.createdAt,
+      userEmail: c.userEmail,
     }));
   },
 });
