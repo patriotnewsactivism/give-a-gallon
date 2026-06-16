@@ -18,6 +18,7 @@ import {
   MyImpactPage,
   SettingsPage,
   SignupPage,
+  AdminDashboard,
 } from "./pages";
 import { DonationSuccessPage } from "./pages/DonationSuccessPage";
 import { DonationCancelPage } from "./pages/DonationCancelPage";
@@ -54,6 +55,7 @@ function App() {
             </Route>
           </Route>
 
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </ThemeProvider>

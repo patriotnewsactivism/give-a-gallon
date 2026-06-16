@@ -186,6 +186,33 @@ const schema = defineSchema({
     body: v.string(),
     createdAt: v.number(),
   }).index("by_creator", ["creatorId", "createdAt"]),
+  // ── Push notifications (admin → all users) ──────────────────────────────
+  notifications: defineTable({
+    title: v.string(),
+    body: v.string(),
+    type: v.union(
+      v.literal("announcement"),
+      v.literal("milestone"),
+      v.literal("alert"),
+    ),
+    targetAudience: v.union(
+      v.literal("all"),
+      v.literal("creators"),
+      v.literal("donors"),
+    ),
+    link: v.optional(v.string()),
+    sentBy: v.string(), // admin email
+    createdAt: v.number(),
+  }).index("by_created", ["createdAt"]),
+
+  // ── Per-user read receipts for notifications ─────────────────────────────
+  notificationReads: defineTable({
+    userId: v.id("users"),
+    notificationId: v.id("notifications"),
+    readAt: v.number(),
+  })
+    .index("by_user", ["userId", "notificationId"])
+    .index("by_notification", ["notificationId"]),
 });
 
 export default schema;

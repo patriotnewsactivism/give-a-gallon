@@ -3,6 +3,7 @@ import { useConvexAuth } from "convex/react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Logo } from "./Logo";
+import { NotificationBell } from "./NotificationBell";
 import { Button } from "./ui/button";
 
 export function Header() {
@@ -65,6 +66,9 @@ export function Header() {
               )
             )}
           </nav>
+
+          {/* Notification Bell */}
+          <NotificationBell />
 
           {/* Mobile toggle */}
           <button

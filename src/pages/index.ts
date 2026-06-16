@@ -10,3 +10,4 @@ export { MembershipPage } from "./MembershipPage";
 
 export { MyImpactPage } from "./MyImpactPage";
 export { LeaderboardPage } from "./LeaderboardPage";
+export { AdminDashboard } from "./AdminDashboard";
