@@ -10,7 +10,7 @@ import {
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
-import { CATEGORIES, VERIFICATION_TIERS, URGENCY_LEVELS } from "../../convex/constants";
+import { CATEGORIES, VERIFICATION_TIERS, URGENCY_LEVELS } from "@/lib/constants";
 import { FuelGaugeMark } from "@/components/FuelGaugeMark";
 import { NetworkBanner } from "@/components/NetworkBanner";
 import { Input } from "@/components/ui/input";
