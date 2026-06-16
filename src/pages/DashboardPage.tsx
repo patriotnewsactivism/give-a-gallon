@@ -35,6 +35,19 @@ export function DashboardPage() {
     creator ? { creatorId: creator._id, limit: 50 } : "skip"
   );
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const connect = searchParams.get("connect");
+    if (connect === "complete") {
+      toast.success("Stripe account connected! You can now receive payouts.");
+      setSearchParams({});
+    } else if (connect === "refresh") {
+      toast.info("Onboarding expired — click 'Connect Stripe' to restart.");
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
+
   // If no creator profile yet, show setup prompt
   if (creator === null) {
     return <SetupPrompt />;
@@ -55,19 +68,6 @@ export function DashboardPage() {
       </div>
     );
   }
-
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  useEffect(() => {
-    const connect = searchParams.get("connect");
-    if (connect === "complete") {
-      toast.success("Stripe account connected! You can now receive payouts.");
-      setSearchParams({});
-    } else if (connect === "refresh") {
-      toast.info("Onboarding expired — click 'Connect Stripe' to restart.");
-      setSearchParams({});
-    }
-  }, [searchParams, setSearchParams]);
 
   const profileUrl = `${window.location.origin}/${creator.slug}`;
 
