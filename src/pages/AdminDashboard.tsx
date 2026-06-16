@@ -396,8 +396,8 @@ export function AdminDashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground mb-1 block">Type</label>
-                    <select value={notifType} onChange={e => setNotifType(e.target.value as any)}
+                    <label htmlFor="notif-type" className="text-xs font-semibold text-muted-foreground mb-1 block">Type</label>
+                    <select id="notif-type" value={notifType} onChange={e => setNotifType(e.target.value as any)}
                       className="w-full h-9 text-sm rounded-md border border-input bg-background px-3 text-foreground">
                       <option value="announcement">📢 Announcement</option>
                       <option value="milestone">🏆 Milestone</option>
@@ -405,8 +405,8 @@ export function AdminDashboard() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground mb-1 block">Audience</label>
-                    <select value={notifAudience} onChange={e => setNotifAudience(e.target.value as any)}
+                    <label htmlFor="notif-audience" className="text-xs font-semibold text-muted-foreground mb-1 block">Audience</label>
+                    <select id="notif-audience" value={notifAudience} onChange={e => setNotifAudience(e.target.value as any)}
                       className="w-full h-9 text-sm rounded-md border border-input bg-background px-3 text-foreground">
                       <option value="all">Everyone</option>
                       <option value="creators">Creators only</option>
