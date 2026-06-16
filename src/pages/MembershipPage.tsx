@@ -229,9 +229,9 @@ export function MembershipPage() {
                 <div className={`relative flex flex-col rounded-2xl border p-5 h-full transition-all ${
                   isActive ? "border-fuel/60 ring-1 ring-fuel/20" : tier.borderClass
                 } ${tier.bgClass}`}>
-                  {tier.badge && !isActive && (
+                  {'badge' in tier && tier.badge && !isActive && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-fuel text-fuel-foreground text-xs font-bold whitespace-nowrap">
-                      {tier.badge}
+                      {(tier as any).badge}
                     </div>
                   )}
                   {isActive && (
