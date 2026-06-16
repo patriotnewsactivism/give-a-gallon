@@ -26,7 +26,7 @@ async function stripePost(path: string, key: string, params: Record<string, stri
   return res.json();
 }
 
-async function stripeGet(path: string, key: string) {
+async function _stripeGet(path: string, key: string) {
   const res = await fetch(`https://api.stripe.com/v1${path}`, {
     headers: { Authorization: `Bearer ${key}` },
   });
