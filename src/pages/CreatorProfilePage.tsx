@@ -15,7 +15,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
-import { CATEGORIES, VERIFICATION_TIERS, URGENCY_LEVELS } from "../../convex/constants";
+import { CATEGORIES, VERIFICATION_TIERS, URGENCY_LEVELS } from "@/lib/constants";
 import { FuelGauge } from "@/components/FuelGauge";
 import { Reveal } from "@/components/Reveal";
 import { WallSection } from "@/components/WallSection";
