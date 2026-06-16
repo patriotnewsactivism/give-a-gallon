@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { Fuel, MapPin, Heart, ExternalLink, Zap, TrendingUp, Users, Award } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 
-const GALLON_PRICE = 4.25;
 
 function formatDate(ts: number) {
   return new Date(ts).toLocaleDateString("en-US", {
