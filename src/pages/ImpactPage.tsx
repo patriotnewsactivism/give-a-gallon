@@ -15,7 +15,6 @@ import { api } from "../../convex/_generated/api";
 import { CATEGORIES } from "../../convex/constants";
 import { CountUp } from "@/components/CountUp";
 import { Reveal } from "@/components/Reveal";
-import { GALLON_PRICE } from "@/lib/constants";
 
 function StatTile({
   icon: Icon,
