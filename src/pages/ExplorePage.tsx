@@ -14,7 +14,6 @@ import { CATEGORIES, VERIFICATION_TIERS, URGENCY_LEVELS } from "@/lib/constants"
 import { FuelGaugeMark } from "@/components/FuelGaugeMark";
 import { NetworkBanner } from "@/components/NetworkBanner";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 
 function VerificationBadge({ status }: { status?: string }) {
   const tier = VERIFICATION_TIERS[(status ?? "unverified") as keyof typeof VERIFICATION_TIERS]
