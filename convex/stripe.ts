@@ -409,7 +409,6 @@ export const handleWebhook = action({
       const session = event.data.object;
       if (session.payment_status === "paid") {
         // Find the donation and creator to send emails
-        const stripeKey = process.env.STRIPE_SECRET_KEY!;
         const donation = await ctx.runQuery(internal.stripe.getDonationBySession, {
           stripeSessionId: session.id,
         });
