@@ -390,7 +390,7 @@ export const handleWebhook = action({
     // ── Subscription status changes ──
     if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
       const sub = event.data.object;
-      const stripeKey = process.env.STRIPE_SECRET_KEY!;
+      const _stripeKey = process.env.STRIPE_SECRET_KEY!;
 
       let status: "active" | "canceled" | "past_due" | "paused" = "active";
       if (sub.status === "canceled" || event.type === "customer.subscription.deleted") status = "canceled";
