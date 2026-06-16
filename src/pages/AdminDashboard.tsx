@@ -12,9 +12,8 @@ import { api } from "../../convex/_generated/api";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
-  Activity, AlertTriangle, Bell, CheckCircle2, ChevronDown, ChevronUp,
-  ExternalLink, Fuel, Megaphone, Search, Shield, Star, TrendingUp,
-  Trophy, Users, Wallet, XCircle, Clock, Zap,
+  Activity,Bell, CheckCircle2, ChevronDown, ChevronUp,
+  ExternalLink, Fuel, Megaphone, Search, Shield, Star,Users, Wallet, XCircle, Clock, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,20 +75,6 @@ export function AdminDashboard() {
   const [notifLink, setNotifLink] = useState("");
   const [sending, setSending] = useState(false);
 
-  if (isAdmin === undefined) {
-    return <div className="flex items-center justify-center min-h-screen"><div className="size-8 rounded-full border-2 border-fuel border-t-transparent animate-spin" /></div>;
-  }
-  if (!isAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center p-6">
-        <Shield className="size-12 text-muted-foreground/30" />
-        <h1 className="text-xl font-semibold">Admin Access Only</h1>
-        <p className="text-sm text-muted-foreground max-w-xs">You don't have permission to view this page.</p>
-        <Button variant="outline" asChild><Link to="/">← Back to Home</Link></Button>
-      </div>
-    );
-  }
-
   // ── Creator table logic ──────────────────────────────────────────────────
   const filteredCreators = useMemo(() => {
     if (!Array.isArray(creators)) return [];
@@ -108,6 +93,21 @@ export function AdminDashboard() {
       return sortAsc ? av - bv : bv - av;
     });
   }, [creators, search, sortKey, sortAsc]);
+
+  if (isAdmin === undefined) {
+    return <div className="flex items-center justify-center min-h-screen"><div className="size-8 rounded-full border-2 border-fuel border-t-transparent animate-spin" /></div>;
+  }
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center p-6">
+        <Shield className="size-12 text-muted-foreground/30" />
+        <h1 className="text-xl font-semibold">Admin Access Only</h1>
+        <p className="text-sm text-muted-foreground max-w-xs">You don't have permission to view this page.</p>
+        <Button variant="outline" asChild><Link to="/">← Back to Home</Link></Button>
+      </div>
+    );
+  }
+
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) setSortAsc(a => !a);
@@ -387,12 +387,12 @@ export function AdminDashboard() {
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Title</label>
-                  <Input placeholder="e.g. Big milestone reached!" value={notifTitle} onChange={e => setNotifTitle(e.target.value)} className="h-9" />
+                  <label htmlFor="notif-title" className="text-xs font-semibold text-muted-foreground mb-1 block">Title</label>
+                  <Input id="notif-title" placeholder="e.g. Big milestone reached!" value={notifTitle} onChange={e => setNotifTitle(e.target.value)} className="h-9" />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Message</label>
-                  <Textarea placeholder="What do you want to tell your community?" value={notifBody} onChange={e => setNotifBody(e.target.value)} rows={3} className="resize-none" />
+                  <label htmlFor="notif-body" className="text-xs font-semibold text-muted-foreground mb-1 block">Message</label>
+                  <Textarea id="notif-body" placeholder="What do you want to tell your community?" value={notifBody} onChange={e => setNotifBody(e.target.value)} rows={3} className="resize-none" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -415,8 +415,8 @@ export function AdminDashboard() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Link (optional)</label>
-                  <Input placeholder="https://give.wtpnews.org/..." value={notifLink} onChange={e => setNotifLink(e.target.value)} className="h-9" />
+                  <label htmlFor="notif-link" className="text-xs font-semibold text-muted-foreground mb-1 block">Link (optional)</label>
+                  <Input id="notif-link" placeholder="https://give.wtpnews.org/..." value={notifLink} onChange={e => setNotifLink(e.target.value)} className="h-9" />
                 </div>
                 <Button onClick={handleSendNotification} disabled={sending || !notifTitle.trim() || !notifBody.trim()} className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90">
                   {sending ? "Sending…" : "Send to All Users"}
