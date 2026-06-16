@@ -25,7 +25,7 @@ import { FeaturedCampaigns } from "@/components/FeaturedCampaigns";
 import { Button } from "@/components/ui/button";
 import { GALLON_PRICE } from "@/lib/constants";
 import { api } from "../../convex/_generated/api";
-import { CATEGORIES } from "../../convex/constants";
+import { CATEGORIES } from "@/lib/constants";
 
 function HeroSection() {
   const stats = useQuery(api.donations.platformStats);
