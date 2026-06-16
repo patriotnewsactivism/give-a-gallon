@@ -70,14 +70,9 @@ export function DonationSuccessPage() {
   );
 
   const [copied, setCopied] = useState(false);
-  const [confettiDone, setConfettiDone] = useState(false);
   // Track how long we've been waiting for the webhook to complete the donation
   const [waitSeconds, setWaitSeconds] = useState(0);
 
-  useEffect(() => {
-    const t = setTimeout(() => setConfettiDone(true), 3000);
-    return () => clearTimeout(t);
-  }, []);
 
   // Poll counter — show a reassuring message if the webhook is slow
   useEffect(() => {
