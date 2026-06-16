@@ -186,8 +186,8 @@ export function SettingsPage() {
           >
             <option value="">Select a category...</option>
             {CATEGORY_LIST.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+              <option key={cat.id} value={cat.id}>
+                {cat.icon} {cat.label}
               </option>
             ))}
           </select>
