@@ -11,7 +11,7 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
@@ -25,6 +25,58 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GALLON_PRICE, GALLON_PRESETS } from "@/lib/constants";
 import { useReferral, clearReferral } from "@/hooks/useReferral";
+
+// ── LiveFuelFlash ─────────────────────────────────────────────────────────
+// Watches this campaign's donations live and flashes a banner whenever a
+// new donation arrives — separate from the global bottom toast.
+interface LiveFuelFlashProps {
+  donations: any[];
+}
+function LiveFuelFlash({ donations }: LiveFuelFlashProps) {
+  const seenId = useRef<string | null>(null);
+  const [flash, setFlash] = useState<{ name: string; gallons: number } | null>(null);
+  const [visible, setVisible] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const completed = donations.filter((d: any) => d.status === "completed");
+    if (completed.length === 0) return;
+    const latest = completed[0];
+    if (seenId.current === null) { seenId.current = latest._id; return; }
+    if (latest._id === seenId.current) return;
+    seenId.current = latest._id;
+    if (timer.current) clearTimeout(timer.current);
+    setFlash({ name: latest.donorName ?? "Someone", gallons: latest.gallons });
+    requestAnimationFrame(() => setVisible(true));
+    timer.current = setTimeout(() => {
+      setVisible(false);
+      setTimeout(() => setFlash(null), 350);
+    }, 5000);
+  }, [donations]);
+
+  if (!flash) return null;
+
+  return (
+    <div
+      className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
+      }`}
+    >
+      <div className="pointer-events-auto flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-fuel/40 bg-card/95 backdrop-blur-md shadow-xl shadow-black/30 text-sm whitespace-nowrap">
+        <span className="relative flex size-2 shrink-0">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-fuel opacity-60" />
+          <span className="relative inline-flex rounded-full size-2 bg-fuel" />
+        </span>
+        <span className="text-muted-foreground">
+          <span className="font-semibold text-foreground">{flash.name}</span>
+          {" just fueled "}
+          <span className="font-bold text-fuel">{flash.gallons} {flash.gallons === 1 ? "gallon" : "gallons"}!</span>
+          {" 🔥"}
+        </span>
+      </div>
+    </div>
+  );
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -108,6 +160,7 @@ export function CreatorProfilePage() {
 
   return (
     <div className="min-h-screen">
+      <LiveFuelFlash donations={completedDonations} />
       {/* Cover image */}
       {creator.coverUrl && (
         <div className="relative h-44 sm:h-64 overflow-hidden">
