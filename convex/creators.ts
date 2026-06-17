@@ -223,20 +223,16 @@ export const listNewest = query({
     return await Promise.all(sorted.map((c) => withImageUrls(ctx, c)));
   },
 });
-import { v } from "convex/values";
-import { query } from "./_generated/server";
 
+// Recent active creator profiles — for automation polling (last N minutes)
 export const listRecentCreators = query({
-  args: { minutes: v.number() },
-  handler: async (ctx, { minutes }) => {
-    const cutoffTime = Date.now() - minutes * 60 * 1000;
+  args: { limit: v.optional(v.number()) },
+  handler: async (ctx, { limit }) => {
     const creators = await ctx.db
       .query("creators")
       .withIndex("by_active", (q) => q.eq("isActive", true))
-      .filter((q) => q.gt(q.field("createdAt"), cutoffTime))
       .order("desc")
-      .collect();
-
+      .take(limit ?? 50);
     return creators.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
   },
 });
