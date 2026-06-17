@@ -44,7 +44,7 @@ export const create = mutation({
     }
 
     const creator = await ctx.db.get(args.creatorId);
-    if (!creator || !creator.isActive) {
+    if (!creator?.isActive) {
       throw new Error("Creator not found or inactive");
     }
 

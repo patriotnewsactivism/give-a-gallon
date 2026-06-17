@@ -15,7 +15,6 @@ import { api } from "../../convex/_generated/api";
 import { CATEGORIES } from "../../convex/constants";
 import { CountUp } from "@/components/CountUp";
 import { Reveal } from "@/components/Reveal";
-import { GALLON_PRICE } from "@/lib/constants";
 
 function StatTile({
   icon: Icon,
@@ -41,7 +40,7 @@ function StatTile({
             className={`text-3xl font-bold tracking-tight ${accent ? "text-fuel" : ""}`}
             style={{ fontFamily: "var(--font-display)" }}
           >
-            <CountUp end={value} />
+            <CountUp value={value} />
           </div>
           <div className="text-sm font-medium mt-0.5">{label}</div>
           {sub && <div className="text-xs text-muted-foreground mt-0.5">{sub}</div>}

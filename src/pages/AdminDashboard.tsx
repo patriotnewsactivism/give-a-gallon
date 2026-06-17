@@ -12,9 +12,8 @@ import { api } from "../../convex/_generated/api";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
-  Activity, AlertTriangle, Bell, CheckCircle2, ChevronDown, ChevronUp,
-  ExternalLink, Fuel, Megaphone, Search, Shield, Star, TrendingUp,
-  Trophy, Users, Wallet, XCircle, Clock, Zap,
+  Activity,Bell, CheckCircle2, ChevronDown, ChevronUp,
+  ExternalLink, Fuel, Megaphone, Search, Shield, Star,Users, Wallet, XCircle, Clock, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,14 +53,14 @@ type SortKey = "createdAt" | "totalGallons" | "lastLoginAt" | "lastDonationAt" |
 
 // ── Main component ─────────────────────────────────────────────────────────
 export function AdminDashboard() {
-  const isAdmin = useQuery(api.admin.isAdmin);
-  const overview = useQuery(isAdmin ? api.admin.getPlatformOverview : api.notifications.getRecentPublic);
-  const creators = useQuery(isAdmin ? api.admin.listAllCreators : api.notifications.getRecentPublic);
-  const recentDonations = useQuery(isAdmin ? api.admin.listAllDonations : api.notifications.getRecentPublic, isAdmin ? { limit: 50 } : undefined);
-  const notifications = useQuery(api.notifications.getRecent);
-  const sendNotification = useMutation(api.admin.sendNotification);
-  const toggleActive = useMutation(api.admin.toggleCreatorActive);
-  const toggleFeatured = useMutation(api.admin.toggleCreatorFeatured);
+  const isAdmin = useQuery((api as any).admin.isAdmin);
+  const overview = useQuery(isAdmin ? (api as any).admin.getPlatformOverview : (api as any).notifications.getRecentPublic);
+  const creators = useQuery(isAdmin ? (api as any).admin.listAllCreators : (api as any).notifications.getRecentPublic);
+  const recentDonations = useQuery(isAdmin ? (api as any).admin.listAllDonations : (api as any).notifications.getRecentPublic, isAdmin ? { limit: 50 } : undefined);
+  const notifications = useQuery((api as any).notifications.getRecent);
+  const sendNotification = useMutation((api as any).admin.sendNotification);
+  const toggleActive = useMutation((api as any).admin.toggleCreatorActive);
+  const toggleFeatured = useMutation((api as any).admin.toggleCreatorFeatured);
 
   const [tab, setTab] = useState<"overview" | "creators" | "donations" | "notifications">("overview");
   const [search, setSearch] = useState("");
@@ -75,20 +74,6 @@ export function AdminDashboard() {
   const [notifAudience, setNotifAudience] = useState<"all" | "creators" | "donors">("all");
   const [notifLink, setNotifLink] = useState("");
   const [sending, setSending] = useState(false);
-
-  if (isAdmin === undefined) {
-    return <div className="flex items-center justify-center min-h-screen"><div className="size-8 rounded-full border-2 border-fuel border-t-transparent animate-spin" /></div>;
-  }
-  if (!isAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center p-6">
-        <Shield className="size-12 text-muted-foreground/30" />
-        <h1 className="text-xl font-semibold">Admin Access Only</h1>
-        <p className="text-sm text-muted-foreground max-w-xs">You don't have permission to view this page.</p>
-        <Button variant="outline" asChild><Link to="/">← Back to Home</Link></Button>
-      </div>
-    );
-  }
 
   // ── Creator table logic ──────────────────────────────────────────────────
   const filteredCreators = useMemo(() => {
@@ -108,6 +93,21 @@ export function AdminDashboard() {
       return sortAsc ? av - bv : bv - av;
     });
   }, [creators, search, sortKey, sortAsc]);
+
+  if (isAdmin === undefined) {
+    return <div className="flex items-center justify-center min-h-screen"><div className="size-8 rounded-full border-2 border-fuel border-t-transparent animate-spin" /></div>;
+  }
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center p-6">
+        <Shield className="size-12 text-muted-foreground/30" />
+        <h1 className="text-xl font-semibold">Admin Access Only</h1>
+        <p className="text-sm text-muted-foreground max-w-xs">You don't have permission to view this page.</p>
+        <Button variant="outline" asChild><Link to="/">← Back to Home</Link></Button>
+      </div>
+    );
+  }
+
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) setSortAsc(a => !a);
@@ -387,17 +387,17 @@ export function AdminDashboard() {
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Title</label>
-                  <Input placeholder="e.g. Big milestone reached!" value={notifTitle} onChange={e => setNotifTitle(e.target.value)} className="h-9" />
+                  <label htmlFor="notif-title" className="text-xs font-semibold text-muted-foreground mb-1 block">Title</label>
+                  <Input id="notif-title" placeholder="e.g. Big milestone reached!" value={notifTitle} onChange={e => setNotifTitle(e.target.value)} className="h-9" />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Message</label>
-                  <Textarea placeholder="What do you want to tell your community?" value={notifBody} onChange={e => setNotifBody(e.target.value)} rows={3} className="resize-none" />
+                  <label htmlFor="notif-body" className="text-xs font-semibold text-muted-foreground mb-1 block">Message</label>
+                  <Textarea id="notif-body" placeholder="What do you want to tell your community?" value={notifBody} onChange={e => setNotifBody(e.target.value)} rows={3} className="resize-none" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground mb-1 block">Type</label>
-                    <select value={notifType} onChange={e => setNotifType(e.target.value as any)}
+                    <label htmlFor="notif-type" className="text-xs font-semibold text-muted-foreground mb-1 block">Type</label>
+                    <select id="notif-type" value={notifType} onChange={e => setNotifType(e.target.value as any)}
                       className="w-full h-9 text-sm rounded-md border border-input bg-background px-3 text-foreground">
                       <option value="announcement">📢 Announcement</option>
                       <option value="milestone">🏆 Milestone</option>
@@ -405,8 +405,8 @@ export function AdminDashboard() {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-muted-foreground mb-1 block">Audience</label>
-                    <select value={notifAudience} onChange={e => setNotifAudience(e.target.value as any)}
+                    <label htmlFor="notif-audience" className="text-xs font-semibold text-muted-foreground mb-1 block">Audience</label>
+                    <select id="notif-audience" value={notifAudience} onChange={e => setNotifAudience(e.target.value as any)}
                       className="w-full h-9 text-sm rounded-md border border-input bg-background px-3 text-foreground">
                       <option value="all">Everyone</option>
                       <option value="creators">Creators only</option>
@@ -415,8 +415,8 @@ export function AdminDashboard() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground mb-1 block">Link (optional)</label>
-                  <Input placeholder="https://give.wtpnews.org/..." value={notifLink} onChange={e => setNotifLink(e.target.value)} className="h-9" />
+                  <label htmlFor="notif-link" className="text-xs font-semibold text-muted-foreground mb-1 block">Link (optional)</label>
+                  <Input id="notif-link" placeholder="https://give.wtpnews.org/..." value={notifLink} onChange={e => setNotifLink(e.target.value)} className="h-9" />
                 </div>
                 <Button onClick={handleSendNotification} disabled={sending || !notifTitle.trim() || !notifBody.trim()} className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90">
                   {sending ? "Sending…" : "Send to All Users"}

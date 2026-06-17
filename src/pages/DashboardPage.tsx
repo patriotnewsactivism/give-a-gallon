@@ -15,7 +15,6 @@ import {
   TrendingUp,
   Users,
   Wallet,
-  Star,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -29,7 +28,6 @@ import { GALLON_PRICE } from "@/lib/constants";
 
 export function DashboardPage() {
   const creator = useQuery(api.creators.getMine);
-  const mySubscription = useQuery(api.subscriptions.getMySubscription);
   const donations = useQuery(
     api.donations.listForCreator,
     creator ? { creatorId: creator._id, limit: 50 } : "skip"
@@ -362,7 +360,7 @@ function PayoutPanel({ creator }: { creator: any }) {
     if (status === "active") {
       getBalance().then(setBalance).catch(console.error);
     }
-  }, [status]);
+  }, [status, getBalance]);
 
   async function handleConnect() {
     setLoading(true);

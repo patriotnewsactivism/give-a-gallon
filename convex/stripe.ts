@@ -390,7 +390,6 @@ export const handleWebhook = action({
     // ── Subscription status changes ──
     if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
       const sub = event.data.object;
-      const stripeKey = process.env.STRIPE_SECRET_KEY!;
 
       let status: "active" | "canceled" | "past_due" | "paused" = "active";
       if (sub.status === "canceled" || event.type === "customer.subscription.deleted") status = "canceled";
@@ -409,7 +408,6 @@ export const handleWebhook = action({
       const session = event.data.object;
       if (session.payment_status === "paid") {
         // Find the donation and creator to send emails
-        const stripeKey = process.env.STRIPE_SECRET_KEY!;
         const donation = await ctx.runQuery(internal.stripe.getDonationBySession, {
           stripeSessionId: session.id,
         });

@@ -1,9 +1,8 @@
-import { useConvexAuth, useMutation, useQuery, useAction } from "convex/react";
+import { useConvexAuth, useQuery, useAction } from "convex/react";
 import { useState } from "react";
 import {
   ArrowRight, CheckCircle2, Crown, Flame, Heart, Shield, Star, Zap,
-  Loader2, AlertCircle, BadgeCheck, XCircle,
-} from "lucide-react";
+  Loader2, AlertCircle, BadgeCheck, XCircle} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
@@ -26,8 +25,7 @@ const TIERS = [
       "1 gallon/month to any campaign",
       "Supporter badge on donor wall",
       "Monthly impact digest",
-    ],
-  },
+    ]},
   {
     id: "community-builder",
     name: "Community Builder",
@@ -44,8 +42,7 @@ const TIERS = [
       "Community Builder badge",
       "Weekly impact updates",
       "Early access to new campaigns",
-    ],
-  },
+    ]},
   {
     id: "freedom-partner",
     name: "Freedom Partner",
@@ -65,8 +62,7 @@ const TIERS = [
       "Direct creator updates in feed",
       "Vote on platform features",
       "Monthly transparency report",
-    ],
-  },
+    ]},
   {
     id: "impact-champion",
     name: "Impact Champion",
@@ -87,8 +83,7 @@ const TIERS = [
       "Direct line to platform team",
       "Annual impact report with your name",
       "Founding member recognition",
-    ],
-  },
+    ]},
 ] as const;
 
 export function MembershipPage() {
@@ -234,9 +229,9 @@ export function MembershipPage() {
                 <div className={`relative flex flex-col rounded-2xl border p-5 h-full transition-all ${
                   isActive ? "border-fuel/60 ring-1 ring-fuel/20" : tier.borderClass
                 } ${tier.bgClass}`}>
-                  {tier.badge && !isActive && (
+                  {'badge' in tier && tier.badge && !isActive && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-fuel text-fuel-foreground text-xs font-bold whitespace-nowrap">
-                      {tier.badge}
+                      {(tier as any).badge}
                     </div>
                   )}
                   {isActive && (
@@ -306,18 +301,15 @@ export function MembershipPage() {
                 {
                   icon: Zap,
                   title: "Predictable fuel",
-                  desc: "Creators know what's coming. Predictable funding means they can plan investigations, file records requests, and commit to long-term campaigns.",
-                },
+                  desc: "Creators know what's coming. Predictable funding means they can plan investigations, file records requests, and commit to long-term campaigns."},
                 {
                   icon: Shield,
                   title: "Builds trust",
-                  desc: "Monthly supporters get priority updates and direct visibility into outcomes. You'll know exactly what your fuel made possible.",
-                },
+                  desc: "Monthly supporters get priority updates and direct visibility into outcomes. You'll know exactly what your fuel made possible."},
                 {
                   icon: Heart,
                   title: "Compounds impact",
-                  desc: "$15/month is $180/year — enough to fund a FOIA request, a week of travel, or dozens of miles for a family in crisis.",
-                },
+                  desc: "$15/month is $180/year — enough to fund a FOIA request, a week of travel, or dozens of miles for a family in crisis."},
               ].map(item => {
                 const Icon = item.icon;
                 return (
@@ -341,16 +333,13 @@ export function MembershipPage() {
             {[
               {
                 q: "Can I cancel anytime?",
-                a: "Yes — cancel from this page or your dashboard. You keep access through the end of your billing period, then it stops. No runaround.",
-              },
+                a: "Yes — cancel from this page or your dashboard. You keep access through the end of your billing period, then it stops. No runaround."},
               {
                 q: "Where do my monthly gallons go?",
-                a: "Right now monthly gallons pool into the platform fuel fund and flow to the most urgent active campaigns. Campaign-level allocation is coming soon.",
-              },
+                a: "Right now monthly gallons pool into the platform fuel fund and flow to the most urgent active campaigns. Campaign-level allocation is coming soon."},
               {
                 q: "What's the 5% platform fee?",
-                a: "Give-A-Gallon takes 5% to cover Stripe fees, server costs, and platform development. The rest goes directly to creators via Stripe Connect.",
-              },
+                a: "Give-A-Gallon takes 5% to cover Stripe fees, server costs, and platform development. The rest goes directly to creators via Stripe Connect."},
             ].map(item => (
               <div key={item.q} className="rounded-xl border border-border/40 bg-card/30 p-5">
                 <div className="font-semibold text-sm mb-1.5 flex items-start gap-2">
