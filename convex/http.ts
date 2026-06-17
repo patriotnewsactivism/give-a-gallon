@@ -47,4 +47,20 @@ http.route({
   }),
 });
 
+// Recent creators endpoint (for automations / webhooks)
+http.route({
+  path: "/api/recent-creators",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const limit = new URL(request.url).searchParams.get("limit") || "50";
+    const creators = await ctx.runQuery(api.creators.listRecentCreators, {
+      limit: parseInt(limit, 10),
+    });
+    return new Response(JSON.stringify(creators), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
 export default http;
