@@ -13,6 +13,29 @@ import { CATEGORIES as CATEGORY_LIST } from "../../convex/constants";
 
 
 
+const BIO_TEMPLATES = [
+  {
+    label: "Courthouse Run",
+    text: "I'm heading to the courthouse to cover the upcoming hearing on [Case Name]. This is a critical moment for our community and I need to be there to document every second. Your gallons cover the 45-mile round trip and ensure the truth is recorded.",
+  },
+  {
+    label: "Public Records Trip",
+    text: "I'm traveling to the county seat to file manual public records requests for the upcoming audit. Transparency requires being on the ground. Your support fuels the 120-mile journey to ensure our government stays accountable.",
+  },
+  {
+    label: "Independent Reporting",
+    text: "I'm an independent journalist covering the [Event Name]. I don't have a corporate expense account, but I have a mission to tell the stories others ignore. Every gallon puts me on the scene and keeps the camera rolling.",
+  },
+  {
+    label: "Veteran Transport",
+    text: "I'm a volunteer driver helping local veterans get to their VA appointments. Many of our heroes have no other way to get the care they need. Your gallons go directly into my tank to ensure no veteran is left behind.",
+  },
+  {
+    label: "Family Emergency",
+    text: "My family is facing an urgent medical situation and we need to travel to [City] for specialist care. It's a long drive and we're struggling to cover the fuel. Any gallons you can provide will help us get there and focus on recovery.",
+  },
+];
+
 export function SettingsPage() {
   const creator = useQuery(api.creators.getMine);
   const upsert = useMutation(api.creators.upsert);
@@ -168,11 +191,23 @@ export function SettingsPage() {
 
         {/* Bio */}
         <Field label="Bio">
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground mr-1 self-center">Templates:</span>
+            {BIO_TEMPLATES.map((t) => (
+              <button
+                key={t.label}
+                onClick={() => setBio(t.text)}
+                className="px-2 py-0.5 rounded-full bg-fuel/10 text-fuel text-[10px] font-bold hover:bg-fuel/20 transition-colors"
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
           <Textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder="Tell supporters about your cause and what you're fighting for..."
-            rows={3}
+            rows={4}
             className="bg-background resize-none"
           />
         </Field>

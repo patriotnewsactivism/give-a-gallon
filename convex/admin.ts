@@ -4,8 +4,9 @@
  * the ADMIN_EMAIL environment variable (set in Convex dashboard).
  */
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 
 // ── Auth helper ────────────────────────────────────────────────────────────
 async function assertAdmin(ctx: any) {
@@ -19,6 +20,15 @@ async function assertAdmin(ctx: any) {
   }
   return user;
 }
+
+// ── Admin: seed demo data ────────────────────────────────────────────────
+export const seedDemoData = mutation({
+  args: {},
+  handler: async (ctx) => {
+    await assertAdmin(ctx);
+    return await ctx.runMutation(internal.seedData.seedCreators);
+  },
+});
 
 // ── Admin: check if current user is admin ────────────────────────────────
 export const isAdmin = query({

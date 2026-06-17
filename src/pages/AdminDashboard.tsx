@@ -61,11 +61,13 @@ export function AdminDashboard() {
   const sendNotification = useMutation((api as any).admin.sendNotification);
   const toggleActive = useMutation((api as any).admin.toggleCreatorActive);
   const toggleFeatured = useMutation((api as any).admin.toggleCreatorFeatured);
+  const seedDemoData = useMutation((api as any).admin.seedDemoData);
 
   const [tab, setTab] = useState<"overview" | "creators" | "donations" | "notifications">("overview");
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortAsc, setSortAsc] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
   // Notification form
   const [notifTitle, setNotifTitle] = useState("");
@@ -74,6 +76,20 @@ export function AdminDashboard() {
   const [notifAudience, setNotifAudience] = useState<"all" | "creators" | "donors">("all");
   const [notifLink, setNotifLink] = useState("");
   const [sending, setSending] = useState(false);
+
+  // ── Seeding logic ────────────────────────────────────────────────────────
+  async function handleSeedData() {
+    if (!confirm("This will seed several demo campaigns and donations. Continue?")) return;
+    setSeeding(true);
+    try {
+      const res = await seedDemoData();
+      toast.success(res.message);
+    } catch (e: any) {
+      toast.error(e.message ?? "Failed to seed");
+    } finally {
+      setSeeding(false);
+    }
+  }
 
   // ── Creator table logic ──────────────────────────────────────────────────
   const filteredCreators = useMemo(() => {
@@ -145,7 +161,19 @@ export function AdminDashboard() {
             <span className="font-black tracking-tight text-lg">ADMIN DASHBOARD</span>
             <span className="px-2 py-0.5 rounded-full bg-fuel/10 text-fuel text-xs font-semibold">LIVE</span>
           </div>
-          <Button variant="outline" size="sm" asChild><Link to="/">← Site</Link></Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSeedData}
+              disabled={seeding}
+              className="text-xs border-dashed border-fuel/30 text-fuel hover:bg-fuel/5"
+            >
+              <Activity className={`size-3.5 mr-1.5 ${seeding ? "animate-spin" : ""}`} />
+              {seeding ? "Seeding..." : "Seed Demo Data"}
+            </Button>
+            <Button variant="outline" size="sm" asChild><Link to="/">← Site</Link></Button>
+          </div>
         </div>
         {/* Tabs */}
         <div className="max-w-7xl mx-auto px-4 flex gap-1 pb-2">

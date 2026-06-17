@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { GALLON_PRICE } from "@/lib/constants";
 import { api } from "../../convex/_generated/api";
 import { CATEGORIES } from "@/lib/constants";
+import { VERIFICATION_TIERS } from "../../convex/constants";
 
 function HeroSection() {
   const stats = useQuery(api.donations.platformStats);
@@ -119,23 +120,24 @@ function HeroSection() {
 
             {/* Headline */}
             <h1
-              className="animate-in fade-in slide-in-from-bottom-3 text-5xl font-extrabold leading-[1.02] tracking-tight duration-700 sm:text-7xl lg:text-8xl"
+              className="animate-in fade-in slide-in-from-bottom-3 text-4xl font-extrabold leading-[1.02] tracking-tight duration-700 sm:text-6xl lg:text-7xl"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              <span className="text-foreground">GIVE A</span>{" "}
-              <span className="relative text-fuel text-glow-fuel">
-                GALLON
+              <span className="text-foreground uppercase">Fuel the people</span>{" "}
+              <br className="hidden sm:block" />
+              <span className="relative text-fuel text-glow-fuel uppercase">
+                who show up.
                 <span className="absolute -bottom-2 left-0 h-1 w-full rounded-full bg-fuel/30" />
               </span>
             </h1>
 
             {/* Subheadline */}
-            <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
-              Supporters fuel your fight{" "}
+            <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
+              Give one gallon at a time to{" "}
               <span className="font-semibold text-foreground">
-                one gallon of gas at a time.
+                verified activists, journalists, veterans, and families
               </span>{" "}
-              No platform politics. No gatekeepers. Just fuel for the people who show up.
+              who need to get somewhere important. Fast, transparent, and direct.
             </p>
 
             {/* CTAs */}
@@ -145,8 +147,8 @@ function HeroSection() {
                 className="h-12 w-full bg-fuel px-8 text-base font-semibold text-fuel-foreground shadow-lg shadow-fuel/30 shadow-glow-fuel transition-transform hover:-translate-y-0.5 hover:bg-fuel/95 hover:shadow-fuel/50 sm:w-auto"
                 asChild
               >
-                <Link to="/signup">
-                  Start Receiving
+                <Link to="/explore">
+                  Find Someone to Fuel
                   <ArrowRight className="ml-1 size-4" />
                 </Link>
               </Button>
@@ -156,9 +158,9 @@ function HeroSection() {
                 className="h-12 w-full border-border/60 px-8 text-base sm:w-auto"
                 asChild
               >
-                <Link to="/explore">
-                  <Heart className="mr-1 size-4" />
-                  Fuel an Activist
+                <Link to="/signup">
+                  <Zap className="mr-1.5 size-4 fill-fuel text-fuel" />
+                  Start Receiving
                 </Link>
               </Button>
             </div>
@@ -397,6 +399,97 @@ function HowItWorksSection() {
               </div>
             </Reveal>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TrustSection() {
+  const tiers = [
+    {
+      title: "Community Vouched",
+      desc: "Vetted by the Give-A-Gallon community through successful previous campaigns and social proof.",
+      icon: Users,
+      color: "text-blue-400",
+      badge: "✓",
+    },
+    {
+      title: "Journalist Verified",
+      desc: "Verified as an independent reporter or documentarian covering real-world events.",
+      icon: Megaphone,
+      color: "text-violet-400",
+      badge: "✓✓",
+    },
+    {
+      title: "Platform Verified",
+      desc: "The highest level of trust. Identity and mission manually verified by the Give-A-Gallon team.",
+      icon: Shield,
+      color: "text-fuel",
+      badge: "✦",
+    },
+  ];
+
+  return (
+    <section className="border-t border-border/30 py-20 sm:py-28 bg-fuel/[0.01]">
+      <div className="container">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <Reveal>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-fuel/10 text-fuel text-xs font-semibold mb-6">
+              <Shield className="size-3" /> BUILT ON TRUST
+            </div>
+            <h2
+              className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl mb-6"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              KNOW WHERE YOUR <br />
+              <span className="text-fuel uppercase text-glow-fuel">Gallons Go.</span>
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+              Transparency isn't just a feature — it's our foundation. We use a multi-tiered verification system to ensure every gallon fuels a real mission.
+            </p>
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <div className="mt-1 size-10 rounded-xl bg-fuel/10 flex items-center justify-center shrink-0">
+                  <Shield className="size-5 text-fuel" />
+                </div>
+                <div>
+                  <h4 className="font-bold mb-1">Stripe Protected</h4>
+                  <p className="text-sm text-muted-foreground">All payments and identity verifications are handled by Stripe, the world leader in secure payments.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="mt-1 size-10 rounded-xl bg-fuel/10 flex items-center justify-center shrink-0">
+                  <Zap className="size-5 text-fuel fill-fuel" />
+                </div>
+                <div>
+                  <h4 className="font-bold mb-1">Proof After Payout</h4>
+                  <p className="text-sm text-muted-foreground">Creators post updates, photos, and receipts after receiving fuel so you can see the impact of your support.</p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delayMs={200}>
+            <div className="grid gap-4">
+              {tiers.map((t) => (
+                <div key={t.title} className="group p-5 rounded-2xl border border-border/50 bg-card/50 hover:border-fuel/40 transition-all">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`text-sm font-bold ${t.color}`}>{t.badge} {t.title}</div>
+                    <t.icon className={`size-4 ml-auto ${t.color}`} />
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {t.desc}
+                  </p>
+                </div>
+              ))}
+              <div className="mt-4 p-4 rounded-xl border border-dashed border-border/50 text-center">
+                <p className="text-xs text-muted-foreground italic">
+                  Donors can filter campaigns by verification level to choose their preferred level of trust.
+                </p>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>
@@ -646,8 +739,12 @@ function CreatorCard({
     location?: string;
     totalGallons: number;
     goal?: number;
+    verificationStatus?: string;
   };
 }) {
+  const tier = VERIFICATION_TIERS[(creator.verificationStatus ?? "unverified") as keyof typeof VERIFICATION_TIERS];
+  const milesFunded = Math.round(creator.totalGallons * 25);
+
   return (
     <Link
       to={`/${creator.slug}`}
@@ -663,9 +760,16 @@ function CreatorCard({
           </span>
         </div>
         <div className="min-w-0">
-          <h3 className="truncate text-sm font-semibold transition-colors group-hover:text-fuel">
-            {creator.displayName}
-          </h3>
+          <div className="flex items-center gap-1.5">
+            <h3 className="truncate text-sm font-semibold transition-colors group-hover:text-fuel">
+              {creator.displayName}
+            </h3>
+            {tier && creator.verificationStatus !== "unverified" && (
+              <span className={`${tier.color} text-[10px] font-bold`} title={tier.label}>
+                {tier.badge}
+              </span>
+            )}
+          </div>
           {creator.location && (
             <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
               <MapPin className="size-3" />
@@ -676,7 +780,7 @@ function CreatorCard({
       </div>
 
       {creator.bio && (
-        <p className="mb-3 line-clamp-2 text-xs text-muted-foreground">
+        <p className="mb-3 line-clamp-2 text-xs text-muted-foreground leading-relaxed">
           {creator.bio}
         </p>
       )}
@@ -689,18 +793,25 @@ function CreatorCard({
             size={140}
             showReadout={false}
           />
-          <div className="-mt-3 text-xs text-muted-foreground">
-            <span className="font-medium text-fuel">
+          <div className="-mt-3 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-fuel">
               {creator.totalGallons}
             </span>{" "}
-            of {creator.goal} gallons
+            / {creator.goal} gallons
           </div>
         </div>
       ) : (
-        <div className="mt-auto flex items-center gap-1.5 text-xs">
-          <FuelGaugeMark className="size-3.5 text-fuel" />
-          <span className="font-medium text-fuel">{creator.totalGallons}</span>
-          <span className="text-muted-foreground">gallons received</span>
+        <div className="mt-auto space-y-2">
+          <div className="flex items-center gap-1.5 text-xs">
+            <FuelGaugeMark className="size-3.5 text-fuel" />
+            <span className="font-bold text-fuel">{creator.totalGallons}</span>
+            <span className="text-muted-foreground">gallons received</span>
+          </div>
+          {milesFunded > 0 && (
+            <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">
+              ≈ {milesFunded.toLocaleString()} miles of fight funded
+            </div>
+          )}
         </div>
       )}
     </Link>
@@ -977,6 +1088,7 @@ export function LandingPage() {
       <NewestCreators />
       <FeaturedCampaigns />
       <NetworkBanner />
+      <TrustSection />
       <WhoItsForSection />
       <HowItWorksSection />
       <InstantPayoutSection />

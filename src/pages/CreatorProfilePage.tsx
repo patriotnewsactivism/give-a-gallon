@@ -132,6 +132,17 @@ export function CreatorProfilePage() {
     creator ? { creatorId: creator._id } : "skip"
   );
 
+  // Update meta tags for shareability
+  useEffect(() => {
+    if (creator) {
+      document.title = `${creator.displayName} needs fuel on Give-A-Gallon`;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute("content", creator.bio || `Support ${creator.displayName} by giving a gallon of fuel. Every gallon fuels the fight.`);
+      }
+    }
+  }, [creator]);
+
   if (creator === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center">
