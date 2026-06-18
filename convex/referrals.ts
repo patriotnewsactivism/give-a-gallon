@@ -60,6 +60,42 @@ export const getMyReferralCode = mutation({
   },
 });
 
+// ── Update the referral code (personalization) ────────────────────────────────
+export const updateReferralCode = mutation({
+  args: { code: v.string() },
+  handler: async (ctx, { code }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const creator = await ctx.db
+      .query("creators")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
+    if (!creator) throw new Error("Creator profile not found");
+
+    // Clean and validate code
+    const newCode = code.replace(/[^a-z0-9_-]/gi, "").toUpperCase();
+    if (newCode.length < 3) throw new Error("Code must be at least 3 characters");
+    if (newCode.length > 20) throw new Error("Code must be 20 characters or less");
+
+    // Check uniqueness
+    const existing = await ctx.db
+      .query("creators")
+      .withIndex("by_referralCode", (q) => q.eq("referralCode", newCode))
+      .first();
+    
+    if (existing && existing._id !== creator._id) {
+      throw new Error("This referral code is already taken");
+    }
+
+    await ctx.db.patch(creator._id, {
+      referralCode: newCode,
+    });
+
+    return newCode;
+  },
+});
+
 // ── Get referral stats for the authenticated creator ──────────────────────────
 export const getMyReferralStats = query({
   args: {},

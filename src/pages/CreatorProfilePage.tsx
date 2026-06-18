@@ -216,6 +216,13 @@ export function CreatorProfilePage() {
                     )}
                     <VerificationBadge status={creator.verificationStatus} note={creator.verificationNote} />
                     <UrgencyBadge urgency={creator.urgency} />
+                    {creator.verificationStatus === "organization" && (
+                      <Button variant="outline" size="sm" className="h-7 text-[10px] font-bold uppercase tracking-tight gap-1 border-amber-500/30 text-amber-400 hover:bg-amber-500/10" asChild>
+                        <Link to={`/${creator.slug}/join`}>
+                          <Users className="size-3" /> Invite Creators
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

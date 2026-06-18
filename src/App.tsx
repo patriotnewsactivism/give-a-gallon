@@ -46,6 +46,8 @@ function App() {
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
+            {/* Firm Onboarding — tailored link for organizations */}
+            <Route path="/:slug/join" element={<FirmOnboardingPage />} />
             {/* Public creator profile — must be last in public routes */}
             <Route path="/:slug" element={<CreatorProfilePage />} />
           </Route>
