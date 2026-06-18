@@ -4,20 +4,23 @@ import {
   BarChart3,
   Check,
   Copy,
+  Edit2,
   ExternalLink,
   Fuel,
   Gift,
   Share2,
   Trophy,
   Users,
+  X,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 const SITE_URL = "https://give.wtpnews.org";
 
@@ -65,8 +68,19 @@ export default function ReferralPage() {
   const stats = useQuery(api.referrals.getMyReferralStats);
   const leaderboard = useQuery(api.referrals.getReferralLeaderboard);
   const generateCode = useMutation(api.referrals.getMyReferralCode);
+  const updateCode = useMutation(api.referrals.updateReferralCode);
+  
   const [copied, setCopied] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newCode, setNewCode] = useState("");
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    if (stats?.referralCode) {
+      setNewCode(stats.referralCode);
+    }
+  }, [stats?.referralCode]);
 
   const referralLink = stats?.referralCode
     ? `${SITE_URL}/?ref=${stats.referralCode}`
@@ -81,6 +95,23 @@ export default function ReferralPage() {
       toast.error("Failed to generate code");
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const handleUpdateCode = async () => {
+    if (newCode.length < 3) {
+      toast.error("Code must be at least 3 characters");
+      return;
+    }
+    setUpdating(true);
+    try {
+      await updateCode({ code: newCode });
+      toast.success("Referral code updated!");
+      setIsEditing(false);
+    } catch (e: any) {
+      toast.error(e.message ?? "Failed to update code");
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -137,33 +168,83 @@ export default function ReferralPage() {
 
       {/* Your referral link */}
       <Card className="p-6 bg-card/60 border-border/40 space-y-4">
-        <div className="flex items-center gap-2">
-          <Zap className="size-5 text-amber-400" />
-          <h2 className="font-semibold text-lg">Your Referral Link</h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Zap className="size-5 text-amber-400" />
+            <h2 className="font-semibold text-lg">Your Referral Link</h2>
+          </div>
+          {referralLink && !isEditing && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsEditing(true)}
+              className="text-xs h-8 gap-1.5 text-muted-foreground hover:text-amber-400"
+            >
+              <Edit2 className="size-3" />
+              Personalize
+            </Button>
+          )}
         </div>
 
         {referralLink ? (
-          <div className="flex gap-2">
-            <div className="flex-1 bg-muted/40 rounded-lg px-4 py-2.5 font-mono text-sm truncate border border-border/40">
-              {referralLink}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopy}
-              className="shrink-0 gap-1.5"
-            >
-              {copied ? <Check className="size-4 text-green-400" /> : <Copy className="size-4" />}
-              {copied ? "Copied" : "Copy"}
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleShare}
-              className="shrink-0 gap-1.5 bg-amber-500 hover:bg-amber-400 text-black"
-            >
-              <Share2 className="size-4" />
-              Share
-            </Button>
+          <div className="space-y-4">
+            {isEditing ? (
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">
+                    ?ref=
+                  </span>
+                  <Input
+                    value={newCode}
+                    onChange={(e) => setNewCode(e.target.value.toUpperCase())}
+                    className="pl-12 font-mono text-sm h-10 uppercase"
+                    placeholder="MY-CODE"
+                    maxLength={20}
+                  />
+                </div>
+                <Button
+                  size="sm"
+                  onClick={handleUpdateCode}
+                  disabled={updating || newCode === stats.referralCode}
+                  className="bg-green-600 hover:bg-green-500 text-white"
+                >
+                  {updating ? "Saving..." : "Save"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setNewCode(stats.referralCode!);
+                  }}
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <div className="flex-1 bg-muted/40 rounded-lg px-4 py-2.5 font-mono text-sm truncate border border-border/40">
+                  {referralLink}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopy}
+                  className="shrink-0 gap-1.5"
+                >
+                  {copied ? <Check className="size-4 text-green-400" /> : <Copy className="size-4" />}
+                  {copied ? "Copied" : "Copy"}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleShare}
+                  className="shrink-0 gap-1.5 bg-amber-500 hover:bg-amber-400 text-black"
+                >
+                  <Share2 className="size-4" />
+                  Share
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-3">
@@ -181,7 +262,7 @@ export default function ReferralPage() {
           </div>
         )}
 
-        {stats?.referralCode && (
+        {stats?.referralCode && !isEditing && (
           <div className="flex gap-2 flex-wrap">
             <a
               href={`https://twitter.com/intent/tweet?text=Help+fuel+independent+journalism+%E2%9B%BD&url=${encodeURIComponent(referralLink!)}`}
