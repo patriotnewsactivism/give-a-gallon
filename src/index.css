@@ -52,41 +52,39 @@
   --font-display: "Oswald", "Impact", system-ui, sans-serif;
 }
 
-/* Give a Gallon — Warm Patriotic theme: Deep Navy + Gold */
+/* Give a Gallon — Dark Patriotic theme: Deep Navy + Crimson Fuel */
 :root {
   --sidebar-width: 16rem;
   --sidebar-width-icon: 3rem;
 
-  /* ── Gold fuel accent — warm, authoritative, patriotic ── */
-  /* oklch equivalent of #c9a227 */
-  --fuel: oklch(0.72 0.13 85);
-  --fuel-foreground: oklch(0.10 0.02 255);
-  --fuel-muted: oklch(0.58 0.09 85);
+  /* ── Crimson fuel accent — firey, energetic, recognizable ── */
+  --fuel: oklch(0.62 0.23 25);
+  --fuel-foreground: oklch(0.98 0 0);
+  --fuel-muted: oklch(0.50 0.15 25);
 
-  /* Primary = gold */
-  --primary: oklch(0.72 0.13 85);
-  --primary-foreground: oklch(0.10 0.02 255);
-  --sidebar-primary: oklch(0.72 0.13 85);
-  --sidebar-primary-foreground: oklch(0.10 0.02 255);
+  /* Primary = crimson */
+  --primary: oklch(0.60 0.20 25);
+  --primary-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.60 0.20 25);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
 
   /* Status colors */
   --success: oklch(0.60 0.16 145);
   --success-foreground: oklch(0.98 0 0);
-  /* Warning reuses gold family */
-  --warning: oklch(0.78 0.15 80);
-  --warning-foreground: oklch(0.10 0.02 255);
-  /* Info = lighter navy blue */
-  --info: oklch(0.62 0.14 240);
+  --warning: oklch(0.72 0.15 70);
+  --warning-foreground: oklch(0.12 0.02 70);
+  /* Info = navy blue */
+  --info: oklch(0.60 0.14 240);
   --info-foreground: oklch(0.98 0 0);
-  /* Destructive = true American flag red, used sparingly */
-  --destructive: oklch(0.50 0.20 27);
+  /* Destructive = flag red */
+  --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
 
-  --chart-1: oklch(0.72 0.13 85);   /* gold */
+  --chart-1: oklch(0.62 0.23 25);   /* crimson */
   --chart-2: oklch(0.55 0.18 255);  /* navy blue */
-  --chart-3: oklch(0.50 0.20 27);   /* flag red */
+  --chart-3: oklch(0.45 0.13 25);   /* dark red */
   --chart-4: oklch(0.60 0.16 145);  /* green */
-  --chart-5: oklch(0.58 0.09 85);   /* muted gold */
+  --chart-5: oklch(0.72 0.15 70);   /* amber */
 
   --radius: 0.5rem;
 
@@ -106,21 +104,21 @@
   --muted: oklch(0.12 0.02 255);
   --muted-foreground: oklch(0.65 0.015 80);
 
-  /* Accent = gold-tinted navy hover */
-  --accent: oklch(0.15 0.03 255);
-  --accent-foreground: oklch(0.72 0.13 85);
+  /* Accent = crimson-tinted navy hover */
+  --accent: oklch(0.12 0.03 25);
+  --accent-foreground: oklch(0.62 0.23 25);
 
   --border: oklch(0.18 0.02 255);
   --input: oklch(0.15 0.02 255);
-  --ring: oklch(0.72 0.13 85);
+  --ring: oklch(0.62 0.23 25);
 
   /* Sidebar — absolute darkest navy */
   --sidebar: oklch(0.045 0.02 255);
   --sidebar-foreground: oklch(0.85 0.008 80);
   --sidebar-accent: oklch(0.10 0.02 255);
-  --sidebar-accent-foreground: oklch(0.72 0.13 85);
+  --sidebar-accent-foreground: oklch(0.62 0.23 25);
   --sidebar-border: oklch(0.14 0.02 255);
-  --sidebar-ring: oklch(0.72 0.13 85);
+  --sidebar-ring: oklch(0.62 0.23 25);
 }
 
 @layer base {
