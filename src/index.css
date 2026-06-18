@@ -179,10 +179,10 @@
     animation: fuel-fill 1.5s ease-out forwards;
   }
 
-  /* Glowing gold fuel accent */
+  /* Glowing crimson fuel accent */
   .fuel-glow {
-    box-shadow: 0 0 20px oklch(0.72 0.13 85 / 0.30),
-                0 0 60px oklch(0.72 0.13 85 / 0.14);
+    box-shadow: 0 0 20px oklch(0.62 0.23 25 / 0.25),
+                0 0 60px oklch(0.62 0.23 25 / 0.12);
   }
 
   /* Subtle noise texture overlay */
@@ -258,10 +258,10 @@
 
 /* ── Visibility utilities ─────────────────────────────── */
 .text-glow-fuel {
-  text-shadow: 0 0 28px oklch(0.72 0.13 85 / 0.60), 0 0 60px oklch(0.72 0.13 85 / 0.28);
+  text-shadow: 0 0 28px oklch(0.62 0.23 25 / 0.55), 0 0 60px oklch(0.62 0.23 25 / 0.25);
 }
 .shadow-glow-fuel {
-  box-shadow: 0 0 24px oklch(0.72 0.13 85 / 0.40), 0 4px 20px oklch(0.72 0.13 85 / 0.22);
+  box-shadow: 0 0 24px oklch(0.62 0.23 25 / 0.35), 0 4px 20px oklch(0.62 0.23 25 / 0.20);
 }
 @keyframes hero-pulse {
   0%, 100% { opacity: 0.05; }
