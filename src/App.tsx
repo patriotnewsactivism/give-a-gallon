@@ -21,6 +21,7 @@ import {
   AdminDashboard,
   PrivacyPolicyPage,
   TermsOfServicePage,
+  FirmOnboardingPage,
 } from "./pages";
 import { DonationSuccessPage } from "./pages/DonationSuccessPage";
 import { DonationCancelPage } from "./pages/DonationCancelPage";

@@ -7,11 +7,17 @@ import {
   Users,
   Fuel,
   TrendingUp,
+<<<<<<< Updated upstream
   MapPin,
 } from "lucide-react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { VERIFICATION_TIERS } from "@/lib/constants";
+=======
+} from "lucide-react";
+import { Link, useParams, Navigate } from "react-router-dom";
+import { api } from "../../convex/_generated/api";
+>>>>>>> Stashed changes
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useEffect } from "react";
@@ -40,8 +46,11 @@ export default function FirmOnboardingPage() {
     return <Navigate to={creator ? `/${creator.slug}` : "/"} replace />;
   }
 
+<<<<<<< Updated upstream
   const tier = VERIFICATION_TIERS.organization;
 
+=======
+>>>>>>> Stashed changes
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col">
       {/* Background decoration */}
@@ -102,7 +111,11 @@ export default function FirmOnboardingPage() {
               icon: TrendingUp,
               title: "Referral Bonus",
               desc: "Earn extra gallons for every donor you bring to the platform. We grow together.",
+<<<<<<< Updated upstream
               color: "text-green-400"
+=======
+              color: "text-green- Green-400"
+>>>>>>> Stashed changes
             }
           ].map((feature, i) => (
             <Card key={i} className="p-6 bg-card/40 border-border/40 space-y-3">
