@@ -64,6 +64,34 @@ function RankBadge({ rank }: { rank: number }) {
   );
 }
 
+import { useMutation, useQuery } from "convex/react";
+import {
+  Award,
+  BarChart3,
+  Check,
+  Copy,
+  Edit2,
+  ExternalLink,
+  Fuel,
+  Gift,
+  Share2,
+  Trophy,
+  Users,
+  X,
+  Zap,
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { api } from "../../convex/_generated/api";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+
+const SITE_URL = "https://give.wtpnews.org";
+
+// ... (MiniBarChart and RankBadge unchanged)
+
 export default function ReferralPage() {
   const stats = useQuery(api.referrals.getMyReferralStats);
   const leaderboard = useQuery(api.referrals.getReferralLeaderboard);
