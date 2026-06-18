@@ -52,62 +52,75 @@
   --font-display: "Oswald", "Impact", system-ui, sans-serif;
 }
 
-/* Give a Gallon — Dark theme with crimson fuel accents */
+/* Give a Gallon — Warm Patriotic theme: Deep Navy + Gold */
 :root {
   --sidebar-width: 16rem;
   --sidebar-width-icon: 3rem;
 
-  /* Crimson fuel accent — slightly brighter to pop on dark */
-  --fuel: oklch(0.62 0.23 25);
-  --fuel-foreground: oklch(0.98 0 0);
-  --fuel-muted: oklch(0.50 0.15 25);
+  /* ── Gold fuel accent — warm, authoritative, patriotic ── */
+  /* oklch equivalent of #c9a227 */
+  --fuel: oklch(0.72 0.13 85);
+  --fuel-foreground: oklch(0.10 0.02 255);
+  --fuel-muted: oklch(0.58 0.09 85);
 
-  --primary: oklch(0.55 0.20 25);
-  --primary-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.55 0.20 25);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
+  /* Primary = gold */
+  --primary: oklch(0.72 0.13 85);
+  --primary-foreground: oklch(0.10 0.02 255);
+  --sidebar-primary: oklch(0.72 0.13 85);
+  --sidebar-primary-foreground: oklch(0.10 0.02 255);
 
+  /* Status colors */
   --success: oklch(0.60 0.16 145);
   --success-foreground: oklch(0.98 0 0);
-  --warning: oklch(0.72 0.15 70);
-  --warning-foreground: oklch(0.12 0.02 70);
-  --info: oklch(0.60 0.14 240);
+  /* Warning reuses gold family */
+  --warning: oklch(0.78 0.15 80);
+  --warning-foreground: oklch(0.10 0.02 255);
+  /* Info = lighter navy blue */
+  --info: oklch(0.62 0.14 240);
   --info-foreground: oklch(0.98 0 0);
+  /* Destructive = true American flag red, used sparingly */
+  --destructive: oklch(0.50 0.20 27);
+  --destructive-foreground: oklch(0.98 0 0);
 
-  --chart-1: oklch(0.55 0.20 25);
-  --chart-2: oklch(0.45 0.13 25);
-  --chart-3: oklch(0.60 0.14 240);
-  --chart-4: oklch(0.60 0.16 145);
-  --chart-5: oklch(0.72 0.15 70);
+  --chart-1: oklch(0.72 0.13 85);   /* gold */
+  --chart-2: oklch(0.55 0.18 255);  /* navy blue */
+  --chart-3: oklch(0.50 0.20 27);   /* flag red */
+  --chart-4: oklch(0.60 0.16 145);  /* green */
+  --chart-5: oklch(0.58 0.09 85);   /* muted gold */
 
   --radius: 0.5rem;
 
-  /* Deep dark base — near-black with very slight warm tint */
-  --background: oklch(0.10 0.006 25);
-  --foreground: oklch(0.99 0.003 60);
-  --card: oklch(0.14 0.008 25);
-  --card-foreground: oklch(0.97 0.004 60);
-  --popover: oklch(0.13 0.007 25);
-  --popover-foreground: oklch(0.97 0.004 60);
-  --secondary: oklch(0.16 0.007 25);
-  --secondary-foreground: oklch(0.88 0.006 60);
-  --muted: oklch(0.16 0.007 25);
-  --muted-foreground: oklch(0.72 0.01 60);
-  --accent: oklch(0.18 0.025 25);
-  --accent-foreground: oklch(0.88 0.10 25);
-  --destructive: oklch(0.55 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.20 0.010 25);
-  --input: oklch(0.18 0.008 25);
-  --ring: oklch(0.55 0.20 25);
+  /* ── Deep navy base — #0a1628 family ── */
+  /* background  ≈ #0a1628 */
+  --background: oklch(0.16 0.04 255);
+  --foreground: oklch(0.96 0.008 80);   /* warm white #f5f0e8 */
 
-  /* Sidebar — slightly darker than background */
-  --sidebar: oklch(0.08 0.006 25);
-  --sidebar-foreground: oklch(0.88 0.005 60);
-  --sidebar-accent: oklch(0.14 0.010 25);
-  --sidebar-accent-foreground: oklch(0.88 0.005 60);
-  --sidebar-border: oklch(0.17 0.008 25);
-  --sidebar-ring: oklch(0.55 0.20 25);
+  /* Cards slightly lighter navy */
+  --card: oklch(0.20 0.04 255);
+  --card-foreground: oklch(0.94 0.008 80);
+  --popover: oklch(0.19 0.04 255);
+  --popover-foreground: oklch(0.94 0.008 80);
+
+  --secondary: oklch(0.22 0.04 255);
+  --secondary-foreground: oklch(0.85 0.01 80);
+  --muted: oklch(0.22 0.04 255);
+  --muted-foreground: oklch(0.68 0.015 80);
+
+  /* Accent = gold-tinted navy hover */
+  --accent: oklch(0.26 0.05 255);
+  --accent-foreground: oklch(0.72 0.13 85);
+
+  --border: oklch(0.28 0.04 255);
+  --input: oklch(0.24 0.04 255);
+  --ring: oklch(0.72 0.13 85);
+
+  /* Sidebar — darkest navy */
+  --sidebar: oklch(0.13 0.04 255);
+  --sidebar-foreground: oklch(0.85 0.008 80);
+  --sidebar-accent: oklch(0.20 0.04 255);
+  --sidebar-accent-foreground: oklch(0.72 0.13 85);
+  --sidebar-border: oklch(0.24 0.04 255);
+  --sidebar-ring: oklch(0.72 0.13 85);
 }
 
 @layer base {
@@ -168,10 +181,10 @@
     animation: fuel-fill 1.5s ease-out forwards;
   }
 
-  /* Glowing fuel accent */
+  /* Glowing gold fuel accent */
   .fuel-glow {
-    box-shadow: 0 0 20px oklch(0.55 0.20 25 / 0.25),
-                0 0 60px oklch(0.55 0.20 25 / 0.12);
+    box-shadow: 0 0 20px oklch(0.72 0.13 85 / 0.30),
+                0 0 60px oklch(0.72 0.13 85 / 0.14);
   }
 
   /* Subtle noise texture overlay */
@@ -185,7 +198,7 @@
     z-index: 0;
   }
 
-  /* Horizontal marquee for the "what a gallon fuels" ticker */
+  /* Horizontal marquee */
   @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
@@ -219,7 +232,7 @@
     animation: float-soft 5s ease-in-out infinite;
   }
 
-  /* Scroll-reveal: starts hidden, .is-visible reveals */
+  /* Scroll-reveal */
   .reveal {
     opacity: 0;
     transform: translateY(24px);
@@ -247,14 +260,14 @@
 
 /* ── Visibility utilities ─────────────────────────────── */
 .text-glow-fuel {
-  text-shadow: 0 0 28px oklch(0.62 0.23 25 / 0.55), 0 0 60px oklch(0.62 0.23 25 / 0.25);
+  text-shadow: 0 0 28px oklch(0.72 0.13 85 / 0.60), 0 0 60px oklch(0.72 0.13 85 / 0.28);
 }
 .shadow-glow-fuel {
-  box-shadow: 0 0 24px oklch(0.62 0.23 25 / 0.35), 0 4px 20px oklch(0.62 0.23 25 / 0.20);
+  box-shadow: 0 0 24px oklch(0.72 0.13 85 / 0.40), 0 4px 20px oklch(0.72 0.13 85 / 0.22);
 }
 @keyframes hero-pulse {
-  0%, 100% { opacity: 0.06; }
-  50%       { opacity: 0.12; }
+  0%, 100% { opacity: 0.05; }
+  50%       { opacity: 0.10; }
 }
 .animate-hero-pulse {
   animation: hero-pulse 6s ease-in-out infinite;
