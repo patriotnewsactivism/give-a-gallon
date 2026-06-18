@@ -19,6 +19,8 @@ import {
   SettingsPage,
   SignupPage,
   AdminDashboard,
+  PrivacyPolicyPage,
+  TermsOfServicePage,
 } from "./pages";
 import { DonationSuccessPage } from "./pages/DonationSuccessPage";
 import { DonationCancelPage } from "./pages/DonationCancelPage";
@@ -42,6 +44,8 @@ function App() {
             <Route path="/donation-success" element={<DonationSuccessPage />} />
             <Route path="/donation-cancel" element={<DonationCancelPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfServicePage />} />
             {/* Public creator profile — must be last in public routes */}
             <Route path="/:slug" element={<CreatorProfilePage />} />
           </Route>

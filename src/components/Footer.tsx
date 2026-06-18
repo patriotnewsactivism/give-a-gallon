@@ -71,8 +71,10 @@ export function Footer() {
               <a href="https://www.civilrightshub.org" target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-fuel transition-colors">Civil Rights Hub</a>
               {" "}· <a href="https://give.wtpnews.org" className="hover:text-foreground transition-colors">give.wtpnews.org</a>
             </p>
-            <p className="text-xs text-muted-foreground">
-              "One gallon can change someone&#39;s day. Many gallons can change a life."
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+              <span>·</span>
+              <Link to="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
             </p>
           </div>
         </div>
