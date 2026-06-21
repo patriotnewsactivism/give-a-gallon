@@ -444,7 +444,7 @@ export function AdminDashboard() {
                 </div>
                 <div>
                   <label htmlFor="notif-link" className="text-xs font-semibold text-muted-foreground mb-1 block">Link (optional)</label>
-                  <Input id="notif-link" placeholder="https://giveagallon.org/..." value={notifLink} onChange={e => setNotifLink(e.target.value)} className="h-9" />
+                  <Input id="notif-link" placeholder="https://www.giveagallon.org/..." value={notifLink} onChange={e => setNotifLink(e.target.value)} className="h-9" />
                 </div>
                 <Button onClick={handleSendNotification} disabled={sending || !notifTitle.trim() || !notifBody.trim()} className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90">
                   {sending ? "Sending…" : "Send to All Users"}

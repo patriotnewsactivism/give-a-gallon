@@ -39,7 +39,7 @@ export const createSubscriptionCheckout = action({
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeKey) throw new Error("Stripe not configured");
 
-    const siteUrl = process.env.SITE_URL || "https://giveagallon.org";
+    const siteUrl = process.env.SITE_URL || "https://www.giveagallon.org";
 
     // Get or create Stripe price for this tier
     const priceId = await ctx.runAction(internal.subscriptions.getOrCreateStripePriceId, {

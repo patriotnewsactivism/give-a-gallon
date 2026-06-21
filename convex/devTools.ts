@@ -126,7 +126,7 @@ export const seedAll = internalAction({
     const now = Date.now();
 
     // 1. Seed platform stats
-    await ctx.runMutation(internal.viktorTools.seedPlatformStats, {});
+    await ctx.runMutation(internal.devTools.seedPlatformStats, {});
 
     // 2. Create seed auth users then creators
     const campaigns = [
@@ -219,7 +219,7 @@ export const seedAll = internalAction({
         });
 
         // Create creator profile
-        const creatorId = await ctx.runMutation(internal.viktorTools.createSeedCreator, {
+        const creatorId = await ctx.runMutation(internal.devTools.createSeedCreator, {
           userId: user._id as any,
           slug: campaign.slug,
           displayName: campaign.displayName,
@@ -239,7 +239,7 @@ export const seedAll = internalAction({
         // Seed a few donations per campaign
         const donorNames = ["Sarah M.", "James T.", "Anonymous", "Pat K.", "Robin L."];
         for (let i = 0; i < 3; i++) {
-          await ctx.runMutation(internal.viktorTools.createSeedDonation, {
+          await ctx.runMutation(internal.devTools.createSeedDonation, {
             creatorId: creatorId as any,
             donorName: donorNames[i % donorNames.length],
             gallons: Math.floor(Math.random() * 4) + 1,

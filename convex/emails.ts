@@ -8,7 +8,7 @@ import { v } from "convex/values";
 declare const process: { env: Record<string, string | undefined> };
 
 const FROM = "Give-A-Gallon <alerts@giveagallon.org>";
-const SITE = "https://giveagallon.org";
+const SITE = "https://www.giveagallon.org";
 const FUEL_COLOR = "#f97316";
 
 // ── Shared HTML wrapper ───────────────────────────────────────────────────────
@@ -32,7 +32,7 @@ function wrap(content: string) {
     <!-- Footer -->
     <div style="text-align:center;margin-top:24px;">
       <p style="color:#555;font-size:12px;margin:0;">
-        © Give-A-Gallon · <a href="${SITE}" style="color:${FUEL_COLOR};text-decoration:none;">giveagallon.org</a>
+        © Give-A-Gallon · <a href="${SITE}" style="color:${FUEL_COLOR};text-decoration:none;">www.giveagallon.org</a>
       </p>
       <p style="color:#444;font-size:11px;margin:6px 0 0;">
         Part of the <a href="https://wtpnews.org" style="color:#555;text-decoration:none;">We The People News</a> network

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Give a Gallon** is a crowdfunding/donation platform for activists, journalists, and creators built on the "We The People News" (WTP News) network. Donors give "gallons of fuel" ($4.25/gallon) to creator campaigns. The platform lives at `giveagallon.org`.
+**Give a Gallon** is a crowdfunding/donation platform for activists, journalists, and creators built on the "We The People News" (WTP News) network. Donors give "gallons of fuel" ($4.25/gallon) to creator campaigns. The platform lives at `www.giveagallon.org`.
 
 ## Tech Stack
 
@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Backend**: Convex (real-time database + serverless functions + file storage)
 - **Auth**: `@convex-dev/auth` (JWT-based, email/password; no OAuth)
 - **Payments**: Stripe Checkout + Stripe Connect (creators collect directly), webhooks verified with HMAC
-- **Email**: Resend (`alerts@giveagallon.org`) via internal Convex actions
+- **Email**: Resend (`alerts@www.giveagallon.org`) via internal Convex actions
 - **Linter/Formatter**: Biome (double quotes, 2-space indent, 80-char line width)
 - **Package manager**: Bun
 - **Deployment**: Vercel (frontend) + Convex cloud (backend); CI via GitHub Actions
@@ -91,7 +91,7 @@ Route structure (from `App.tsx`):
 **Convex (set via `bunx convex env`)**:
 - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
 - `RESEND_API_KEY`
-- `SITE_URL` (e.g. `https://giveagallon.org`)
+- `SITE_URL` (e.g. `https://www.giveagallon.org`)
 - `CONVEX_SITE_URL` (injected automatically by Convex)
 
 **Vite (set in Vercel project settings)**:

@@ -48,7 +48,7 @@ export const createCheckoutSession = action({
       },
     );
 
-    const siteUrl = process.env.SITE_URL || "https://giveagallon.org";
+    const siteUrl = process.env.SITE_URL || "https://www.giveagallon.org";
 
     const params = new URLSearchParams();
     params.append("mode", "payment");

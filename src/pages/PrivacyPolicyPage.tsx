@@ -21,7 +21,7 @@ export function PrivacyPolicyPage() {
         </p>
 
         <p className="text-muted-foreground mb-6">
-          Give-A-Gallon ("we," "us," or "the Platform") is operated by We The People News. This Privacy Policy explains how we collect, use, and protect information when you use giveagallon.org and related services.
+          Give-A-Gallon ("we," "us," or "the Platform") is operated by We The People News. This Privacy Policy explains how we collect, use, and protect information when you use www.giveagallon.org and related services.
         </p>
 
         {/* Callout */}

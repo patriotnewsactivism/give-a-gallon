@@ -45,7 +45,7 @@ export const startOnboarding = action({
     const creator: any = await ctx.runQuery(internal.connect.getMyCreator);
     if (!creator) throw new Error("Creator profile not found");
 
-    const siteUrl = process.env.SITE_URL || "https://giveagallon.org";
+    const siteUrl = process.env.SITE_URL || "https://www.giveagallon.org";
 
     // Create a Connect Express account if we don't have one yet
     let accountId = creator.stripeAccountId;

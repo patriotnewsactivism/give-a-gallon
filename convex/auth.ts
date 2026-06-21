@@ -2,7 +2,7 @@ import { Password } from "@convex-dev/auth/providers/Password";
 import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
 import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
-import { ResendEmail, ResendPasswordReset } from "./ViktorSpacesEmail";
+import { ResendEmail, ResendPasswordReset } from "./authEmail";
 
 // Email verification + password reset are only enforced when Resend is
 // configured (RESEND_API_KEY set in the Convex deployment). This keeps local
