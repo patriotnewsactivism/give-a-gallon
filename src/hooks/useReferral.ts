@@ -36,6 +36,10 @@ function writeStored(code: string) {
   }
 }
 
+export function setReferral(code: string) {
+  writeStored(code);
+}
+
 export function clearReferral() {
   try {
     localStorage.removeItem(STORAGE_KEY);
