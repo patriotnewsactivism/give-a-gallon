@@ -1,4 +1,5 @@
 // Give a Gallon — Stripe Connect Express onboarding
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { action, internalMutation, internalQuery } from "./_generated/server";
 import { internal } from "./_generated/api";
@@ -194,17 +195,16 @@ export const getBalance = action({
 export const getMyCreator = internalQuery({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-    const user = await ctx.db
-      .query("users")
-      .filter(q => q.eq(q.field("email"), identity.email))
-      .unique();
-    if (!user) return null;
+    // Resolve the creator the same way the rest of the app does: by the
+    // authenticated user id. The auth identity does not carry a reliable
+    // `email` claim, so an email-based lookup here returns null and breaks
+    // onboarding/payouts/balance with a spurious "Creator profile not found".
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
     return ctx.db
       .query("creators")
-      .withIndex("by_userId", q => q.eq("userId", user._id))
-      .unique();
+      .withIndex("by_userId", q => q.eq("userId", userId))
+      .first();
   },
 });
 
