@@ -21,7 +21,7 @@ export function TermsOfServicePage() {
         </p>
 
         <p className="text-muted-foreground mb-6 text-sm">
-          Welcome to Give-A-Gallon ("the Platform"), operated by We The People News. By using give.wtpnews.org, you agree to these Terms of Service ("Terms"). If you do not agree, do not use the Platform.
+          Welcome to Give-A-Gallon ("the Platform"), operated by We The People News. By using giveagallon.org, you agree to these Terms of Service ("Terms"). If you do not agree, do not use the Platform.
         </p>
 
         {/* Sections */}
@@ -237,7 +237,7 @@ export function TermsOfServicePage() {
             Website:{" "}
             <a href="https://wtpnews.org" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">wtpnews.org</a><br />
             Platform:{" "}
-            <a href="https://give.wtpnews.org" className="text-fuel hover:underline">give.wtpnews.org</a>
+            <a href="https://giveagallon.org" className="text-fuel hover:underline">giveagallon.org</a>
           </p>
         </Section>
 

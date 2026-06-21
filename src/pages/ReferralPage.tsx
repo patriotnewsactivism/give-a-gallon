@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-const SITE_URL = "https://give.wtpnews.org";
+const SITE_URL = "https://giveagallon.org";
 
 // Simple bar chart component
 function MiniBarChart({
