@@ -41,12 +41,12 @@ function HeroSection() {
     <section className="relative overflow-hidden">
       {/* Rich layered background — fills desktop horizontal space */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-700/[0.18] via-blue-700/[0.05] to-transparent" />
-        <div className="absolute -top-24 left-1/2 h-[700px] w-[1100px] -translate-x-1/2 rounded-full bg-blue-700/[0.13] blur-3xl animate-hero-pulse" />
-        <div className="absolute top-0 left-0 h-full w-[30%] bg-gradient-to-r from-blue-700/[0.07] to-transparent" />
-        <div className="absolute top-0 right-0 h-full w-[30%] bg-gradient-to-l from-blue-700/[0.07] to-transparent" />
-        <div className="absolute top-20 left-[3%] h-80 w-80 rounded-full bg-blue-700/[0.08] blur-3xl" />
-        <div className="absolute top-32 right-[3%] h-64 w-64 rounded-full bg-blue-700/[0.08] blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-600/[0.25] via-blue-700/[0.08] to-transparent" />
+        <div className="absolute -top-24 left-1/2 h-[700px] w-[1100px] -translate-x-1/2 rounded-full bg-blue-600/[0.20] blur-3xl animate-hero-pulse" />
+        <div className="absolute top-0 left-0 h-full w-[30%] bg-gradient-to-r from-blue-700/[0.10] to-transparent" />
+        <div className="absolute top-0 right-0 h-full w-[30%] bg-gradient-to-l from-blue-700/[0.10] to-transparent" />
+        <div className="absolute top-20 left-[3%] h-80 w-80 rounded-full bg-blue-600/[0.14] blur-3xl" />
+        <div className="absolute top-32 right-[3%] h-64 w-64 rounded-full bg-blue-600/[0.14] blur-3xl" />
         <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-background to-transparent" />
         <div className="absolute inset-0 opacity-[0.04]" style={{backgroundImage: "linear-gradient(oklch(0.45 0.18 255) 1px, transparent 1px), linear-gradient(90deg, oklch(0.45 0.18 255) 1px, transparent 1px)", backgroundSize: "80px 80px"}} />
       </div>
