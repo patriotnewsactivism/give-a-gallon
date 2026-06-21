@@ -52,7 +52,11 @@
   --font-display: "Oswald", "Impact", system-ui, sans-serif;
 }
 
+<<<<<<< HEAD
 /* Give a Gallon — Dark Navy + Fuel Orange theme */
+=======
+/* Give a Gallon — Dark Patriotic theme: Deep Navy + Crimson Fuel */
+>>>>>>> parent of 173eda6 (kawaii)
 :root {
   --sidebar-width: 16rem;
   --sidebar-width-icon: 3rem;
@@ -73,8 +77,15 @@
   --success-foreground: oklch(0.98 0 0);
   --warning: oklch(0.72 0.15 70);
   --warning-foreground: oklch(0.12 0.02 70);
+<<<<<<< HEAD
   --info: oklch(0.60 0.14 240);
   --info-foreground: oklch(0.98 0 0);
+=======
+  /* Info = navy blue */
+  --info: oklch(0.60 0.14 240);
+  --info-foreground: oklch(0.98 0 0);
+  /* Destructive = red (kept distinct from fuel orange) */
+>>>>>>> parent of 173eda6 (kawaii)
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
 
@@ -86,9 +97,16 @@
 
   --radius: 0.5rem;
 
+<<<<<<< HEAD
   /* ── Deep navy base ── */
   --background: oklch(0.06 0.02 255);
   --foreground: oklch(0.98 0.005 80);
+=======
+  /* ── Deep navy base — #030712 family ── */
+  /* background  ≈ #030712 */
+  --background: oklch(0.06 0.02 255);
+  --foreground: oklch(0.98 0.005 80);   /* clean white */
+>>>>>>> parent of 173eda6 (kawaii)
 
   /* Cards slightly lighter navy */
   --card: oklch(0.09 0.02 255);
