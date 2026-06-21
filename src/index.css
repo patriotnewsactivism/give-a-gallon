@@ -1,4 +1,3 @@
-@ -1,273 +1,273 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -53,25 +52,16 @@
   --font-display: "Oswald", "Impact", system-ui, sans-serif;
 }
 
-/* Give a Gallon — Dark Patriotic theme: Deep Navy + Crimson Fuel */
+/* Give a Gallon — Dark Navy + Fuel Orange theme */
 :root {
   --sidebar-width: 16rem;
   --sidebar-width-icon: 3rem;
 
-  /* ── Crimson fuel accent — firey, energetic, recognizable ── */
-  --fuel: oklch(0.62 0.23 25);
-  --fuel-foreground: oklch(0.98 0 0);
-  --fuel-muted: oklch(0.50 0.15 25);
   /* ── Fuel orange accent — gasoline, fire, energy ── */
   --fuel: oklch(0.70 0.21 40);
   --fuel-foreground: oklch(0.10 0.02 40);
   --fuel-muted: oklch(0.55 0.14 40);
 
-  /* Primary = crimson */
-  --primary: oklch(0.60 0.20 25);
-  --primary-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.60 0.20 25);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
   /* Primary = fuel orange */
   --primary: oklch(0.68 0.19 40);
   --primary-foreground: oklch(0.10 0.02 40);
@@ -83,28 +73,22 @@
   --success-foreground: oklch(0.98 0 0);
   --warning: oklch(0.72 0.15 70);
   --warning-foreground: oklch(0.12 0.02 70);
-  /* Info = navy blue */
   --info: oklch(0.60 0.14 240);
   --info-foreground: oklch(0.98 0 0);
-  /* Destructive = flag red */
-  /* Destructive = red (kept distinct from fuel orange) */
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
 
-  --chart-1: oklch(0.62 0.23 25);   /* crimson */
   --chart-1: oklch(0.70 0.21 40);   /* fuel orange */
   --chart-2: oklch(0.55 0.18 255);  /* navy blue */
-  --chart-3: oklch(0.45 0.13 25);   /* dark red */
   --chart-3: oklch(0.50 0.15 40);   /* dark orange */
   --chart-4: oklch(0.60 0.16 145);  /* green */
   --chart-5: oklch(0.72 0.15 70);   /* amber */
 
   --radius: 0.5rem;
 
-  /* ── Deep navy base — #030712 family ── */
-  /* background  ≈ #030712 */
+  /* ── Deep navy base ── */
   --background: oklch(0.06 0.02 255);
-  --foreground: oklch(0.98 0.005 80);   /* clean white */
+  --foreground: oklch(0.98 0.005 80);
 
   /* Cards slightly lighter navy */
   --card: oklch(0.09 0.02 255);
@@ -117,26 +101,20 @@
   --muted: oklch(0.12 0.02 255);
   --muted-foreground: oklch(0.65 0.015 80);
 
-  /* Accent = crimson-tinted navy hover */
-  --accent: oklch(0.12 0.03 25);
-  --accent-foreground: oklch(0.62 0.23 25);
   /* Accent = orange-tinted navy hover */
   --accent: oklch(0.12 0.03 40);
   --accent-foreground: oklch(0.70 0.21 40);
 
   --border: oklch(0.18 0.02 255);
   --input: oklch(0.15 0.02 255);
-  --ring: oklch(0.62 0.23 25);
   --ring: oklch(0.70 0.21 40);
 
   /* Sidebar — absolute darkest navy */
   --sidebar: oklch(0.045 0.02 255);
   --sidebar-foreground: oklch(0.85 0.008 80);
   --sidebar-accent: oklch(0.10 0.02 255);
-  --sidebar-accent-foreground: oklch(0.62 0.23 25);
   --sidebar-accent-foreground: oklch(0.70 0.21 40);
   --sidebar-border: oklch(0.14 0.02 255);
-  --sidebar-ring: oklch(0.62 0.23 25);
   --sidebar-ring: oklch(0.70 0.21 40);
 }
 
@@ -198,11 +176,8 @@
     animation: fuel-fill 1.5s ease-out forwards;
   }
 
-  /* Glowing crimson fuel accent */
   /* Glowing fuel orange accent */
   .fuel-glow {
-    box-shadow: 0 0 20px oklch(0.62 0.23 25 / 0.25),
-                0 0 60px oklch(0.62 0.23 25 / 0.12);
     box-shadow: 0 0 20px oklch(0.70 0.21 40 / 0.30),
                 0 0 60px oklch(0.70 0.21 40 / 0.15);
   }
@@ -280,11 +255,9 @@
 
 /* ── Visibility utilities ─────────────────────────────── */
 .text-glow-fuel {
-  text-shadow: 0 0 28px oklch(0.62 0.23 25 / 0.55), 0 0 60px oklch(0.62 0.23 25 / 0.25);
   text-shadow: 0 0 28px oklch(0.70 0.21 40 / 0.55), 0 0 60px oklch(0.70 0.21 40 / 0.25);
 }
 .shadow-glow-fuel {
-  box-shadow: 0 0 24px oklch(0.62 0.23 25 / 0.35), 0 4px 20px oklch(0.62 0.23 25 / 0.20);
   box-shadow: 0 0 24px oklch(0.70 0.21 40 / 0.35), 0 4px 20px oklch(0.70 0.21 40 / 0.20);
 }
 @keyframes hero-pulse {
