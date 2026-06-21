@@ -24,7 +24,7 @@ async function assertAdmin(ctx: any) {
 // ── Admin: seed demo data ────────────────────────────────────────────────
 export const seedDemoData = mutation({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<{ message: string }> => {
     await assertAdmin(ctx);
     return await ctx.runMutation(internal.seedData.seedCreators);
   },

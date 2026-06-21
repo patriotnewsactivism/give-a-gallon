@@ -102,6 +102,7 @@ export const seedCreators = internalMutation({
     for (const creator of creators) {
       const id = await ctx.db.insert("creators", {
         ...creator,
+        verificationStatus: creator.verificationStatus as "unverified" | "community" | "journalist" | "organization" | "platform",
         userId: "jd74v6ksf8m9p0q2r4t5v6x7" as any,
       });
       creatorIds.push({ id, slug: creator.slug, displayName: creator.displayName });
@@ -124,9 +125,10 @@ export const seedCreators = internalMutation({
           creatorId: creator.id,
           gallons: d.gallons,
           amountCents: d.gallons * 425,
+          platformFeeCents: Math.round(d.gallons * 425 * 0.05),
           donorName: d.donorName,
-          status: "succeeded",
-          campaignName: creator.displayName,
+          isAnonymous: false,
+          status: "completed",
           createdAt: Date.now() - Math.random() * 24 * 60 * 60 * 1000,
         });
       }
@@ -136,7 +138,8 @@ export const seedCreators = internalMutation({
     for (const creator of creatorIds) {
       await ctx.db.insert("updates", {
         creatorId: creator.id,
-        content: `Just gassed up and headed to the ${creator.displayName === "Civil Rights Hub" ? "courthouse" : "next location"}. Thanks for the fuel!`,
+        title: "Fueled up and rolling",
+        body: `Just gassed up and headed to the ${creator.displayName === "Civil Rights Hub" ? "courthouse" : "next location"}. Thanks for the fuel!`,
         gallonsUsed: Math.floor(Math.random() * 20) + 5,
         impactTag: "Movement",
         createdAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
