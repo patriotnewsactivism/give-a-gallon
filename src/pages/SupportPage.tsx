@@ -223,7 +223,7 @@ export function SupportPage() {
               </Button>
               <p className="text-[11px] text-muted-foreground text-center">
                 We'll reply to your email. By submitting you agree to our{" "}
-                <Link to="/privacy" className="text-fuel hover:underline">
+                <Link to="/privacy-policy" className="text-fuel hover:underline">
                   Privacy Policy
                 </Link>
                 .
