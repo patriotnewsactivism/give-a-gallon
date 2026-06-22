@@ -78,6 +78,15 @@ export const createCheckoutSession = action({
       params.append("customer_email", args.donorEmail);
     }
 
+    // Show a recognizable descriptor on donors' bank/card statements. Unfamiliar
+    // descriptors are a top driver of "I don't recognize this charge" disputes,
+    // which feed Stripe's fraud/risk scoring. Suffix is concatenated with the
+    // account's statement descriptor (set in Stripe Dashboard → Public details).
+    params.append(
+      "payment_intent_data[statement_descriptor_suffix]",
+      "GIVEAGALLON",
+    );
+
     // If the creator has a verified Connect account, route the payment through
     // them and collect our platform fee as an application_fee_amount.
     if (creator?.stripeAccountId && creator?.stripeAccountStatus === "active") {
