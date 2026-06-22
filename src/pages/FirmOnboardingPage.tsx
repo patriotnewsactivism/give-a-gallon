@@ -7,11 +7,9 @@ import {
   Users,
   Fuel,
   TrendingUp,
-  MapPin,
 } from "lucide-react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
-import { VERIFICATION_TIERS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useEffect } from "react";
@@ -39,8 +37,6 @@ export default function FirmOnboardingPage() {
   if (!creator || creator.verificationStatus !== "organization") {
     return <Navigate to={creator ? `/${creator.slug}` : "/"} replace />;
   }
-
-  const tier = VERIFICATION_TIERS.organization;
 
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col">

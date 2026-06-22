@@ -4,7 +4,7 @@
  * the ADMIN_EMAIL environment variable (set in Convex dashboard).
  */
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { mutation, query, internalMutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 

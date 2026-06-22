@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Backend**: Convex (real-time database + serverless functions + file storage)
 - **Auth**: `@convex-dev/auth` (JWT-based, email/password; no OAuth)
 - **Payments**: Stripe Checkout + Stripe Connect (creators collect directly), webhooks verified with HMAC
-- **Email**: Resend (`alerts@www.giveagallon.org`) via internal Convex actions
+- **Email**: Resend (`alerts@giveagallon.org`) via internal Convex actions
 - **Linter/Formatter**: Biome (double quotes, 2-space indent, 80-char line width)
 - **Package manager**: Bun
 - **Deployment**: Vercel (frontend) + Convex cloud (backend); CI via GitHub Actions
