@@ -214,7 +214,7 @@ const schema = defineSchema({
     .index("by_user", ["userId", "notificationId"])
     .index("by_notification", ["notificationId"]),
 
-  // ── Support tickets (contact form → AI assistant) ────────────────────────
+  // ── Support tickets (contact form + email → AI assistant) ────────────────
   supportTickets: defineTable({
     name: v.string(),
     email: v.string(),
@@ -228,11 +228,21 @@ const schema = defineSchema({
       v.literal("closed"),
     ),
     aiReply: v.optional(v.string()),
+    source: v.optional(v.string()), // "web" | "email"
     repliedAt: v.optional(v.number()),
+    lastMessageAt: v.optional(v.number()),
     createdAt: v.number(),
   })
     .index("by_status", ["status", "createdAt"])
     .index("by_email", ["email", "createdAt"]),
+
+  // ── Support conversation log (one row per message in a ticket thread) ─────
+  supportMessages: defineTable({
+    ticketId: v.id("supportTickets"),
+    role: v.union(v.literal("user"), v.literal("assistant")),
+    body: v.string(),
+    createdAt: v.number(),
+  }).index("by_ticket", ["ticketId", "createdAt"]),
 });
 
 export default schema;

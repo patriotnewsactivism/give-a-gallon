@@ -1,8 +1,9 @@
 "use node";
 
 // Give a Gallon — AI support assistant ("AI employee" manning support@).
-// Drafts a reply to each support ticket with Claude, emails it to the sender
-// from support@giveagallon.org, and copies the support inbox for oversight.
+// Drafts a reply to each support ticket with Claude using the full thread as
+// context, emails it to the sender from support@giveagallon.org, and copies the
+// support inbox for oversight. Works for both web-form tickets and email replies.
 import Anthropic from "@anthropic-ai/sdk";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
@@ -17,7 +18,8 @@ const SITE = "https://www.giveagallon.org";
 const KNOWLEDGE = `
 You are the support assistant for Give-A-Gallon (www.giveagallon.org), a
 crowdfunding platform by We The People News where donors fund activists,
-journalists, and creators in "gallons of fuel."
+journalists, and creators in "gallons of fuel." You are handling an email
+support conversation and may see several prior messages in the thread.
 
 Facts you can rely on:
 - 1 gallon of fuel = $4.25.
@@ -45,7 +47,8 @@ Rules:
   locked account, anything requiring you to look up their data), help with what
   you can from the facts, then tell them a teammate will personally follow up
   within one business day.
-- Keep it under ~200 words.
+- Continue the conversation naturally; don't repeat a greeting if the thread is
+  already underway. Keep it under ~200 words.
 `.trim();
 
 async function sendEmail(opts: {
@@ -86,32 +89,43 @@ function wrap(bodyHtml: string): string {
   </div>`;
 }
 
-async function draftReply(ticket: Doc<"supportTickets">): Promise<string | null> {
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+async function draftReply(
+  ticket: Doc<"supportTickets">,
+  thread: Doc<"supportMessages">[],
+): Promise<string | null> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null;
+
+  // Map the thread to alternating Claude turns (user = sender, assistant = us).
+  const history: Anthropic.MessageParam[] = thread.length
+    ? thread.map(m => ({
+        role: m.role,
+        content: m.body,
+      }))
+    : [{ role: "user", content: ticket.message }];
+
+  // The API requires the conversation to start with a user turn.
+  if (history[0]?.role !== "user") {
+    history.unshift({ role: "user", content: ticket.message });
+  }
 
   const client = new Anthropic({ apiKey });
   const message = await client.messages.create({
     model: "claude-opus-4-8",
     max_tokens: 1024,
-    system: KNOWLEDGE,
-    messages: [
-      {
-        role: "user",
-        content:
-          `A user submitted a support request.\n\n` +
-          `Name: ${ticket.name}\n` +
-          `Category: ${ticket.category}\n` +
-          `Subject: ${ticket.subject}\n\n` +
-          `Message:\n${ticket.message}\n\n` +
-          `Write the email reply now.`,
-      },
-    ],
+    system:
+      KNOWLEDGE +
+      `\n\nThis thread's topic: "${ticket.subject}" (category: ${ticket.category}).`,
+    messages: history,
   });
 
   return message.content
     .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
+    .map(b => b.text)
     .join("")
     .trim();
 }
@@ -119,27 +133,47 @@ async function draftReply(ticket: Doc<"supportTickets">): Promise<string | null>
 export const handleTicket = internalAction({
   args: { ticketId: v.id("supportTickets") },
   handler: async (ctx, { ticketId }) => {
-    const ticket = await ctx.runQuery(internal.support.getTicket, { ticketId });
+    const { ticket, messages } = await ctx.runQuery(
+      internal.support.getThread,
+      {
+        ticketId,
+      },
+    );
     if (!ticket) return;
 
     let aiReply: string | null = null;
     try {
-      aiReply = await draftReply(ticket);
+      aiReply = await draftReply(ticket, messages);
     } catch (err) {
       console.error("Support AI draft failed:", err);
     }
 
+    const firstContact = messages.length <= 1;
     const greeting = ticket.name ? `Hi ${ticket.name},` : "Hi,";
     const replyText =
       aiReply ??
-      `${greeting}\n\nThanks for reaching out to Give-A-Gallon support — we've ` +
-        `received your message and a teammate will follow up within one ` +
-        `business day.\n\n— The Give-A-Gallon Support Team`;
+      (firstContact
+        ? `${greeting}\n\nThanks for reaching out to Give-A-Gallon support — we've ` +
+          `received your message and a teammate will follow up within one ` +
+          `business day.\n\n— The Give-A-Gallon Support Team`
+        : `${greeting}\n\nThanks for the follow-up — a teammate will get back to ` +
+          `you within one business day.\n\n— The Give-A-Gallon Support Team`);
 
-    // 1) Reply to the user. Replies route back to the support inbox.
+    // Record the assistant turn in the thread before sending.
+    await ctx.runMutation(internal.support.addMessage, {
+      ticketId,
+      role: "assistant",
+      body: replyText,
+    });
+
+    const subject = /^re:/i.test(ticket.subject)
+      ? ticket.subject
+      : `Re: ${ticket.subject}`;
+
+    // 1) Reply to the sender. Replies route back to the support inbox.
     await sendEmail({
       to: ticket.email,
-      subject: `Re: ${ticket.subject}`,
+      subject,
       replyTo: SUPPORT_INBOX,
       html: wrap(
         `<p style="white-space:pre-wrap;line-height:1.6;">${escapeHtml(replyText)}</p>`,
@@ -147,13 +181,16 @@ export const handleTicket = internalAction({
     });
 
     // 2) Copy the support inbox for human oversight of the AI's reply.
+    const lastInbound =
+      [...messages].reverse().find(m => m.role === "user")?.body ??
+      ticket.message;
     await sendEmail({
       to: SUPPORT_INBOX,
       subject: `[${ticket.category}] ${ticket.subject} — ${ticket.email}`,
       html: wrap(
-        `<p><strong>New support ticket</strong></p>
+        `<p><strong>${firstContact ? "New" : "Reply on"} support ticket</strong> (${escapeHtml(ticket.source ?? "web")})</p>
          <p style="font-size:13px;color:#555;">From ${escapeHtml(ticket.name)} &lt;${escapeHtml(ticket.email)}&gt;<br/>Category: ${escapeHtml(ticket.category)}</p>
-         <p style="white-space:pre-wrap;line-height:1.5;"><strong>Message:</strong>\n${escapeHtml(ticket.message)}</p>
+         <p style="white-space:pre-wrap;line-height:1.5;"><strong>Latest message:</strong>\n${escapeHtml(lastInbound)}</p>
          <p style="white-space:pre-wrap;line-height:1.5;color:#0a7;"><strong>AI reply sent:</strong>\n${escapeHtml(replyText)}</p>
          ${aiReply ? "" : '<p style="color:#c00;"><strong>⚠ AI was unavailable — a human reply is needed.</strong></p>'}`,
       ),
@@ -166,10 +203,3 @@ export const handleTicket = internalAction({
     });
   },
 });
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}

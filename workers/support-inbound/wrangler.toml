@@ -1,0 +1,14 @@
+name = "giveagallon-support-inbound"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+# Public, non-secret config. Point at your PROD Convex HTTP actions domain
+# (the *.convex.site host, not *.convex.cloud) + the /support-inbound path.
+[vars]
+CONVEX_SUPPORT_URL = "https://aware-sandpiper-557.convex.site/support-inbound"
+# Optional: also forward a copy of every support email to a real inbox.
+# FORWARD_TO = "you@example.com"
+
+# Secret (do NOT put here) — set with:
+#   wrangler secret put SUPPORT_INBOUND_SECRET
+# It must match the SUPPORT_INBOUND_SECRET set in the Convex deployment.
