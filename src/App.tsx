@@ -21,6 +21,7 @@ import {
   AdminDashboard,
   PrivacyPolicyPage,
   TermsOfServicePage,
+  SupportPage,
   FirmOnboardingPage,
 } from "./pages";
 import { DonationSuccessPage } from "./pages/DonationSuccessPage";
@@ -47,6 +48,7 @@ function App() {
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
+            <Route path="/support" element={<SupportPage />} />
             {/* Firm Onboarding — tailored link for organizations */}
             <Route path="/:slug/join" element={<FirmOnboardingPage />} />
             {/* Public creator profile — must be last in public routes */}

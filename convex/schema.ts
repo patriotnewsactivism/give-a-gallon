@@ -213,6 +213,26 @@ const schema = defineSchema({
   })
     .index("by_user", ["userId", "notificationId"])
     .index("by_notification", ["notificationId"]),
+
+  // ── Support tickets (contact form → AI assistant) ────────────────────────
+  supportTickets: defineTable({
+    name: v.string(),
+    email: v.string(),
+    category: v.string(), // "donation" | "creator" | "payout" | "account" | "other"
+    subject: v.string(),
+    message: v.string(),
+    status: v.union(
+      v.literal("open"),
+      v.literal("ai_replied"),
+      v.literal("needs_human"),
+      v.literal("closed"),
+    ),
+    aiReply: v.optional(v.string()),
+    repliedAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_status", ["status", "createdAt"])
+    .index("by_email", ["email", "createdAt"]),
 });
 
 export default schema;
