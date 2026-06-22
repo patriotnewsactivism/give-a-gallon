@@ -47,7 +47,9 @@ function App() {
             <Route path="/donation-cancel" element={<DonationCancelPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
+            <Route path="/tos" element={<TermsOfServicePage />} />
             <Route path="/support" element={<SupportPage />} />
             {/* Firm Onboarding — tailored link for organizations */}
             <Route path="/:slug/join" element={<FirmOnboardingPage />} />
