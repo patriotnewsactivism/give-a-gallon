@@ -214,7 +214,7 @@ const schema = defineSchema({
     .index("by_user", ["userId", "notificationId"])
     .index("by_notification", ["notificationId"]),
 
-  // ── Support tickets (contact form → AI assistant) ────────────────────────
+  // ── Support tickets (contact form + email → AI assistant) ────────────────
   supportTickets: defineTable({
     name: v.string(),
     email: v.string(),
@@ -228,23 +228,21 @@ const schema = defineSchema({
       v.literal("closed"),
     ),
     aiReply: v.optional(v.string()),
+    source: v.optional(v.string()), // "web" | "email"
     repliedAt: v.optional(v.number()),
+    lastMessageAt: v.optional(v.number()),
     createdAt: v.number(),
   })
     .index("by_status", ["status", "createdAt"])
     .index("by_email", ["email", "createdAt"]),
 
-  // ── Stripe Connect V2 Account Mapping (Sample Integration) ───────────────
-  stripeV2Accounts: defineTable({
-    userId: v.id("users"),
-    stripeAccountId: v.string(),
-    stripeAccountStatus: v.string(), // e.g. "pending", "active", "restricted"
-    displayName: v.string(),
-    contactEmail: v.string(),
+  // ── Support conversation log (one row per message in a ticket thread) ─────
+  supportMessages: defineTable({
+    ticketId: v.id("supportTickets"),
+    role: v.union(v.literal("user"), v.literal("assistant")),
+    body: v.string(),
     createdAt: v.number(),
-  })
-    .index("by_user", ["userId"])
-    .index("by_stripeAccount", ["stripeAccountId"]),
+  }).index("by_ticket", ["ticketId", "createdAt"]),
 });
 
 export default schema;
