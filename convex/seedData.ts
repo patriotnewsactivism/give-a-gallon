@@ -1,5 +1,5 @@
-import { internalMutation, internalAction } from "./_generated/server";
-import { v } from "convex/values";
+import type { Id } from "./_generated/dataModel";
+import { internalMutation } from "./_generated/server";
 
 export const seedCreators = internalMutation({
   args: {},
@@ -98,7 +98,7 @@ export const seedCreators = internalMutation({
       },
     ];
 
-    const creatorIds = [];
+    const creatorIds: { id: Id<"creators">; slug: string; displayName: string }[] = [];
     for (const creator of creators) {
       const id = await ctx.db.insert("creators", {
         ...creator,

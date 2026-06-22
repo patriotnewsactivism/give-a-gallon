@@ -205,7 +205,7 @@ export default function ReferralPage() {
                 <Button
                   size="sm"
                   onClick={handleUpdateCode}
-                  disabled={updating || newCode === stats.referralCode}
+                  disabled={updating || newCode === stats?.referralCode}
                   className="bg-green-600 hover:bg-green-500 text-white"
                 >
                   {updating ? "Saving..." : "Save"}
@@ -215,7 +215,7 @@ export default function ReferralPage() {
                   size="sm"
                   onClick={() => {
                     setIsEditing(false);
-                    setNewCode(stats.referralCode!);
+                    setNewCode(stats?.referralCode ?? "");
                   }}
                 >
                   <X className="size-4" />

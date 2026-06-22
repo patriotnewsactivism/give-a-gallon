@@ -1,5 +1,3 @@
-import React from "react";
-
 /**
  * PatrioticBackground — A subtle, blended American flag and eagle motif.
  * Designed to be placed as an absolute-positioned layer behind content.

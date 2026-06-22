@@ -9,6 +9,7 @@ import {
   MessageSquare,
   Shield,
   TrendingUp,
+  Users,
   Zap,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
