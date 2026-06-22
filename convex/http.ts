@@ -31,6 +31,32 @@ http.route({
   }),
 });
 
+// Stripe Connect V2 Thin Webhook endpoint
+http.route({
+  path: "/stripe-v2-webhook",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    // Read Stripe V2 Signature and payload
+    const signature = request.headers.get("stripe-signature") || "";
+    const payload = await request.text();
+
+    try {
+      // Forward the thin event payload to our connectV2 action for verification and execution
+      await ctx.runAction(api.connectV2.handleV2Webhook, { payload, signature });
+      return new Response(JSON.stringify({ received: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      console.error("Connect V2 Webhook HTTP Error:", error);
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }),
+});
+
 // Recent donations endpoint (for automations / webhooks)
 http.route({
   path: "/api/recent-donations",

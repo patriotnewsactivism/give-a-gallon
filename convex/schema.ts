@@ -233,6 +233,18 @@ const schema = defineSchema({
   })
     .index("by_status", ["status", "createdAt"])
     .index("by_email", ["email", "createdAt"]),
+
+  // ── Stripe Connect V2 Account Mapping (Sample Integration) ───────────────
+  stripeV2Accounts: defineTable({
+    userId: v.id("users"),
+    stripeAccountId: v.string(),
+    stripeAccountStatus: v.string(), // e.g. "pending", "active", "restricted"
+    displayName: v.string(),
+    contactEmail: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_stripeAccount", ["stripeAccountId"]),
 });
 
 export default schema;

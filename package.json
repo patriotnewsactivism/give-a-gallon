@@ -24,7 +24,6 @@
     "build:vercel": "vite build"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.105.0",
     "@auth/core": "^0.37.4",
     "@convex-dev/auth": "^0.0.90",
     "@hookform/resolvers": "^5.2.2",
@@ -72,6 +71,7 @@
     "react-router-dom": "^7.11.0",
     "recharts": "^2.15.2",
     "sonner": "^2.0.7",
+    "stripe": "^22.2.3",
     "tailwind-merge": "^3.3.1",
     "vaul": "^1.1.2",
     "zod": "^4.1.12"
