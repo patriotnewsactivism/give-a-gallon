@@ -13,4 +13,5 @@ export { LeaderboardPage } from "./LeaderboardPage";
 export { AdminDashboard } from "./AdminDashboard";
 export { PrivacyPolicyPage } from "./PrivacyPolicyPage";
 export { TermsOfServicePage } from "./TermsOfServicePage";
+export { SupportPage } from "./SupportPage";
 export { default as FirmOnboardingPage } from "./FirmOnboardingPage";

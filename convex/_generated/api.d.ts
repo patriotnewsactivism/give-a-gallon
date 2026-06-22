@@ -29,6 +29,8 @@ import type * as seedData from "../seedData.js";
 import type * as seedTestUser from "../seedTestUser.js";
 import type * as stripe from "../stripe.js";
 import type * as subscriptions from "../subscriptions.js";
+import type * as support from "../support.js";
+import type * as supportAI from "../supportAI.js";
 import type * as testAuth from "../testAuth.js";
 import type * as updates from "../updates.js";
 import type * as users from "../users.js";
@@ -62,6 +64,8 @@ declare const fullApi: ApiFromModules<{
   seedTestUser: typeof seedTestUser;
   stripe: typeof stripe;
   subscriptions: typeof subscriptions;
+  support: typeof support;
+  supportAI: typeof supportAI;
   testAuth: typeof testAuth;
   updates: typeof updates;
   users: typeof users;
