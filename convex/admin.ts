@@ -188,6 +188,74 @@ export const listAllDonations = query({
   },
 });
 
+// ── Admin: donation evidence export (for Stripe authorization appeals) ─────
+// Returns every completed donation with the fields Stripe asks for when
+// disputing "unauthorized payment" claims: who paid, what they funded, when,
+// and the payment-intent ID that ties the row back to the Stripe dashboard.
+export const exportDonationEvidence = query({
+  args: {},
+  handler: async (ctx) => {
+    await assertAdmin(ctx);
+
+    const donations = await ctx.db
+      .query("donations")
+      .withIndex("by_status", (q) => q.eq("status", "completed"))
+      .order("desc")
+      .collect();
+
+    const rows = await Promise.all(
+      donations.map(async (d) => {
+        const creator = await ctx.db.get(d.creatorId);
+        const donorUser = d.donorUserId ? await ctx.db.get(d.donorUserId) : null;
+        return {
+          date: new Date(d.createdAt).toISOString(),
+          donorName: d.donorName ?? "Anonymous",
+          donorEmail: d.donorEmail ?? donorUser?.email ?? "",
+          hasAccount: !!d.donorUserId,
+          gallons: d.gallons,
+          amountUsd: (d.amountCents / 100).toFixed(2),
+          platformFeeUsd: (d.platformFeeCents / 100).toFixed(2),
+          fundedCreator: creator?.displayName ?? "Unknown",
+          fundedSlug: creator?.slug ?? "",
+          donorMessage: d.message ?? "",
+          stripePaymentIntentId: d.stripePaymentIntentId ?? "",
+          stripeSessionId: d.stripeSessionId ?? "",
+        };
+      }),
+    );
+
+    const totalUsd = donations.reduce((s, d) => s + d.amountCents, 0) / 100;
+    const withAccounts = donations.filter((d) => !!d.donorUserId).length;
+    const withMessages = donations.filter((d) => !!d.message).length;
+    const uniqueEmails = new Set(
+      donations.map((d) => d.donorEmail).filter(Boolean),
+    ).size;
+
+    return {
+      summary: {
+        totalDonations: donations.length,
+        totalUsd: totalUsd.toFixed(2),
+        uniqueDonorEmails: uniqueEmails,
+        donationsFromLoggedInUsers: withAccounts,
+        donationsWithPersonalMessage: withMessages,
+        firstDonationAt:
+          donations.length > 0
+            ? new Date(
+                Math.min(...donations.map((d) => d.createdAt)),
+              ).toISOString()
+            : null,
+        lastDonationAt:
+          donations.length > 0
+            ? new Date(
+                Math.max(...donations.map((d) => d.createdAt)),
+              ).toISOString()
+            : null,
+      },
+      rows,
+    };
+  },
+});
+
 // ── Admin: send push notification to all users ───────────────────────────
 export const sendNotification = mutation({
   args: {
