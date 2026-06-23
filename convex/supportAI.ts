@@ -4,7 +4,6 @@
 // Drafts a reply to each support ticket with Claude using the full thread as
 // context, emails it to the sender from support@giveagallon.org, and copies the
 // support inbox for oversight. Works for both web-form tickets and email replies.
-import Anthropic from "@anthropic-ai/sdk";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
@@ -93,6 +92,8 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+type MessageParam = { role: "user" | "assistant"; content: string };
+
 async function draftReply(
   ticket: Doc<"supportTickets">,
   thread: Doc<"supportMessages">[],
@@ -101,11 +102,8 @@ async function draftReply(
   if (!apiKey) return null;
 
   // Map the thread to alternating Claude turns (user = sender, assistant = us).
-  const history: Anthropic.MessageParam[] = thread.length
-    ? thread.map(m => ({
-        role: m.role,
-        content: m.body,
-      }))
+  const history: MessageParam[] = thread.length
+    ? thread.map(m => ({ role: m.role, content: m.body }))
     : [{ role: "user", content: ticket.message }];
 
   // The API requires the conversation to start with a user turn.
@@ -113,21 +111,39 @@ async function draftReply(
     history.unshift({ role: "user", content: ticket.message });
   }
 
-  const client = new Anthropic({ apiKey });
-  const message = await client.messages.create({
-    model: "claude-opus-4-8",
-    max_tokens: 1024,
-    system:
-      KNOWLEDGE +
-      `\n\nThis thread's topic: "${ticket.subject}" (category: ${ticket.category}).`,
-    messages: history,
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-opus-4-8",
+      max_tokens: 1024,
+      system:
+        KNOWLEDGE +
+        `\n\nThis thread's topic: "${ticket.subject}" (category: ${ticket.category}).`,
+      messages: history,
+    }),
   });
 
-  return message.content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map(b => b.text)
-    .join("")
-    .trim();
+  if (!res.ok) {
+    console.error("Anthropic API error:", await res.text());
+    return null;
+  }
+
+  const data = (await res.json()) as {
+    content: Array<{ type: string; text: string }>;
+  };
+
+  return (
+    data.content
+      .filter(b => b.type === "text")
+      .map(b => b.text)
+      .join("")
+      .trim() || null
+  );
 }
 
 export const handleTicket = internalAction({
