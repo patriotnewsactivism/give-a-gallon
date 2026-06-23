@@ -97,7 +97,7 @@ export function TermsOfServicePage() {
                 </tr>
                 <tr className="border-b border-border/20">
                   <td className="py-3 px-4">⚡ Instant payout</td>
-                  <td className="py-3 px-4">~1% (Stripe fee, min $0.50)</td>
+                  <td className="py-3 px-4">~1.5% (Stripe fee, min $0.50, max $10)</td>
                   <td className="py-3 px-4">Campaign Creator (at cost)</td>
                 </tr>
               </tbody>

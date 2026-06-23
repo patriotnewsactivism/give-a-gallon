@@ -51,6 +51,10 @@ function App() {
             <Route path="/terms" element={<TermsOfServicePage />} />
             <Route path="/tos" element={<TermsOfServicePage />} />
             <Route path="/support" element={<SupportPage />} />
+            {/* Common URL aliases — redirect before the /:slug catch-all */}
+            <Route path="/browse" element={<Navigate to="/explore" replace />} />
+            <Route path="/campaigns" element={<Navigate to="/explore" replace />} />
+            <Route path="/start" element={<Navigate to="/signup" replace />} />
             {/* Firm Onboarding — tailored link for organizations */}
             <Route path="/:slug/join" element={<FirmOnboardingPage />} />
             {/* Public creator profile — must be last in public routes */}

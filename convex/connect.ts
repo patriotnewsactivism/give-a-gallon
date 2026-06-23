@@ -80,7 +80,7 @@ export const startOnboarding = action({
 /**
  * Request a payout for the creator.
  * standard = 1-2 business days, no fee.
- * instant   = ~30 min to debit card, Stripe charges ~1% (min $0.50, max $10).
+ * instant   = ~30 min to debit card, Stripe charges ~1.5% (min $0.50, max $10).
  *             We pass Stripe's fee through transparently — no markup.
  */
 export const requestPayout = action({
@@ -105,11 +105,12 @@ export const requestPayout = action({
     }
     if (amountCents < 100) throw new Error("Minimum payout is $1.00");
 
-    // Calculate Stripe instant payout fee: 1%, min $0.50, max $10.00
+    // Calculate Stripe instant payout fee: 1.5%, min $0.50, max $10.00
     // We pass this through at cost — zero markup.
+    // Ref: https://docs.stripe.com/payouts/instant-payouts#pricing
     let feeCents = 0;
     if (instant) {
-      feeCents = Math.round(amountCents * 0.01);
+      feeCents = Math.round(amountCents * 0.015);
       if (feeCents < 50) feeCents = 50;
       if (feeCents > 1000) feeCents = 1000;
     }

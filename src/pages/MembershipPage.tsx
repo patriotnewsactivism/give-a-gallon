@@ -204,7 +204,7 @@ export function MembershipPage() {
               </h3>
               <p className="text-sm text-muted-foreground">
                 Every other platform makes you wait 2–5 business days. Give-A-Gallon offers instant payouts to your debit card — gas when you need it most.
-                Stripe charges a small processing fee (~1%) for instant transfers.{" "}
+                Stripe charges a small processing fee (~1.5%) for instant transfers.{" "}
                 <strong className="text-foreground">We pass it through at cost — Give-A-Gallon keeps nothing extra.</strong>
               </p>
             </div>

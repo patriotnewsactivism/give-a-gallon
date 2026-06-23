@@ -418,7 +418,7 @@ function PayoutPanel({ creator }: { creator: any }) {
           <h3 className="font-semibold mb-3">Connect Stripe to Get Paid</h3>
           <ul className="space-y-1.5 mb-4">
             {[
-              { icon: "⚡", text: "Instant payout — ~30 min to your debit card (1% fee, min $0.50)" },
+              { icon: "⚡", text: "Instant payout — ~30 min to your debit card (1.5% fee, min $0.50)" },
               { icon: "🏦", text: "Standard payout — 1–2 business days, no fee" },
               { icon: "🔒", text: "Quick KYC — name, DOB, SSN last-4, debit card" },
               { icon: "💸", text: "Donations route straight to your account" },
@@ -499,9 +499,9 @@ function PayoutPanel({ creator }: { creator: any }) {
   const pending = balance?.pendingCents ?? 0;
   const canPayout = available >= 100;
 
-  // Instant fee preview: 1%, min $0.50, max $10
+  // Instant fee preview: 1.5%, min $0.50, max $10
   const instantFeeCents = canPayout
-    ? Math.min(1000, Math.max(50, Math.round(available * 0.01)))
+    ? Math.min(1000, Math.max(50, Math.round(available * 0.015)))
     : 50;
   const instantNetCents = available - instantFeeCents;
 
