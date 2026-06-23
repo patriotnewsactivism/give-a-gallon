@@ -100,7 +100,7 @@ function HeroSection() {
                 <span className="text-xs font-black text-fuel uppercase tracking-wider">Instant Payouts</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                Money on your debit card in <strong className="text-foreground">~30 minutes</strong>. Not days. Stripe's fee passed through at cost — we keep nothing.
+                Eligible accounts get money on your debit card in <strong className="text-foreground">~30 minutes</strong>. Stripe's ~1.5% fee passed through at cost — we keep nothing.
               </p>
               <Link to="/signup">
                 <Button size="sm" className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90 text-xs font-bold">
@@ -848,9 +848,9 @@ function InstantPayoutSection() {
                 NOT DAYS LATER.
               </h2>
               <p className="text-muted-foreground text-sm sm:text-base leading-relaxed mb-6">
-                Other platforms hold your money for 2–5 business days. We think that's wrong.
-                When a supporter fuels your fight, that money should reach you <strong className="text-foreground">within 30 minutes</strong> — not next week.
-                Stripe charges a small processing fee for instant transfers. <strong className="text-foreground">We pass it straight through — no markup, no cut.</strong>
+                Most platforms hold your money for 2–5 business days. We do better.
+                Standard payouts arrive in 1–2 business days at no cost. Eligible accounts can unlock instant payouts — money on your debit card in <strong className="text-foreground">~30 minutes</strong>.
+                Stripe charges a small fee (~1.5%) for instant transfers. <strong className="text-foreground">We pass it straight through — no markup, no cut.</strong>
               </p>
               <Link to="/signup">
                 <Button className="bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold w-full sm:w-auto">
@@ -882,7 +882,7 @@ function InstantPayoutSection() {
                 </div>
                 {[
                   { label: "Standard payout", val: "1–2 business days · free" },
-                  { label: "⚡ Instant payout", val: "~30 min · Stripe fee only" },
+                  { label: "⚡ Instant payout", val: "~30 min · 1.5% Stripe fee" },
                   { label: "We charge you", val: "Nothing extra. Ever." },
                 ].map(row => (
                   <div key={row.label} className="flex items-center justify-between py-1.5 text-sm border-b border-fuel/10 last:border-0">
@@ -892,7 +892,7 @@ function InstantPayoutSection() {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                Instant payout uses Stripe&apos;s ~1% processing fee (min $0.50) — passed to you at cost. Give-A-Gallon keeps nothing.
+                Instant payout uses Stripe&apos;s ~1.5% fee (min $0.50, max $10). New accounts have a standard verification period before first payout. Give-A-Gallon keeps nothing.
               </p>
             </div>
           </div>

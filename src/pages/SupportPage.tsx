@@ -27,7 +27,7 @@ const FAQS = [
   },
   {
     q: "When do creators get paid?",
-    a: "Payouts go through Stripe. Standard payouts take 1–2 business days (free); instant payouts carry Stripe's ~1% fee. New Stripe accounts can have temporary holds Stripe sets for fraud protection — these clear automatically.",
+    a: "Payouts go through Stripe. Standard payouts take 1–2 business days (free); instant payouts carry Stripe's ~1.5% fee (min $0.50, max $10). New accounts go through Stripe's standard verification — your first payout may take 7–14 days. After that, standard payouts are typically next-business-day. Instant payout eligibility is determined by Stripe. Give-A-Gallon never adds fees beyond what Stripe charges.",
   },
   {
     q: "Are donations tax-deductible?",
