@@ -57,7 +57,7 @@ export function Footer() {
               <h4 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">Trust</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><span className="text-xs">5% platform fee</span></li>
-                <li><span className="text-xs">~3% Stripe processing</span></li>
+                <li><span className="text-xs">~3% PayPal processing</span></li>
                 <li><span className="text-xs">~92% to creators</span></li>
                 <li><Link to="/impact" className="hover:text-foreground transition-colors text-xs">Full transparency →</Link></li>
               </ul>
