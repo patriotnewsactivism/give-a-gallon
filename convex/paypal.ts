@@ -94,7 +94,7 @@ export const createCheckoutSession = action({
     if (!approveLink) throw new Error("No PayPal approve link returned");
 
     await ctx.runMutation(internal.paypalMutations.setPayPalOrderId, {
-      donationId,
+      donationId: donationId as any,
       paypalOrderId: orderData.id,
     });
 
