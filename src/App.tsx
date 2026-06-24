@@ -21,6 +21,7 @@ import {
   AdminDashboard,
   PrivacyPolicyPage,
   TermsOfServicePage,
+  RefundPolicyPage,
   SupportPage,
   FirmOnboardingPage,
 } from "./pages";
@@ -50,6 +51,8 @@ function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
             <Route path="/tos" element={<TermsOfServicePage />} />
+            <Route path="/refunds" element={<RefundPolicyPage />} />
+            <Route path="/refund-policy" element={<RefundPolicyPage />} />
             <Route path="/support" element={<SupportPage />} />
             {/* Firm Onboarding — tailored link for organizations */}
             <Route path="/:slug/join" element={<FirmOnboardingPage />} />

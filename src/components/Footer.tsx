@@ -76,6 +76,8 @@ export function Footer() {
               <span>·</span>
               <Link to="/tos" className="hover:text-foreground transition-colors">Terms of Service</Link>
               <span>·</span>
+              <Link to="/refunds" className="hover:text-foreground transition-colors">Refund Policy</Link>
+              <span>·</span>
               <Link to="/support" className="hover:text-foreground transition-colors">Support</Link>
             </p>
           </div>
