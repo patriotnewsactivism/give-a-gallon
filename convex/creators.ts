@@ -1,7 +1,12 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { mutation, type QueryCtx, query } from "./_generated/server";
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
 // Resolve uploaded storage ids to served URLs, falling back to any external
 // URL fields. Returns the creator doc with `avatarUrl`/`coverUrl` populated.
@@ -130,6 +135,36 @@ export const upsert = mutation({
   },
 });
 
+// Set the PayPal email where automated payouts are sent. Setting it triggers a
+// sweep that back-pays any donations that completed while no email was on file.
+export const setPayoutEmail = mutation({
+  args: { paypalPayoutEmail: v.string() },
+  handler: async (ctx, { paypalPayoutEmail }) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Not authenticated");
+
+    const email = paypalPayoutEmail.trim().toLowerCase().slice(0, 200);
+    if (!isValidEmail(email)) {
+      throw new Error("Please enter a valid PayPal email address");
+    }
+
+    const mine = await ctx.db
+      .query("creators")
+      .withIndex("by_userId", q => q.eq("userId", userId))
+      .first();
+    if (!mine) throw new Error("Create your profile first");
+
+    await ctx.db.patch(mine._id, { paypalPayoutEmail: email });
+
+    // Back-pay any donations that were held waiting for a payout email.
+    await ctx.scheduler.runAfter(0, internal.paypal.sweepCreatorPayouts, {
+      creatorId: mine._id,
+    });
+
+    return { ok: true };
+  },
+});
+
 // Set / replace the avatar or cover image for the current user's profile.
 // Pass a storageId to set, or null to remove. Omit a field to leave it as-is.
 export const setImages = mutation({
@@ -176,29 +211,29 @@ export const getById = query({
 // Get editorially featured campaigns (Phase 5)
 export const listFeatured = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const creators = await ctx.db
       .query("creators")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active", q => q.eq("isActive", true))
       .order("desc")
       .collect();
 
-    const featured = creators.filter((c) => c.isFeatured === true);
-    return await Promise.all(featured.map((c) => withImageUrls(ctx, c)));
+    const featured = creators.filter(c => c.isFeatured === true);
+    return await Promise.all(featured.map(c => withImageUrls(ctx, c)));
   },
 });
 
 // Platform-wide aggregate stats for the public leaderboard page
 export const getPlatformStats = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const creators = await ctx.db
       .query("creators")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active", q => q.eq("isActive", true))
       .collect();
 
     const donations = await ctx.db.query("donations").collect();
-    const completed = donations.filter((d) => d.status === "completed");
+    const completed = donations.filter(d => d.status === "completed");
 
     return {
       totalCreators: creators.length,
@@ -215,12 +250,14 @@ export const listNewest = query({
   handler: async (ctx, { limit }) => {
     const creators = await ctx.db
       .query("creators")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active", q => q.eq("isActive", true))
       .order("desc")
       .take(limit ?? 12);
     // Sort by createdAt descending so newest appear first
-    const sorted = creators.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
-    return await Promise.all(sorted.map((c) => withImageUrls(ctx, c)));
+    const sorted = creators.sort(
+      (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0),
+    );
+    return await Promise.all(sorted.map(c => withImageUrls(ctx, c)));
   },
 });
 
@@ -230,7 +267,7 @@ export const listRecentCreators = query({
   handler: async (ctx, { limit }) => {
     const creators = await ctx.db
       .query("creators")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active", q => q.eq("isActive", true))
       .order("desc")
       .take(limit ?? 50);
     return creators.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));

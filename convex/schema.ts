@@ -39,6 +39,8 @@ const schema = defineSchema({
         v.literal("restricted"),
       ),
     ),
+    // PayPal Payouts — where automated creator payouts are sent
+    paypalPayoutEmail: v.optional(v.string()),
     // Verification system
     verificationStatus: v.optional(
       v.union(
@@ -116,6 +118,20 @@ const schema = defineSchema({
     // PayPal (alternative processor)
     paypalOrderId: v.optional(v.string()),
     paypalCaptureId: v.optional(v.string()),
+    // Automated creator payout tracking (PayPal Payouts)
+    payoutStatus: v.optional(
+      v.union(
+        v.literal("held"), // completed but creator has no payout email yet
+        v.literal("processing"), // payout submitted to PayPal
+        v.literal("paid"), // payout succeeded
+        v.literal("unclaimed"), // sent but recipient hasn't accepted yet
+        v.literal("failed"), // payout failed/denied/returned
+      ),
+    ),
+    payoutAmountCents: v.optional(v.number()),
+    paypalPayoutBatchId: v.optional(v.string()),
+    paypalPayoutItemId: v.optional(v.string()),
+    payoutAt: v.optional(v.number()),
     // Referral tracking
     referralCode: v.optional(v.string()),
     referredByCreatorId: v.optional(v.id("creators")),
@@ -123,6 +139,7 @@ const schema = defineSchema({
   })
     .index("by_stripeSession", ["stripeSessionId"])
     .index("by_paypalOrder", ["paypalOrderId"])
+    .index("by_paypalPayoutItem", ["paypalPayoutItemId"])
     .index("by_creator", ["creatorId", "createdAt"])
     .index("by_status", ["status", "createdAt"])
     .index("by_donorUser", ["donorUserId", "createdAt"]),

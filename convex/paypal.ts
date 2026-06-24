@@ -320,6 +320,11 @@ async function applyCompletion(
       message: donation.message,
     });
   }
+
+  // Kick off the automated creator payout (non-blocking).
+  await ctx.scheduler.runAfter(0, internal.paypal.payoutForDonation, {
+    donationId: donation._id,
+  });
 }
 
 export const completeDonationByOrder = internalMutation({
@@ -344,6 +349,237 @@ export const completeDonationById = internalMutation({
   },
   handler: async (ctx, { donationId, paypalCaptureId }) => {
     await applyCompletion(ctx, donationId, paypalCaptureId);
+  },
+});
+
+// ── Automated creator payouts (PayPal Payouts) ─────────────────────────────────
+
+// The amount paid to the creator per donation. We pay the "net to creator"
+// already shown in confirmation emails (gross minus the 5% platform fee); the
+// platform absorbs PayPal's processing + payout fees from that 5%. To change the
+// split, adjust this one function.
+function creatorPayoutCents(donation: {
+  amountCents: number;
+  platformFeeCents: number;
+}): number {
+  return donation.amountCents - donation.platformFeeCents;
+}
+
+export const getDonationWithCreator = internalQuery({
+  args: { donationId: v.id("donations") },
+  handler: async (ctx, { donationId }) => {
+    const donation = await ctx.db.get(donationId);
+    if (!donation) return null;
+    const creator = await ctx.db.get(donation.creatorId);
+    return { donation, creator };
+  },
+});
+
+export const listPayableDonations = internalQuery({
+  args: { creatorId: v.id("creators") },
+  handler: async (ctx, { creatorId }) => {
+    // Completed donations for this creator that haven't been paid out yet
+    // (either explicitly "held" or never attempted).
+    const donations = await ctx.db
+      .query("donations")
+      .withIndex("by_creator", q => q.eq("creatorId", creatorId))
+      .collect();
+    return donations.filter(
+      d =>
+        d.status === "completed" &&
+        (d.payoutStatus === undefined ||
+          d.payoutStatus === "held" ||
+          d.payoutStatus === "failed"),
+    );
+  },
+});
+
+export const markPayoutHeld = internalMutation({
+  args: { donationId: v.id("donations") },
+  handler: async (ctx, { donationId }) => {
+    const d = await ctx.db.get(donationId);
+    if (!d || d.payoutStatus === "paid") return;
+    await ctx.db.patch(donationId, { payoutStatus: "held" });
+  },
+});
+
+export const recordPayoutResult = internalMutation({
+  args: {
+    donationId: v.id("donations"),
+    payoutStatus: v.union(
+      v.literal("processing"),
+      v.literal("paid"),
+      v.literal("unclaimed"),
+      v.literal("failed"),
+    ),
+    payoutAmountCents: v.optional(v.number()),
+    paypalPayoutBatchId: v.optional(v.string()),
+    paypalPayoutItemId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const d = await ctx.db.get(args.donationId);
+    if (!d) return;
+    await ctx.db.patch(args.donationId, {
+      payoutStatus: args.payoutStatus,
+      ...(args.payoutAmountCents !== undefined
+        ? { payoutAmountCents: args.payoutAmountCents }
+        : {}),
+      ...(args.paypalPayoutBatchId
+        ? { paypalPayoutBatchId: args.paypalPayoutBatchId }
+        : {}),
+      ...(args.paypalPayoutItemId
+        ? { paypalPayoutItemId: args.paypalPayoutItemId }
+        : {}),
+      ...(args.payoutStatus === "paid" ? { payoutAt: Date.now() } : {}),
+    });
+  },
+});
+
+export const updatePayoutStatusByItem = internalMutation({
+  args: {
+    paypalPayoutItemId: v.string(),
+    payoutStatus: v.union(
+      v.literal("paid"),
+      v.literal("unclaimed"),
+      v.literal("failed"),
+    ),
+  },
+  handler: async (ctx, { paypalPayoutItemId, payoutStatus }) => {
+    const d = await ctx.db
+      .query("donations")
+      .withIndex("by_paypalPayoutItem", q =>
+        q.eq("paypalPayoutItemId", paypalPayoutItemId),
+      )
+      .first();
+    if (!d) return;
+    await ctx.db.patch(d._id, {
+      payoutStatus,
+      ...(payoutStatus === "paid" ? { payoutAt: Date.now() } : {}),
+    });
+  },
+});
+
+// Send one creator payout for a single donation via the PayPal Payouts API.
+async function sendPayout(opts: {
+  amountCents: number;
+  receiverEmail: string;
+  donationId: string;
+  note: string;
+}): Promise<{ batchId: string; itemId: string; status: string }> {
+  const token = await getAccessToken();
+  const senderItemId = `gag-${opts.donationId}`;
+  const res = await fetch(`${paypalApiBase()}/v1/payments/payouts`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      sender_batch_header: {
+        // Idempotency: PayPal rejects a reused sender_batch_id, preventing
+        // accidental double-payouts for the same donation.
+        sender_batch_id: `gag-payout-${opts.donationId}`,
+        email_subject: "You've received a Give-A-Gallon payout",
+        email_message:
+          "Your supporters fueled your campaign. Here's your payout from Give-A-Gallon.",
+      },
+      items: [
+        {
+          recipient_type: "EMAIL",
+          amount: {
+            value: (opts.amountCents / 100).toFixed(2),
+            currency: "USD",
+          },
+          receiver: opts.receiverEmail,
+          note: opts.note,
+          sender_item_id: senderItemId,
+        },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`PayPal payout failed: ${body}`);
+  }
+
+  const data = (await res.json()) as {
+    batch_header?: { payout_batch_id?: string; batch_status?: string };
+    items?: Array<{ payout_item_id?: string }>;
+  };
+  return {
+    batchId: data.batch_header?.payout_batch_id ?? "",
+    itemId: data.items?.[0]?.payout_item_id ?? "",
+    status: data.batch_header?.batch_status ?? "PENDING",
+  };
+}
+
+export const payoutForDonation = internalAction({
+  args: { donationId: v.id("donations") },
+  handler: async (ctx, { donationId }) => {
+    const data = await ctx.runQuery(internal.paypal.getDonationWithCreator, {
+      donationId,
+    });
+    if (!data?.donation || !data.creator) return;
+    const { donation, creator } = data;
+
+    if (donation.status !== "completed") return;
+    if (
+      donation.payoutStatus === "paid" ||
+      donation.payoutStatus === "processing"
+    ) {
+      return; // already handled
+    }
+
+    // No payout email yet → hold the funds; the sweep pays it once they add one.
+    if (!creator.paypalPayoutEmail) {
+      await ctx.runMutation(internal.paypal.markPayoutHeld, { donationId });
+      return;
+    }
+
+    const amountCents = creatorPayoutCents(donation);
+    if (amountCents <= 0) return;
+
+    try {
+      const result = await sendPayout({
+        amountCents,
+        receiverEmail: creator.paypalPayoutEmail,
+        donationId,
+        note: `Payout for ${donation.gallons} gallon${
+          donation.gallons > 1 ? "s" : ""
+        } on Give-A-Gallon`,
+      });
+      await ctx.runMutation(internal.paypal.recordPayoutResult, {
+        donationId,
+        payoutStatus: "processing",
+        payoutAmountCents: amountCents,
+        paypalPayoutBatchId: result.batchId,
+        paypalPayoutItemId: result.itemId,
+      });
+    } catch (err) {
+      console.error("Creator payout failed:", err);
+      await ctx.runMutation(internal.paypal.recordPayoutResult, {
+        donationId,
+        payoutStatus: "failed",
+        payoutAmountCents: amountCents,
+      });
+    }
+  },
+});
+
+// Back-pay every payable donation for a creator (called when they set/update
+// their payout email). Spaces payouts slightly to stay clear of rate limits.
+export const sweepCreatorPayouts = internalAction({
+  args: { creatorId: v.id("creators") },
+  handler: async (ctx, { creatorId }) => {
+    const payable = await ctx.runQuery(internal.paypal.listPayableDonations, {
+      creatorId,
+    });
+    for (const d of payable) {
+      await ctx.runAction(internal.paypal.payoutForDonation, {
+        donationId: d._id,
+      });
+    }
   },
 });
 
@@ -449,12 +685,14 @@ export const handleWebhook = action({
       resource?: {
         id?: string;
         custom_id?: string;
+        payout_item_id?: string;
         supplementary_data?: {
           related_ids?: { order_id?: string };
         };
       };
     };
 
+    // ── Donation captured → complete the donation (backup for the return path) ──
     if (event.event_type === "PAYMENT.CAPTURE.COMPLETED") {
       const resource = event.resource ?? {};
       const captureId = resource.id;
@@ -471,6 +709,23 @@ export const handleWebhook = action({
         await ctx.runMutation(internal.paypal.completeDonationByOrder, {
           paypalOrderId: orderId,
           paypalCaptureId: captureId,
+        });
+      }
+    }
+
+    // ── Creator payout item events → update payout status ──
+    if (event.event_type?.startsWith("PAYMENT.PAYOUTS-ITEM.")) {
+      const itemId = event.resource?.payout_item_id;
+      if (itemId) {
+        const status: "paid" | "unclaimed" | "failed" =
+          event.event_type === "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+            ? "paid"
+            : event.event_type === "PAYMENT.PAYOUTS-ITEM.UNCLAIMED"
+              ? "unclaimed"
+              : "failed"; // FAILED / DENIED / RETURNED / BLOCKED / REFUNDED
+        await ctx.runMutation(internal.paypal.updatePayoutStatusByItem, {
+          paypalPayoutItemId: itemId,
+          payoutStatus: status,
         });
       }
     }

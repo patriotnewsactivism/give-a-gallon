@@ -71,16 +71,44 @@ cd C:\give-a-gallon
 npx convex deploy -y
 ```
 
-## Paying creators (payouts)
+## Paying creators (automated payouts)
 
-In the central-account model the platform holds the funds and pays creators out.
-Options:
-- **Manual (launch fast):** use the admin donation views to see what each
-  creator is owed and send PayPal payments by hand.
-- **Automated (next step):** PayPal **Payouts API** can push funds to creators'
-  PayPal accounts near-instantly. This is the equivalent of Stripe Connect and
-  can be added with a `paypal.createPayout` action when you're ready — say the
-  word and it can be wired up.
+Creator payouts are **fully automated** via the PayPal Payouts API:
+
+1. A creator adds their **PayPal payout email** in Settings → "Get Paid — PayPal
+   Payouts" (calls `creators.setPayoutEmail`).
+2. Every time a donation to that creator completes, `paypal.payoutForDonation`
+   automatically sends them their net share (gross minus the 5% platform fee) to
+   that PayPal email — no manual step.
+3. If a donation completes **before** the creator has added a payout email, it's
+   marked `held`. The moment they add their email, `sweepCreatorPayouts`
+   back-pays every held donation automatically.
+4. Payout status per donation is tracked on the `donations` row
+   (`payoutStatus`: held → processing → paid / unclaimed / failed) and finalized
+   by the `PAYMENT.PAYOUTS-ITEM.*` webhook events.
+
+### Enable the Payouts feature on your PayPal account
+- PayPal **Payouts** must be enabled on your business account (Account Settings
+  → request Payouts access if it isn't already on). Sandbox has it by default.
+- Your account needs sufficient balance to fund payouts; PayPal draws from your
+  balance/funding source per payout.
+
+### Webhook events to subscribe (in addition to capture)
+On the same webhook from step 3 above, also subscribe to:
+- **Payouts item succeeded** (`PAYMENT.PAYOUTS-ITEM.SUCCEEDED`)
+- **Payouts item failed** (`PAYMENT.PAYOUTS-ITEM.FAILED`)
+- **Payouts item unclaimed** (`PAYMENT.PAYOUTS-ITEM.UNCLAIMED`)
+- (optional) `PAYMENT.PAYOUTS-ITEM.DENIED`, `.RETURNED`, `.BLOCKED`
+
+### Changing the payout split
+By default each creator receives **gross − 5% platform fee**; the platform
+absorbs PayPal's processing + payout fees from that 5%. To change this, edit the
+single `creatorPayoutCents()` function in `convex/paypal.ts`.
+
+### Unclaimed payouts
+If a creator's PayPal email isn't a registered PayPal account, the payout shows
+as `unclaimed`; PayPal emails them a claim link. If unclaimed for ~30 days the
+funds auto-return to your balance — re-run by updating their email in Settings.
 
 ## Notes / caveats
 
