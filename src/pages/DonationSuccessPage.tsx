@@ -48,12 +48,12 @@ function ReferralShare({ slug, code }: { slug: string; code: string }) {
 
 export function DonationSuccessPage() {
   const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get("session_id");
+  const sessionId = searchParams.get("donation_id");
   const isSubscription = searchParams.get("subscription") === "1";
 
   // Poll for the donation record tied to this session
   const donation = useQuery(
-    api.donations.getByStripeSession,
+    api.donations.getByPayPalOrder,
     sessionId ? { sessionId } : "skip"
   );
 
