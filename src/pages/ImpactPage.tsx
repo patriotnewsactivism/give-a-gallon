@@ -137,9 +137,9 @@ export function ImpactPage() {
             </div>
             <div className="grid sm:grid-cols-3 gap-4">
               {[
-                { pct: "~92%", label: "Goes to creators", desc: "Net after Stripe processing", color: "text-fuel" },
+                { pct: "~92%", label: "Goes to creators", desc: "Net after PayPal processing", color: "text-fuel" },
                 { pct: "5%", label: "Platform fee", desc: "Covers operations & development", color: "text-muted-foreground" },
-                { pct: "~3%", label: "Stripe processing", desc: "Card processing (charged by Stripe)", color: "text-muted-foreground" },
+                { pct: "~3%", label: "PayPal processing", desc: "Card processing (via PayPal)", color: "text-muted-foreground" },
               ].map(item => (
                 <div key={item.label} className="text-center p-4 rounded-xl bg-muted/20 border border-border/30">
                   <div className={`text-3xl font-bold mb-1 ${item.color}`} style={{ fontFamily: "var(--font-display)" }}>
