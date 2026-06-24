@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 const CATEGORIES = [
   { id: "donation", label: "Donations & receipts" },
   { id: "creator", label: "Running a campaign" },
-  { id: "payout", label: "Payouts & Stripe" },
+  { id: "payout", label: "Payouts & PayPal" },
   { id: "account", label: "Account & login" },
   { id: "other", label: "Something else" },
 ];
@@ -19,7 +19,7 @@ const CATEGORIES = [
 const FAQS = [
   {
     q: "How much is a gallon, and where does my money go?",
-    a: "One gallon of fuel is $4.25. After a 5% platform fee and ~3% Stripe processing, roughly 92% reaches the creator.",
+    a: "One gallon of fuel is $4.25. After a 5% platform fee and ~3% PayPal processing, 92% goes directly to the creator.",
   },
   {
     q: "Can I get a refund?",
@@ -27,7 +27,7 @@ const FAQS = [
   },
   {
     q: "When do creators get paid?",
-    a: "Payouts go through Stripe. Standard payouts take 1–2 business days (free); instant payouts carry Stripe's ~1.5% fee (min $0.50, max $10). New accounts go through Stripe's standard verification — your first payout may take 7–14 days. After that, standard payouts are typically next-business-day. Instant payout eligibility is determined by Stripe. Give-A-Gallon never adds fees beyond what Stripe charges.",
+    a: "Payouts go through PayPal. Standard payouts take 1–2 business days (free); instant payouts use PayPal's standard processing fee. New accounts may have a brief verification period. Give-A-Gallon never adds fees beyond what PayPal charges.",
   },
   {
     q: "Are donations tax-deductible?",
