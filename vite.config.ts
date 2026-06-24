@@ -7,7 +7,12 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "src"),
+      "@": path.resolve([import.me](https://import.me)ta.dirname, "src"),
+    },
+  },
+  build: {
+    rollupOptions: {
+      external: ["@anthropic-ai/sdk"],
     },
   },
 });
