@@ -38,10 +38,10 @@ export function DashboardPage() {
   useEffect(() => {
     const connect = searchParams.get("connect");
     if (connect === "complete") {
-      toast.success("Stripe account connected! You can now receive payouts.");
+      toast.success("PayPal account connected! You can now receive payouts.");
       setSearchParams({});
     } else if (connect === "refresh") {
-      toast.info("Onboarding expired — click 'Connect Stripe' to restart.");
+      toast.info("Onboarding expired — click 'Connect PayPal' to restart.");
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
@@ -340,9 +340,9 @@ function PostUpdatePanel() {
 
 
 function PayoutPanel({ creator }: { creator: any }) {
-  const startOnboarding = useAction(api.connect.startOnboarding);
-  const getBalance = useAction(api.connect.getBalance);
-  const requestPayout = useAction(api.connect.requestPayout);
+  const startOnboarding = useAction(api.paypalConnect.startOnboarding);
+  const getBalance = useAction(api.paypalConnect.getBalance);
+  const requestPayout = useAction(api.paypalConnect.requestPayout);
 
   const [loading, setLoading] = useState(false);
   const [payoutResult, setPayoutResult] = useState<{
@@ -415,7 +415,7 @@ function PayoutPanel({ creator }: { creator: any }) {
           </p>
         </div>
         <div className="p-5">
-          <h3 className="font-semibold mb-3">Connect Stripe to Get Paid</h3>
+          <h3 className="font-semibold mb-3">Connect PayPal to Get Paid</h3>
           <ul className="space-y-1.5 mb-4">
             {[
               { icon: "⚡", text: "Instant payout — ~30 min to your debit card (1.5% fee, min $0.50)" },
@@ -435,7 +435,7 @@ function PayoutPanel({ creator }: { creator: any }) {
             disabled={loading}
           >
             {loading ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Zap className="size-4 mr-2" />}
-            Connect Stripe — Start Getting Paid
+            Connect PayPal — Start Getting Paid
           </Button>
         </div>
       </div>
@@ -453,7 +453,7 @@ function PayoutPanel({ creator }: { creator: any }) {
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold mb-1">Almost There — Finish Setup</h3>
             <p className="text-sm text-muted-foreground mb-1">
-              Complete your Stripe onboarding to unlock payouts — including instant.
+              Complete your PayPal onboarding to unlock payouts — including instant.
             </p>
             <p className="text-xs text-fuel font-medium mb-4">⚡ Instant payouts unlock once verified.</p>
             <Button
@@ -482,11 +482,11 @@ function PayoutPanel({ creator }: { creator: any }) {
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold mb-1">Action Required</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Stripe needs more information before enabling payouts on your account.
+              PayPal needs more information before enabling payouts on your account.
             </p>
             <Button variant="outline" className="border-red-500/30 text-red-600 hover:bg-red-500/10" onClick={handleConnect} disabled={loading}>
               {loading && <Loader2 className="size-4 mr-2 animate-spin" />}
-              Resolve with Stripe
+              Resolve with PayPal
             </Button>
           </div>
         </div>
