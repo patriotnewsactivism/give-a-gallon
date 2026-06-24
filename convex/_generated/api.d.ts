@@ -13,6 +13,7 @@ import type * as auth from "../auth.js";
 import type * as authEmail from "../authEmail.js";
 import type * as automations from "../automations.js";
 import type * as connect from "../connect.js";
+import type * as connectV2 from "../connectV2.js";
 import type * as constants from "../constants.js";
 import type * as creators from "../creators.js";
 import type * as devTools from "../devTools.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   authEmail: typeof authEmail;
   automations: typeof automations;
   connect: typeof connect;
+  connectV2: typeof connectV2;
   constants: typeof constants;
   creators: typeof creators;
   devTools: typeof devTools;
