@@ -14,7 +14,8 @@ http.route({
   handler: httpAction(async (ctx, request) => {
     const payload = await request.text();
     // Use Object.fromEntries — works in all Convex runtimes without .entries()
-    const headers: Record<string, string> = Object.fromEntries(request.headers);
+    const headers: Record<string, string> = {};
+    request.headers.forEach((value: string, key: string) => { headers[key] = value; });
     try {
       await ctx.runAction(api.paypal.handleWebhook, { payload, headers: JSON.stringify(headers) });
       return new Response(JSON.stringify({ received: true }), {
