@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve([import.me](https://import.me)ta.dirname, "src"),
+      "@": path.resolve(import.meta.dirname, "src"),
     },
   },
   build: {
@@ -16,3 +16,4 @@ export default defineConfig({
     },
   },
 });
+
