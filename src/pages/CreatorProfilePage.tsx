@@ -400,7 +400,7 @@ export function CreatorProfilePage() {
 
 function DonationForm({ creatorId, creatorName }: { creatorId: string; creatorName: string }) {
   const { referralCode } = useReferral();
-  const createCheckout = useAction(api.stripe.createCheckoutSession);
+  const createCheckout = useAction(api.paypal.createCheckoutSession);
   const [gallons, setGallons] = useState(3);
   const [customGallons, setCustomGallons] = useState("");
   const [isCustom, setIsCustom] = useState(false);
@@ -533,7 +533,7 @@ function DonationForm({ creatorId, creatorName }: { creatorId: string; creatorNa
           </span>
         )}
       </Button>
-      <p className="text-center text-xs text-muted-foreground">Powered by Stripe · Secure checkout</p>
+      <p className="text-center text-xs text-muted-foreground">Powered by PayPal · Secure checkout</p>
     </div>
   );
 }
