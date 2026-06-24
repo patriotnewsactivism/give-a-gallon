@@ -24,6 +24,7 @@
     "build:vercel": "vite build"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "@auth/core": "^0.37.4",
     "@convex-dev/auth": "^0.0.90",
     "@hookform/resolvers": "^5.2.2",
