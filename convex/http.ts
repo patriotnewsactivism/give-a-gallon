@@ -13,16 +13,17 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     const payload = await request.text();
-    const headers: Record<string,string> = {};
-    for (const [k,v] of request.headers.entries()) headers[k] = v;
+    // Use Object.fromEntries — works in all Convex runtimes without .entries()
+    const headers: Record<string, string> = Object.fromEntries(request.headers);
     try {
       await ctx.runAction(api.paypal.handleWebhook, { payload, headers: JSON.stringify(headers) });
       return new Response(JSON.stringify({ received: true }), {
         status: 200, headers: { "Content-Type": "application/json" },
       });
-    } catch (error: any) {
-      console.error("PayPal webhook error:", error);
-      return new Response(JSON.stringify({ error: error.message }), {
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error("PayPal webhook error:", msg);
+      return new Response(JSON.stringify({ error: msg }), {
         status: 400, headers: { "Content-Type": "application/json" },
       });
     }
