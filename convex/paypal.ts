@@ -1,11 +1,8 @@
 "use node";
-// Give a Gallon — PayPal Checkout integration (Orders API v2)
+// Give a Gallon — PayPal Checkout actions (Node.js runtime)
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { action, internalMutation, internalQuery } from "./_generated/server";
-
-const GALLON_PRICE_CENTS = 425;
-const PLATFORM_FEE_PCT = 0.05;
+import { action } from "./_generated/server";
 
 async function getPayPalToken(): Promise<string> {
   const clientId = process.env.PAYPAL_CLIENT_ID;
@@ -44,11 +41,11 @@ export const createCheckoutSession = action({
   },
   handler: async (ctx, args) => {
     if (args.gallons < 1 || args.gallons > 1000) throw new Error("Gallons must be between 1 and 1000");
-    const amountCents = Math.round(args.gallons * GALLON_PRICE_CENTS);
-    const platformFeeCents = Math.round(amountCents * PLATFORM_FEE_PCT);
+    const amountCents = Math.round(args.gallons * 425);
+    const platformFeeCents = Math.round(amountCents * 0.05);
     const amountUSD = (amountCents / 100).toFixed(2);
 
-    const donationId = await ctx.runMutation(internal.paypal.createPendingDonation, {
+    const donationId = await ctx.runMutation(internal.paypalMutations.createPendingDonation, {
       creatorId: args.creatorId,
       gallons: args.gallons,
       amountCents,
@@ -93,7 +90,11 @@ export const createCheckoutSession = action({
     const approveLink = orderData.links?.find((l: any) => l.rel === "approve")?.href;
     if (!approveLink) throw new Error("No PayPal approve link returned");
 
-    await ctx.runMutation(internal.paypal.setPayPalOrderId, { donationId, paypalOrderId: orderData.id });
+    await ctx.runMutation(internal.paypalMutations.setPayPalOrderId, {
+      donationId,
+      paypalOrderId: orderData.id,
+    });
+
     return { url: approveLink as string, orderId: orderData.id as string, donationId };
   },
 });
@@ -112,19 +113,14 @@ export const captureOrder = action({
     const donationId = unit?.custom_id || unit?.reference_id;
     const captureId  = unit?.payments?.captures?.[0]?.id;
     if (!donationId) throw new Error("No donationId in PayPal capture response");
-    await ctx.runMutation(internal.paypal.completeDonation, { donationId, paypalCaptureId: captureId });
+    await ctx.runMutation(internal.paypalMutations.completeDonation, { donationId, paypalCaptureId: captureId });
     return { success: true, donationId };
   },
 });
 
-export const getByPayPalOrder = internalQuery({
-  args: { donationId: v.string() },
-  handler: async (ctx, { donationId }) => ctx.db.get(donationId as any),
-});
-
 export const handleWebhook = action({
   args: { payload: v.string(), headers: v.string() },
-  handler: async (ctx, { payload, headers }) => {
+  handler: async (ctx, { payload }) => {
     const event = JSON.parse(payload);
     const eventType: string = event.event_type;
     if (eventType === "CHECKOUT.ORDER.APPROVED" || eventType === "PAYMENT.CAPTURE.COMPLETED") {
@@ -132,65 +128,9 @@ export const handleWebhook = action({
       const donationId = resource?.custom_id || resource?.purchase_units?.[0]?.custom_id;
       const captureId  = resource?.id;
       if (donationId) {
-        await ctx.runMutation(internal.paypal.completeDonation, { donationId, paypalCaptureId: captureId });
+        await ctx.runMutation(internal.paypalMutations.completeDonation, { donationId, paypalCaptureId: captureId });
       }
     }
     return { received: true };
-  },
-});
-
-export const createPendingDonation = internalMutation({
-  args: {
-    creatorId: v.id("creators"),
-    gallons: v.number(),
-    amountCents: v.number(),
-    platformFeeCents: v.number(),
-    donorName: v.optional(v.string()),
-    donorEmail: v.optional(v.string()),
-    message: v.optional(v.string()),
-    isAnonymous: v.boolean(),
-    referralCode: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => ctx.db.insert("donations", { ...args, status: "pending", createdAt: Date.now() }),
-});
-
-export const setPayPalOrderId = internalMutation({
-  args: { donationId: v.id("donations"), paypalOrderId: v.string() },
-  handler: async (ctx, { donationId, paypalOrderId }) => ctx.db.patch(donationId, { stripeSessionId: paypalOrderId }),
-});
-
-export const completeDonation = internalMutation({
-  args: { donationId: v.string(), paypalCaptureId: v.optional(v.string()) },
-  handler: async (ctx, { donationId, paypalCaptureId }) => {
-    const donation = await ctx.db.get(donationId as any);
-    if (!donation || donation.status === "completed") return;
-    await ctx.db.patch(donation._id, {
-      status: "completed",
-      ...(paypalCaptureId ? { stripePaymentIntentId: paypalCaptureId } : {}),
-    });
-    const creator = await ctx.db.get(donation.creatorId);
-    if (creator) {
-      await ctx.db.patch(creator._id, {
-        totalGallons: creator.totalGallons + donation.gallons,
-        totalDonations: creator.totalDonations + 1,
-        totalAmountCents: creator.totalAmountCents + donation.amountCents,
-      });
-    }
-    const stats = await ctx.db.query("platformStats").withIndex("by_key", q => q.eq("key","global")).first();
-    if (stats) {
-      await ctx.db.patch(stats._id, {
-        totalDonationsCents: stats.totalDonationsCents + donation.amountCents,
-        totalGallons: stats.totalGallons + donation.gallons,
-        totalDonors: stats.totalDonors + 1,
-        updatedAt: Date.now(),
-      });
-    }
-    if (donation.referralCode) {
-      await ctx.runMutation(internal.referrals.creditReferral, {
-        referralCode: donation.referralCode,
-        gallons: donation.gallons,
-        donationId: donation._id,
-      });
-    }
   },
 });
