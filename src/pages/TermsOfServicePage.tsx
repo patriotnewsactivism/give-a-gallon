@@ -43,7 +43,7 @@ export function TermsOfServicePage() {
           <ul>
             <li>You must be at least 18 years old to create an account</li>
             <li>You must provide accurate and truthful information</li>
-            <li>Campaign Creators must complete Stripe identity verification to receive payouts</li>
+            <li>Campaign Creators must complete PayPal identity verification to receive payouts</li>
             <li>You may not use the Platform for any unlawful purpose</li>
           </ul>
         </Section>
@@ -81,7 +81,7 @@ export function TermsOfServicePage() {
                   <td className="py-3 px-4">Deducted from donation</td>
                 </tr>
                 <tr className="border-b border-border/20">
-                  <td className="py-3 px-4">Stripe processing</td>
+                  <td className="py-3 px-4">PayPal processing</td>
                   <td className="py-3 px-4">~3%</td>
                   <td className="py-3 px-4">Deducted from donation</td>
                 </tr>
@@ -97,7 +97,7 @@ export function TermsOfServicePage() {
                 </tr>
                 <tr className="border-b border-border/20">
                   <td className="py-3 px-4">⚡ Instant payout</td>
-                  <td className="py-3 px-4">~1.5% (Stripe fee, min $0.50, max $10)</td>
+                  <td className="py-3 px-4">~3% (PayPal processing fee)</td>
                   <td className="py-3 px-4">Campaign Creator (at cost)</td>
                 </tr>
               </tbody>
@@ -105,11 +105,11 @@ export function TermsOfServicePage() {
           </div>
           <p>
             All payments are processed by{" "}
-            <a href="https://stripe.com" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">Stripe, Inc.</a>{" "}
+            <a href="https://paypal.com" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">PayPal, Inc.</a>{" "}
             By using the Platform, you also agree to{" "}
-            <a href="https://stripe.com/legal/connect-account" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">Stripe's Connected Account Agreement</a>{" "}
+            <a href="https://www.paypal.com/us/legalhub/paypal-user-agreement-full" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">PayPal's User Agreement</a>{" "}
             (for Campaign Creators) and{" "}
-            <a href="https://stripe.com/legal/end-users" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">Stripe's terms</a>{" "}
+            <a href="https://www.paypal.com/us/legalhub/paypal-user-agreement-full" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">PayPal's terms</a>{" "}
             (for Donors).
           </p>
         </Section>
@@ -184,7 +184,7 @@ export function TermsOfServicePage() {
           </p>
           <p>
             <strong className="text-foreground">THIRD-PARTY SERVICES.</strong>{" "}
-            We rely on Stripe for payment processing and Vercel for hosting. We are not liable for disruptions, errors, or data breaches caused by third-party service providers.
+            We rely on PayPal for payment processing and hosting infrastructure. We are not liable for disruptions, errors, or data breaches caused by third-party service providers.
           </p>
         </Section>
 
