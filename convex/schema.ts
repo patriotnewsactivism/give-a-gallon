@@ -128,9 +128,9 @@ const schema = defineSchema({
     userId: v.id("users"),
     donorEmail: v.string(),
     donorName: v.optional(v.string()),
-    tierId: v.string(), // "fuel-supporter" | "community-builder" | "freedom-partner" | "impact-champion"
+    tierId: v.string(),
     tierName: v.string(),
-    amountCents: v.number(), // monthly amount
+    amountCents: v.number(),
     gallonsPerMonth: v.number(),
     status: v.union(
       v.literal("active"),
@@ -141,7 +141,7 @@ const schema = defineSchema({
     stripeSubscriptionId: v.optional(v.string()),
     stripeCustomerId: v.optional(v.string()),
     stripePriceId: v.optional(v.string()),
-    currentPeriodEnd: v.optional(v.number()), // unix ms
+    currentPeriodEnd: v.optional(v.number()),
     canceledAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -153,7 +153,7 @@ const schema = defineSchema({
 
   // ── Platform-wide stats (materialized) ─────────────────────────────────────
   platformStats: defineTable({
-    key: v.string(), // "global"
+    key: v.string(),
     totalDonationsCents: v.number(),
     totalGallons: v.number(),
     totalDonors: v.number(),
@@ -169,7 +169,7 @@ const schema = defineSchema({
   emailLog: defineTable({
     to: v.string(),
     subject: v.string(),
-    type: v.string(), // "donation_received" | "donation_confirmation" | "subscription_confirmed" | "subscription_canceled"
+    type: v.string(),
     relatedId: v.optional(v.string()),
     status: v.union(v.literal("sent"), v.literal("failed")),
     error: v.optional(v.string()),
@@ -178,7 +178,7 @@ const schema = defineSchema({
     .index("by_type", ["type", "createdAt"])
     .index("by_to", ["to", "createdAt"]),
 
-  // ── Supporter wall — messages of support on a campaign ──────────────────────
+  // ── Supporter wall ──────────────────────────────────────────────────────────
   wallPosts: defineTable({
     creatorId: v.id("creators"),
     userId: v.id("users"),
@@ -186,7 +186,8 @@ const schema = defineSchema({
     body: v.string(),
     createdAt: v.number(),
   }).index("by_creator", ["creatorId", "createdAt"]),
-  // ── Push notifications (admin → all users) ──────────────────────────────
+
+  // ── Push notifications ──────────────────────────────────────────────────────
   notifications: defineTable({
     title: v.string(),
     body: v.string(),
@@ -201,11 +202,11 @@ const schema = defineSchema({
       v.literal("donors"),
     ),
     link: v.optional(v.string()),
-    sentBy: v.string(), // admin email
+    sentBy: v.string(),
     createdAt: v.number(),
   }).index("by_created", ["createdAt"]),
 
-  // ── Per-user read receipts for notifications ─────────────────────────────
+  // ── Per-user read receipts for notifications ────────────────────────────────
   notificationReads: defineTable({
     userId: v.id("users"),
     notificationId: v.id("notifications"),
@@ -214,11 +215,11 @@ const schema = defineSchema({
     .index("by_user", ["userId", "notificationId"])
     .index("by_notification", ["notificationId"]),
 
-  // ── Support tickets (contact form + email → AI assistant) ────────────────
+  // ── Support tickets ─────────────────────────────────────────────────────────
   supportTickets: defineTable({
     name: v.string(),
     email: v.string(),
-    category: v.string(), // "donation" | "creator" | "payout" | "account" | "other"
+    category: v.string(),
     subject: v.string(),
     message: v.string(),
     status: v.union(
@@ -228,7 +229,7 @@ const schema = defineSchema({
       v.literal("closed"),
     ),
     aiReply: v.optional(v.string()),
-    source: v.optional(v.string()), // "web" | "email"
+    source: v.optional(v.string()),
     repliedAt: v.optional(v.number()),
     lastMessageAt: v.optional(v.number()),
     createdAt: v.number(),
@@ -236,13 +237,29 @@ const schema = defineSchema({
     .index("by_status", ["status", "createdAt"])
     .index("by_email", ["email", "createdAt"]),
 
-  // ── Support conversation log (one row per message in a ticket thread) ─────
+  // ── Support conversation log ─────────────────────────────────────────────────
   supportMessages: defineTable({
     ticketId: v.id("supportTickets"),
     role: v.union(v.literal("user"), v.literal("assistant")),
     body: v.string(),
     createdAt: v.number(),
   }).index("by_ticket", ["ticketId", "createdAt"]),
+
+  // ── Stripe Connect V2 account mappings ──────────────────────────────────────
+  stripeV2Accounts: defineTable({
+    userId: v.id("users"),
+    stripeAccountId: v.string(),
+    stripeAccountStatus: v.union(
+      v.literal("pending"),
+      v.literal("active"),
+      v.literal("restricted"),
+    ),
+    displayName: v.string(),
+    contactEmail: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_stripeAccount", ["stripeAccountId"]),
 });
 
 export default schema;

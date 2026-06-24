@@ -68,7 +68,7 @@ export const storeV2AccountMapping = internalMutation({
   args: {
     userId: v.id("users"),
     stripeAccountId: v.string(),
-    stripeAccountStatus: v.string(),
+    stripeAccountStatus: v.union(v.literal("pending"), v.literal("active"), v.literal("restricted")),
     displayName: v.string(),
     contactEmail: v.string(),
   },
@@ -106,7 +106,7 @@ export const storeV2AccountMapping = internalMutation({
 export const updateV2AccountStatus = internalMutation({
   args: {
     stripeAccountId: v.string(),
-    stripeAccountStatus: v.string(),
+    stripeAccountStatus: v.union(v.literal("pending"), v.literal("active"), v.literal("restricted")),
   },
   handler: async (ctx, { stripeAccountId, stripeAccountStatus }) => {
     const record = await ctx.db
@@ -495,7 +495,7 @@ export const handleV2Webhook = action({
        * Parse 'thin' event signature and structure.
        * Uses the 'parseThinEvent' helper on the stripeClient instance for V2 accounts.
        */
-      const thinEvent = stripeClient.parseThinEvent(payload, signature, webhookSecret);
+      const thinEvent = stripeClient.webhooks.constructEvent(payload, signature, webhookSecret);
       console.log(`Verified thin event: ${thinEvent.type} (ID: ${thinEvent.id})`);
 
       /**
@@ -520,7 +520,7 @@ export const handleV2Webhook = action({
          * In V2 account event, the context/related account ID is present on the event data context:
          * Or we can retrieve the account object or query status from the event payload.
          */
-        const accountId = event.context || (event.data as any)?.object?.id;
+        const accountId = (event as any).context || (event as any)?.data?.object?.id;
         if (accountId) {
           console.log(`Detected status or requirements change on connected account ${accountId}. Triggering status sync...`);
           
@@ -558,3 +558,4 @@ export const handleV2Webhook = action({
     }
   },
 });
+
