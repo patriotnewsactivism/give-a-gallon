@@ -152,6 +152,23 @@ export const getByStripeSession = query({
 });
 
 // Get all donations by a logged-in donor (by email)
+
+export const getByPayPalOrder = query({
+  args: { sessionId: v.string() },
+  handler: async (ctx, { sessionId }) => {
+    // sessionId is actually the donation record ID for PayPal flows
+    // Try direct ID lookup first, then fall back to stripeSessionId index (stores PayPal order ID)
+    try {
+      const byId = await ctx.db.get(sessionId as any);
+      if (byId) return byId;
+    } catch {}
+    return ctx.db
+      .query("donations")
+      .withIndex("by_stripeSession", q => q.eq("stripeSessionId", sessionId))
+      .first();
+  },
+});
+
 export const getMyDonations = query({
   args: {},
   handler: async (ctx) => {
