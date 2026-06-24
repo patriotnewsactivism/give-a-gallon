@@ -38,15 +38,15 @@ export function PrivacyPolicyPage() {
         <Section title="1. Information We Collect">
           <p>
             <strong className="text-foreground">Account Information.</strong>{" "}
-            When you sign up as a campaign creator or supporter, we collect your name, email address, and — for campaign creators — payout details required by our payment processor (Stripe).
+            When you sign up as a campaign creator or supporter, we collect your name, email address, and — for campaign creators — payout details required by our payment processor (PayPal).
           </p>
           <p>
             <strong className="text-foreground">Payment Information.</strong>{" "}
             All payment processing is handled by{" "}
-            <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">
-              Stripe, Inc.
+            <a href="https://www.paypal.com/us/legalhub/privacy-full" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">
+              PayPal, Inc.
             </a>{" "}
-            We do not store your credit card number, bank account number, or other sensitive financial data on our servers. Stripe collects and processes this information under their own privacy policy.
+            We do not store your credit card number, bank account number, or other sensitive financial data on our servers. PayPal collects and processes this information under their own privacy policy.
           </p>
           <p>
             <strong className="text-foreground">Donation Activity.</strong>{" "}
@@ -70,7 +70,7 @@ export function PrivacyPolicyPage() {
 
         <Section title="2. How We Use Your Information">
           <ul>
-            <li>Process donations and payouts through Stripe</li>
+            <li>Process donations and payouts through PayPal</li>
             <li>Display campaign progress, leaderboards, and live activity</li>
             <li>Communicate with you about your account, donations, or campaigns</li>
             <li>Prevent fraud and ensure platform security</li>
@@ -89,9 +89,9 @@ export function PrivacyPolicyPage() {
           <p><strong className="text-foreground">We DO share data with:</strong></p>
           <ul>
             <li>
-              <strong className="text-foreground">Stripe</strong> — to process payments, payouts, and identity verification for campaign creators. Stripe acts as an independent data controller. See{" "}
-              <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">
-                Stripe's Privacy Policy
+              <strong className="text-foreground">PayPal</strong> — to process payments and payouts for campaign creators. PayPal acts as an independent data controller. See{" "}
+              <a href="https://www.paypal.com/us/legalhub/privacy-full" target="_blank" rel="noopener noreferrer" className="text-fuel hover:underline">
+                PayPal's Privacy Policy
               </a>.
             </li>
             <li>
@@ -120,7 +120,7 @@ export function PrivacyPolicyPage() {
           <p>We implement industry-standard security measures including:</p>
           <ul>
             <li>SSL/TLS encryption on all connections</li>
-            <li>Stripe's PCI-DSS Level 1 compliance for all payment data</li>
+            <li>PayPal's PCI-DSS Level 1 compliance for all payment data</li>
             <li>Access controls limiting who can view account data</li>
             <li>Regular monitoring for unauthorized access</li>
           </ul>
@@ -128,7 +128,7 @@ export function PrivacyPolicyPage() {
             <p className="text-sm">
               <strong className="text-foreground">We never see your full card number.</strong>{" "}
               <span className="text-muted-foreground">
-                All sensitive payment data is collected and stored exclusively by Stripe. Our servers never touch it.
+                All sensitive payment data is collected and stored exclusively by PayPal. Our servers never touch it.
               </span>
             </p>
           </div>
