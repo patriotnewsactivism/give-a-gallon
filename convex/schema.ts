@@ -113,12 +113,16 @@ const schema = defineSchema({
     stripeSessionId: v.optional(v.string()),
     stripePaymentIntentId: v.optional(v.string()),
     stripeTransferId: v.optional(v.string()),
+    // PayPal (alternative processor)
+    paypalOrderId: v.optional(v.string()),
+    paypalCaptureId: v.optional(v.string()),
     // Referral tracking
     referralCode: v.optional(v.string()),
     referredByCreatorId: v.optional(v.id("creators")),
     createdAt: v.number(),
   })
     .index("by_stripeSession", ["stripeSessionId"])
+    .index("by_paypalOrder", ["paypalOrderId"])
     .index("by_creator", ["creatorId", "createdAt"])
     .index("by_status", ["status", "createdAt"])
     .index("by_donorUser", ["donorUserId", "createdAt"]),

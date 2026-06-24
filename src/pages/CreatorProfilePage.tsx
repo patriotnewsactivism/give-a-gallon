@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { ShareSheet } from "@/components/ShareSheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { GALLON_PRICE, GALLON_PRESETS } from "@/lib/constants";
+import { GALLON_PRICE, GALLON_PRESETS, PAYMENT_PROVIDER } from "@/lib/constants";
 import { useReferral, clearReferral } from "@/hooks/useReferral";
 
 // ── LiveFuelFlash ─────────────────────────────────────────────────────────
@@ -401,6 +401,7 @@ export function CreatorProfilePage() {
 function DonationForm({ creatorId, creatorName }: { creatorId: string; creatorName: string }) {
   const { referralCode } = useReferral();
   const createCheckout = useAction(api.stripe.createCheckoutSession);
+  const createPaypalOrder = useAction(api.paypal.createOrder);
   const [gallons, setGallons] = useState(3);
   const [customGallons, setCustomGallons] = useState("");
   const [isCustom, setIsCustom] = useState(false);
@@ -418,14 +419,18 @@ function DonationForm({ creatorId, creatorName }: { creatorId: string; creatorNa
     if (!isAnonymous && !donorName.trim()) { toast.error("Please enter your name or donate anonymously"); return; }
     setSubmitting(true);
     try {
-      const { url } = await createCheckout({
+      const checkoutArgs = {
         creatorId: creatorId as any,
         gallons: effectiveGallons,
         donorName: isAnonymous ? undefined : donorName.trim(),
         message: message.trim() || undefined,
         isAnonymous,
         referralCode,
-      });
+      };
+      const { url } =
+        PAYMENT_PROVIDER === "paypal"
+          ? await createPaypalOrder(checkoutArgs)
+          : await createCheckout(checkoutArgs);
       clearReferral();
       window.location.href = url;
     } catch (e: any) {

@@ -22,6 +22,7 @@ import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as milestones from "../milestones.js";
 import type * as notifications from "../notifications.js";
+import type * as paypal from "../paypal.js";
 import type * as platform from "../platform.js";
 import type * as recentDonationsQuery from "../recentDonationsQuery.js";
 import type * as referrals from "../referrals.js";
@@ -57,6 +58,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   milestones: typeof milestones;
   notifications: typeof notifications;
+  paypal: typeof paypal;
   platform: typeof platform;
   recentDonationsQuery: typeof recentDonationsQuery;
   referrals: typeof referrals;

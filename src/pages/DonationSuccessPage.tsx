@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -51,11 +51,33 @@ export function DonationSuccessPage() {
   const sessionId = searchParams.get("session_id");
   const isSubscription = searchParams.get("subscription") === "1";
 
-  // Poll for the donation record tied to this session
-  const donation = useQuery(
+  // PayPal return: ...?provider=paypal&token=ORDER_ID&PayerID=...
+  const isPaypal = searchParams.get("provider") === "paypal";
+  const paypalOrderId = searchParams.get("token");
+  const capturePaypal = useAction(api.paypal.captureOrder);
+
+  // On return from PayPal, capture the order to finalize the donation. The
+  // webhook is a backup; this synchronous capture is the primary completion.
+  useEffect(() => {
+    if (isPaypal && paypalOrderId) {
+      capturePaypal({ orderId: paypalOrderId }).catch((e) =>
+        console.error("PayPal capture failed:", e),
+      );
+    }
+  }, [isPaypal, paypalOrderId, capturePaypal]);
+
+  // Poll for the donation record tied to this checkout (Stripe or PayPal).
+  const stripeDonation = useQuery(
     api.donations.getByStripeSession,
-    sessionId ? { sessionId } : "skip"
+    !isPaypal && sessionId ? { sessionId } : "skip"
   );
+  const paypalDonation = useQuery(
+    api.donations.getByPaypalOrder,
+    isPaypal && paypalOrderId ? { orderId: paypalOrderId } : "skip"
+  );
+  const donation = isPaypal ? paypalDonation : stripeDonation;
+  // Unified id used only to decide whether we have a checkout to track.
+  const checkoutRef = isPaypal ? paypalOrderId : sessionId;
 
   const creator = useQuery(
     api.creators.getById,
@@ -121,8 +143,8 @@ export function DonationSuccessPage() {
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, "_blank");
   }
 
-  // If no session ID at all, something is wrong
-  if (!sessionId) {
+  // If no checkout reference at all, something is wrong
+  if (!checkoutRef) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 text-center">
         <div>

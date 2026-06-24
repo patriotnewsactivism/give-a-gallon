@@ -57,6 +57,40 @@ http.route({
   }),
 });
 
+// PayPal webhook endpoint (backup completion path for PAYMENT.CAPTURE.COMPLETED)
+http.route({
+  path: "/paypal-webhook",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const body = await request.text();
+    try {
+      await ctx.runAction(api.paypal.handleWebhook, {
+        body,
+        headers: {
+          transmissionId:
+            request.headers.get("paypal-transmission-id") ?? undefined,
+          transmissionTime:
+            request.headers.get("paypal-transmission-time") ?? undefined,
+          transmissionSig:
+            request.headers.get("paypal-transmission-sig") ?? undefined,
+          certUrl: request.headers.get("paypal-cert-url") ?? undefined,
+          authAlgo: request.headers.get("paypal-auth-algo") ?? undefined,
+        },
+      });
+      return new Response(JSON.stringify({ received: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error: any) {
+      console.error("PayPal webhook error:", error);
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }),
+});
+
 // Recent donations endpoint (for automations / webhooks)
 http.route({
   path: "/api/recent-donations",

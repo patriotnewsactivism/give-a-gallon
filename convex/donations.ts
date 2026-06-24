@@ -151,6 +151,17 @@ export const getByStripeSession = query({
   },
 });
 
+// Get a single donation by its PayPal order ID (for success page)
+export const getByPaypalOrder = query({
+  args: { orderId: v.string() },
+  handler: async (ctx, { orderId }) => {
+    return ctx.db
+      .query("donations")
+      .withIndex("by_paypalOrder", (q) => q.eq("paypalOrderId", orderId))
+      .first();
+  },
+});
+
 // Get all donations by a logged-in donor (by email)
 export const getMyDonations = query({
   args: {},

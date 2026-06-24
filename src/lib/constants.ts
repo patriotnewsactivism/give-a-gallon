@@ -3,6 +3,12 @@ export const GALLON_PRICE = 4.25; // USD per gallon
 export const PLATFORM_FEE_PCT = 0.05; // 5% platform fee
 export const GALLON_PRESETS = [1, 3, 5, 10, 20];
 
+// Which payment processor the donation flow uses. Set VITE_PAYMENT_PROVIDER
+// to "paypal" to route checkout through PayPal instead of Stripe. Defaults to
+// Stripe so nothing changes until the env var is set in Vercel.
+export const PAYMENT_PROVIDER: "stripe" | "paypal" =
+  import.meta.env.VITE_PAYMENT_PROVIDER === "paypal" ? "paypal" : "stripe";
+
 export const CATEGORIES = [
   { id: "fuel-assistance",          label: "Fuel Assistance",           icon: "⛽", description: "Basic transportation needs" },
   { id: "veterans",                 label: "Veterans",                  icon: "🎖️", description: "Serving those who served" },
