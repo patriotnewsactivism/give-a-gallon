@@ -94,7 +94,7 @@ export function MembershipPage() {
 
   const mySubscription = useQuery(api.subscriptions.getMySubscription);
   const stats = useQuery(api.subscriptions.getSubscriptionStats);
-  const createCheckout = useAction(api.subscriptions.createSubscriptionCheckout);
+  const createCheckout = useAction(api.subscriptions.createSubscriptionOrder);
   const cancelSub = useAction(api.subscriptions.cancelSubscription);
 
   const handleSubscribe = async (tierId: string) => {
@@ -204,7 +204,7 @@ export function MembershipPage() {
               </h3>
               <p className="text-sm text-muted-foreground">
                 Every other platform makes you wait 2–5 business days. Give-A-Gallon offers instant payouts to your debit card — gas when you need it most.
-                Stripe charges a small processing fee (~1.5%) for instant transfers.{" "}
+                PayPal charges a small processing fee (~1.5%) for instant transfers.{" "}
                 <strong className="text-foreground">We pass it through at cost — Give-A-Gallon keeps nothing extra.</strong>
               </p>
             </div>
@@ -339,7 +339,7 @@ export function MembershipPage() {
                 a: "Right now monthly gallons pool into the platform fuel fund and flow to the most urgent active campaigns. Campaign-level allocation is coming soon."},
               {
                 q: "What's the 5% platform fee?",
-                a: "Give-A-Gallon takes 5% to cover Stripe fees, server costs, and platform development. The rest goes directly to creators via Stripe Connect."},
+                a: "Give-A-Gallon takes 5% to cover PayPal fees, server costs, and platform development. The rest goes directly to creators via PayPal Payouts."},
             ].map(item => (
               <div key={item.q} className="rounded-xl border border-border/40 bg-card/30 p-5">
                 <div className="font-semibold text-sm mb-1.5 flex items-start gap-2">
