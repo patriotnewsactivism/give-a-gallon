@@ -85,7 +85,7 @@ export default function FirmOnboardingPage() {
             {
               icon: Zap,
               title: "Instant Payouts",
-              desc: "Donations arrive on your debit card in ~30 minutes via Stripe. No waiting for weekly payouts.",
+              desc: "Donations arrive on your PayPal account in ~30 minutes. No waiting for weekly payouts.",
               color: "text-amber-400"
             },
             {
@@ -116,7 +116,7 @@ export default function FirmOnboardingPage() {
           <div className="space-y-4 max-w-xl">
             <h2 className="text-2xl font-bold">Ready to get fueled?</h2>
             <p className="text-muted-foreground">
-              Setting up your campaign takes less than 5 minutes. Connect your Stripe account and start raising fuel for your mission today.
+              Setting up your campaign takes less than 5 minutes. Connect your PayPal account and start raising fuel for your mission today.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
@@ -142,7 +142,7 @@ export default function FirmOnboardingPage() {
           <div className="flex items-center gap-8 opacity-40 grayscale hover:grayscale-0 transition-all">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="size-5" />
-              <span className="font-bold text-lg tracking-tight">STRIPE</span>
+              <span className="font-bold text-lg tracking-tight">PAYPAL</span>
             </div>
             <div className="flex items-center gap-2">
               <Shield className="size-5" />
