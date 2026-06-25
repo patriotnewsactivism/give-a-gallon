@@ -14,6 +14,7 @@ export function SignIn() {
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   // Step 1 of reset: request an OTP code by email.
   if (mode === "reset-request") {
@@ -139,6 +140,30 @@ export function SignIn() {
             <button
               type="button"
               className="w-full text-center text-xs text-muted-foreground hover:text-foreground"
+              onClick={async () => {
+                setError("");
+                setLoading(true);
+                try {
+                  const formData = new FormData();
+                  formData.set("flow", "signIn");
+                  formData.set("email", email);
+                  formData.set("password", password);
+                  // Resend the verification code
+                  await signIn("password", formData);
+                } catch (err: any) {
+                  setError(
+                    err?.message ?? "Could not send new code. Please try again.",
+                  );
+                } finally {
+                  setLoading(false);
+                }
+              }}
+            >
+              Didn't get a code? Send again
+            </button>
+            <button
+              type="button"
+              className="w-full text-center text-xs text-muted-foreground hover:text-foreground"
               onClick={() => {
                 setMode("signin");
                 setError("");
@@ -240,12 +265,14 @@ export function SignIn() {
             const formData = new FormData(e.currentTarget);
             formData.set("flow", "signIn");
             const submittedEmail = String(formData.get("email") ?? "");
+            const submittedPassword = String(formData.get("password") ?? "");
             try {
               const result = await signIn("password", formData);
               // When email verification is enabled and the user exists but isn't verified,
               // the server sends an OTP and does not sign the user in yet.
               if (!result.signingIn) {
                 setEmail(submittedEmail);
+                setPassword(submittedPassword);
                 setMode("verify");
               }
             } catch (err: any) {
