@@ -6,7 +6,7 @@ import { Card, CardContent } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
-type Mode = "signin" | "reset-request" | "reset-verify";
+type Mode = "signin" | "verify" | "reset-request" | "reset-verify";
 
 export function SignIn() {
   const { signIn } = useAuthActions();
@@ -171,8 +171,15 @@ export function SignIn() {
             setLoading(true);
             const formData = new FormData(e.currentTarget);
             formData.set("flow", "signIn");
+            const submittedEmail = String(formData.get("email") ?? "");
             try {
-              await signIn("password", formData);
+              const result = await signIn("password", formData);
+              // When email verification is enabled and the user exists but isn't verified,
+              // the server sends an OTP and does not sign the user in yet.
+              if (!result.signingIn) {
+                setEmail(submittedEmail);
+                setMode("verify");
+              }
             } catch (err: any) {
               setError(err?.message ?? "Invalid email or password.");
             } finally {
