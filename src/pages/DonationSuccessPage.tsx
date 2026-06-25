@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -9,7 +9,7 @@ import {
   Sparkles,
   Twitter,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../../convex/_generated/api";
 import { Reveal } from "@/components/Reveal";
@@ -49,7 +49,11 @@ function ReferralShare({ slug, code }: { slug: string; code: string }) {
 export function DonationSuccessPage() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("donation_id");
+  const paypalOrderId = searchParams.get("token"); // PayPal appends ?token=ORDER_ID on return
   const isSubscription = searchParams.get("subscription") === "1";
+
+  const captureOrder = useAction(api.paypal.captureOrder);
+  const captureAttempted = useRef(false);
 
   // Poll for the donation record tied to this session
   const donation = useQuery(
@@ -63,11 +67,23 @@ export function DonationSuccessPage() {
   );
 
   const [copied, setCopied] = useState(false);
-  // Track how long we've been waiting for the webhook to complete the donation
+  const [captureError, setCaptureError] = useState("");
+  // Track how long we've been waiting for the donation to complete
   const [waitSeconds, setWaitSeconds] = useState(0);
 
+  // Capture the PayPal order as soon as the page loads (if not already completed)
+  useEffect(() => {
+    if (!paypalOrderId) return;
+    if (captureAttempted.current) return;
+    if (donation?.status === "completed") return;
+    captureAttempted.current = true;
+    captureOrder({ orderId: paypalOrderId }).catch((err: any) => {
+      console.error("Capture error:", err);
+      setCaptureError(err?.message ?? "Capture failed");
+    });
+  }, [paypalOrderId, donation?.status]);
 
-  // Poll counter — show a reassuring message if the webhook is slow
+  // Poll counter — show a reassuring message if capture is slow
   useEffect(() => {
     if (donation?.status === "completed") return;
     const interval = setInterval(() => setWaitSeconds(s => s + 1), 1000);
@@ -133,7 +149,7 @@ export function DonationSuccessPage() {
     );
   }
 
-  // Webhook may not have fired yet — show reassuring pending state
+  // Waiting for capture to complete
   if (donation === undefined || (donation && donation.status === "pending" && waitSeconds < 15)) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -141,6 +157,9 @@ export function DonationSuccessPage() {
           <div className="size-16 rounded-full border-4 border-fuel border-t-transparent animate-spin mx-auto mb-5" />
           <h2 className="text-xl font-bold mb-2">Confirming your donation…</h2>
           <p className="text-muted-foreground text-sm">Hang tight — we're locking in your gallons.</p>
+          {captureError && (
+            <p className="text-destructive text-xs mt-3">{captureError}</p>
+          )}
         </div>
       </div>
     );
@@ -252,23 +271,16 @@ export function DonationSuccessPage() {
           </Reveal>
         )}
 
-        {/* Secondary actions */}
-        <Reveal className="flex flex-col gap-2">
-          {creator && (
-            <Button className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90" asChild>
+        {/* Back to creator */}
+        {creator && (
+          <Reveal>
+            <Button variant="ghost" className="w-full text-muted-foreground" asChild>
               <Link to={`/${creator.slug}`}>
-                <Heart className="size-4 mr-1.5" /> View {creator.displayName}'s Campaign
+                <ArrowRight className="size-4 mr-2" /> Back to {creator.displayName}'s page
               </Link>
             </Button>
-          )}
-          <Button variant="outline" className="w-full" asChild>
-            <Link to="/explore">
-              <Fuel className="size-4 mr-1.5" /> Fuel Another Campaign
-              <ArrowRight className="size-3.5 ml-1" />
-            </Link>
-          </Button>
-        </Reveal>
-
+          </Reveal>
+        )}
       </div>
     </div>
   );
