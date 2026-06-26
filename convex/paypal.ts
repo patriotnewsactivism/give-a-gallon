@@ -6,11 +6,12 @@ import { action } from "./_generated/server";
 
 async function getPayPalToken(): Promise<string> {
   const clientId = process.env.PAYPAL_CLIENT_ID;
-  const secret   = process.env.PAYPAL_SECRET;
+  const secret = process.env.PAYPAL_SECRET;
   if (!clientId || !secret) throw new Error("PayPal not configured");
-  const base = process.env.PAYPAL_ENV === "sandbox"
-    ? "https://api-m.sandbox.paypal.com"
-    : "https://api-m.paypal.com";
+  const base =
+    process.env.PAYPAL_ENV === "sandbox"
+      ? "https://api-m.sandbox.paypal.com"
+      : "https://api-m.paypal.com";
   const res = await fetch(`${base}/v1/oauth2/token`, {
     method: "POST",
     headers: {
@@ -39,23 +40,30 @@ export const createCheckoutSession = action({
     isAnonymous: v.boolean(),
     referralCode: v.optional(v.string()),
   },
-  handler: async (ctx, args): Promise<{ url: string; orderId: string; donationId: string }> => {
-    if (args.gallons < 1 || args.gallons > 1000) throw new Error("Gallons must be between 1 and 1000");
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ url: string; orderId: string; donationId: string }> => {
+    if (args.gallons < 1 || args.gallons > 1000)
+      throw new Error("Gallons must be between 1 and 1000");
     const amountCents = Math.round(args.gallons * 425);
     const platformFeeCents = Math.round(amountCents * 0.05);
     const amountUSD = (amountCents / 100).toFixed(2);
 
-    const donationId: string = await ctx.runMutation(internal.paypalMutations.createPendingDonation, {
-      creatorId: args.creatorId,
-      gallons: args.gallons,
-      amountCents,
-      platformFeeCents,
-      donorName: args.donorName,
-      donorEmail: args.donorEmail,
-      message: args.message,
-      isAnonymous: args.isAnonymous,
-      referralCode: args.referralCode,
-    });
+    const donationId: string = await ctx.runMutation(
+      internal.paypalMutations.createPendingDonation,
+      {
+        creatorId: args.creatorId,
+        gallons: args.gallons,
+        amountCents,
+        platformFeeCents,
+        donorName: args.donorName,
+        donorEmail: args.donorEmail,
+        message: args.message,
+        isAnonymous: args.isAnonymous,
+        referralCode: args.referralCode,
+      },
+    );
 
     const siteUrl = process.env.SITE_URL || "https://www.giveagallon.org";
     const token = await getPayPalToken();
@@ -69,12 +77,14 @@ export const createCheckoutSession = action({
       },
       body: JSON.stringify({
         intent: "CAPTURE",
-        purchase_units: [{
-          reference_id: donationId,
-          description: `${args.gallons} Gallon${args.gallons > 1 ? "s" : ""} of Fuel — Give-A-Gallon`,
-          custom_id: donationId,
-          amount: { currency_code: "USD", value: amountUSD },
-        }],
+        purchase_units: [
+          {
+            reference_id: donationId,
+            description: `${args.gallons} Gallon${args.gallons > 1 ? "s" : ""} of Fuel — Give-A-Gallon`,
+            custom_id: donationId,
+            amount: { currency_code: "USD", value: amountUSD },
+          },
+        ],
         application_context: {
           brand_name: "Give-A-Gallon",
           landing_page: "NO_PREFERENCE",
@@ -85,12 +95,15 @@ export const createCheckoutSession = action({
       }),
     });
 
-    if (!orderRes.ok) throw new Error(`Failed to create PayPal order: ${await orderRes.text()}`);
-    const orderData = await orderRes.json() as {
+    if (!orderRes.ok)
+      throw new Error(
+        `Failed to create PayPal order: ${await orderRes.text()}`,
+      );
+    const orderData = (await orderRes.json()) as {
       id: string;
       links: Array<{ rel: string; href: string }>;
     };
-    const approveLink = orderData.links?.find((l) => l.rel === "approve")?.href;
+    const approveLink = orderData.links?.find(l => l.rel === "approve")?.href;
     if (!approveLink) throw new Error("No PayPal approve link returned");
 
     await ctx.runMutation(internal.paypalMutations.setPayPalOrderId, {
@@ -104,14 +117,24 @@ export const createCheckoutSession = action({
 
 export const captureOrder = action({
   args: { orderId: v.string() },
-  handler: async (ctx, { orderId }): Promise<{ success: boolean; donationId: string }> => {
+  handler: async (
+    ctx,
+    { orderId },
+  ): Promise<{ success: boolean; donationId: string }> => {
     const token = await getPayPalToken();
-    const res = await fetch(`${paypalBase()}/v2/checkout/orders/${orderId}/capture`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    });
-    if (!res.ok) throw new Error(`Failed to capture PayPal order: ${await res.text()}`);
-    const data = await res.json() as {
+    const res = await fetch(
+      `${paypalBase()}/v2/checkout/orders/${orderId}/capture`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (!res.ok)
+      throw new Error(`Failed to capture PayPal order: ${await res.text()}`);
+    const data = (await res.json()) as {
       purchase_units: Array<{
         custom_id?: string;
         reference_id?: string;
@@ -119,10 +142,14 @@ export const captureOrder = action({
       }>;
     };
     const unit = data.purchase_units?.[0];
-    const donationId  = unit?.custom_id || unit?.reference_id;
-    const captureId   = unit?.payments?.captures?.[0]?.id;
-    if (!donationId) throw new Error("No donationId in PayPal capture response");
-    await ctx.runMutation(internal.paypalMutations.completeDonation, { donationId, paypalCaptureId: captureId });
+    const donationId = unit?.custom_id || unit?.reference_id;
+    const captureId = unit?.payments?.captures?.[0]?.id;
+    if (!donationId)
+      throw new Error("No donationId in PayPal capture response");
+    await ctx.runMutation(internal.paypalMutations.completeDonation, {
+      donationId,
+      paypalCaptureId: captureId,
+    });
     return { success: true, donationId };
   },
 });
@@ -139,12 +166,19 @@ export const handleWebhook = action({
       };
     };
     const eventType = event.event_type;
-    if (eventType === "CHECKOUT.ORDER.APPROVED" || eventType === "PAYMENT.CAPTURE.COMPLETED") {
+    if (
+      eventType === "CHECKOUT.ORDER.APPROVED" ||
+      eventType === "PAYMENT.CAPTURE.COMPLETED"
+    ) {
       const resource = event.resource;
-      const donationId = resource?.custom_id || resource?.purchase_units?.[0]?.custom_id;
-      const captureId  = resource?.id;
+      const donationId =
+        resource?.custom_id || resource?.purchase_units?.[0]?.custom_id;
+      const captureId = resource?.id;
       if (donationId) {
-        await ctx.runMutation(internal.paypalMutations.completeDonation, { donationId, paypalCaptureId: captureId });
+        await ctx.runMutation(internal.paypalMutations.completeDonation, {
+          donationId,
+          paypalCaptureId: captureId,
+        });
       }
     }
     return { received: true };

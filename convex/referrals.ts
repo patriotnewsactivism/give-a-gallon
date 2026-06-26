@@ -8,6 +8,7 @@
  *  4. Referrer earns bonus gallons / leaderboard position
  */
 
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import {
   internalMutation,
@@ -15,11 +16,13 @@ import {
   mutation,
   query,
 } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
 
 // ── Generate a short unique code ──────────────────────────────────────────────
 function generateCode(slug: string): string {
-  const base = slug.replace(/[^a-z0-9]/gi, "").slice(0, 6).toUpperCase();
+  const base = slug
+    .replace(/[^a-z0-9]/gi, "")
+    .slice(0, 6)
+    .toUpperCase();
   const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
   return `${base}${rand}`;
 }
@@ -27,13 +30,13 @@ function generateCode(slug: string): string {
 // ── Get or create a referral code for the authenticated creator ───────────────
 export const getMyReferralCode = mutation({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const userId = await getAuthUserId(ctx);
     if (!userId) throw new Error("Not authenticated");
 
     const creator = await ctx.db
       .query("creators")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .withIndex("by_userId", q => q.eq("userId", userId))
       .first();
     if (!creator) throw new Error("Creator profile not found");
 
@@ -44,7 +47,7 @@ export const getMyReferralCode = mutation({
     // Check uniqueness
     const existing = await ctx.db
       .query("creators")
-      .withIndex("by_referralCode", (q) => q.eq("referralCode", code))
+      .withIndex("by_referralCode", q => q.eq("referralCode", code))
       .first();
     if (existing) {
       code = generateCode(creator.slug + Date.now().toString(36));
@@ -69,21 +72,23 @@ export const updateReferralCode = mutation({
 
     const creator = await ctx.db
       .query("creators")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .withIndex("by_userId", q => q.eq("userId", userId))
       .first();
     if (!creator) throw new Error("Creator profile not found");
 
     // Clean and validate code
     const newCode = code.replace(/[^a-z0-9_-]/gi, "").toUpperCase();
-    if (newCode.length < 3) throw new Error("Code must be at least 3 characters");
-    if (newCode.length > 20) throw new Error("Code must be 20 characters or less");
+    if (newCode.length < 3)
+      throw new Error("Code must be at least 3 characters");
+    if (newCode.length > 20)
+      throw new Error("Code must be 20 characters or less");
 
     // Check uniqueness
     const existing = await ctx.db
       .query("creators")
-      .withIndex("by_referralCode", (q) => q.eq("referralCode", newCode))
+      .withIndex("by_referralCode", q => q.eq("referralCode", newCode))
       .first();
-    
+
     if (existing && existing._id !== creator._id) {
       throw new Error("This referral code is already taken");
     }
@@ -99,13 +104,13 @@ export const updateReferralCode = mutation({
 // ── Get referral stats for the authenticated creator ──────────────────────────
 export const getMyReferralStats = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
     const creator = await ctx.db
       .query("creators")
-      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .withIndex("by_userId", q => q.eq("userId", userId))
       .first();
     if (!creator) return null;
 
@@ -113,11 +118,11 @@ export const getMyReferralStats = query({
     const referredDonations = creator.referralCode
       ? await ctx.db
           .query("donations")
-          .filter((q) =>
+          .filter(q =>
             q.and(
               q.eq(q.field("referralCode"), creator.referralCode),
-              q.eq(q.field("status"), "completed")
-            )
+              q.eq(q.field("status"), "completed"),
+            ),
           )
           .collect()
       : [];
@@ -141,11 +146,11 @@ export const getMyReferralStats = query({
     // Top referrers leaderboard (all creators, sorted by referralGallons)
     const allCreators = await ctx.db
       .query("creators")
-      .filter((q) =>
+      .filter(q =>
         q.and(
           q.gt(q.field("referralGallons"), 0),
-          q.eq(q.field("isActive"), true)
-        )
+          q.eq(q.field("isActive"), true),
+        ),
       )
       .collect();
 
@@ -179,7 +184,7 @@ export const getCreatorByReferralCode = internalQuery({
   handler: async (ctx, { code }) => {
     return ctx.db
       .query("creators")
-      .withIndex("by_referralCode", (q) => q.eq("referralCode", code))
+      .withIndex("by_referralCode", q => q.eq("referralCode", code))
       .first();
   },
 });
@@ -194,7 +199,7 @@ export const creditReferral = internalMutation({
   handler: async (ctx, { referralCode, gallons, donationId }) => {
     const referrer = await ctx.db
       .query("creators")
-      .withIndex("by_referralCode", (q) => q.eq("referralCode", referralCode))
+      .withIndex("by_referralCode", q => q.eq("referralCode", referralCode))
       .first();
     if (!referrer) return;
 
@@ -213,14 +218,14 @@ export const creditReferral = internalMutation({
 // ── Public leaderboard (no auth required) ─────────────────────────────────────
 export const getReferralLeaderboard = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const creators = await ctx.db
       .query("creators")
-      .filter((q) =>
+      .filter(q =>
         q.and(
           q.gt(q.field("referralGallons"), 0),
-          q.eq(q.field("isActive"), true)
-        )
+          q.eq(q.field("isActive"), true),
+        ),
       )
       .collect();
 

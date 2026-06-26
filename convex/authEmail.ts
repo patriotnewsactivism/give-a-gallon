@@ -28,13 +28,15 @@ async function sendEmail({
   const fromEmail = process.env.RESEND_FROM_EMAIL ?? "alerts@giveagallon.org";
 
   if (!apiKey) {
-    throw new Error("RESEND_API_KEY is not set. Add it to your Convex environment variables.");
+    throw new Error(
+      "RESEND_API_KEY is not set. Add it to your Convex environment variables.",
+    );
   }
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({

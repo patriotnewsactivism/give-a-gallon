@@ -28,7 +28,12 @@ export function FuelGaugeMark({
   };
 
   return (
-    <svg viewBox="0 0 24 24" fill="none" className={cn(className)} aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={cn(className)}
+      aria-hidden="true"
+    >
       {/* Track */}
       <path
         d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}

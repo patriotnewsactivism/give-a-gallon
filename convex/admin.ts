@@ -4,9 +4,9 @@
  * the ADMIN_EMAIL environment variable (set in Convex dashboard).
  */
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import { mutation, query } from "./_generated/server";
 
 // ── Auth helper ────────────────────────────────────────────────────────────
 async function assertAdmin(ctx: any) {
@@ -33,7 +33,7 @@ export const seedDemoData = mutation({
 // ── Admin: check if current user is admin ────────────────────────────────
 export const isAdmin = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return false;
     const user = await ctx.db.get(userId);
@@ -46,23 +46,20 @@ export const isAdmin = query({
 // ── Admin: full creator list with user + donation stats ──────────────────
 export const listAllCreators = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     await assertAdmin(ctx);
 
-    const creators = await ctx.db
-      .query("creators")
-      .order("desc")
-      .collect();
+    const creators = await ctx.db.query("creators").order("desc").collect();
 
     const results = await Promise.all(
-      creators.map(async (c) => {
+      creators.map(async c => {
         // Get the user record for last login
         const user = await ctx.db.get(c.userId);
 
         // Get auth sessions to find last login time
         const sessions = await ctx.db
           .query("authSessions")
-          .filter((q) => q.eq(q.field("userId"), c.userId))
+          .filter(q => q.eq(q.field("userId"), c.userId))
           .order("desc")
           .take(1);
 
@@ -71,18 +68,19 @@ export const listAllCreators = query({
         // Get most recent completed donation
         const lastDonation = await ctx.db
           .query("donations")
-          .withIndex("by_creator", (q) => q.eq("creatorId", c._id))
+          .withIndex("by_creator", q => q.eq("creatorId", c._id))
           .order("desc")
           .first();
 
-        const lastDonationCompleted = lastDonation?.status === "completed"
-          ? lastDonation
-          : await ctx.db
-              .query("donations")
-              .withIndex("by_creator", (q) => q.eq("creatorId", c._id))
-              .filter((q) => q.eq(q.field("status"), "completed"))
-              .order("desc")
-              .first();
+        const lastDonationCompleted =
+          lastDonation?.status === "completed"
+            ? lastDonation
+            : await ctx.db
+                .query("donations")
+                .withIndex("by_creator", q => q.eq("creatorId", c._id))
+                .filter(q => q.eq(q.field("status"), "completed"))
+                .order("desc")
+                .first();
 
         return {
           _id: c._id,
@@ -105,7 +103,7 @@ export const listAllCreators = query({
           lastDonationGallons: lastDonationCompleted?.gallons ?? null,
           hasActiveGoal: !!(c.goal && c.goal > 0 && c.totalGallons < c.goal),
         };
-      })
+      }),
     );
 
     return results;
@@ -115,30 +113,30 @@ export const listAllCreators = query({
 // ── Admin: platform-wide stats snapshot ──────────────────────────────────
 export const getPlatformOverview = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     await assertAdmin(ctx);
 
     const creators = await ctx.db.query("creators").collect();
-    const activeCreators = creators.filter((c) => c.isActive);
+    const activeCreators = creators.filter(c => c.isActive);
 
     const allDonations = await ctx.db
       .query("donations")
-      .withIndex("by_status", (q) => q.eq("status", "completed"))
+      .withIndex("by_status", q => q.eq("status", "completed"))
       .order("desc")
       .take(500);
 
     const subscriptions = await ctx.db
       .query("subscriptions")
-      .withIndex("by_status", (q) => q.eq("status", "active"))
+      .withIndex("by_status", q => q.eq("status", "active"))
       .collect();
 
     // Donations in last 24h
     const since24h = Date.now() - 86400000;
-    const recent24h = allDonations.filter((d) => d.createdAt > since24h);
+    const recent24h = allDonations.filter(d => d.createdAt > since24h);
 
     // Donations in last 7d
     const since7d = Date.now() - 7 * 86400000;
-    const recent7d = allDonations.filter((d) => d.createdAt > since7d);
+    const recent7d = allDonations.filter(d => d.createdAt > since7d);
 
     return {
       totalCreators: creators.length,
@@ -147,7 +145,10 @@ export const getPlatformOverview = query({
       totalAmountCents: allDonations.reduce((s, d) => s + d.amountCents, 0),
       totalDonations: allDonations.length,
       activeSubscriptions: subscriptions.length,
-      monthlyRecurringCents: subscriptions.reduce((s, s2) => s + s2.amountCents, 0),
+      monthlyRecurringCents: subscriptions.reduce(
+        (s, s2) => s + s2.amountCents,
+        0,
+      ),
       last24hDonations: recent24h.length,
       last24hAmountCents: recent24h.reduce((s, d) => s + d.amountCents, 0),
       last24hGallons: recent24h.reduce((s, d) => s + d.gallons, 0),
@@ -165,12 +166,12 @@ export const listAllDonations = query({
 
     const donations = await ctx.db
       .query("donations")
-      .withIndex("by_status", (q) => q.eq("status", "completed"))
+      .withIndex("by_status", q => q.eq("status", "completed"))
       .order("desc")
       .take(limit ?? 100);
 
     return await Promise.all(
-      donations.map(async (d) => {
+      donations.map(async d => {
         const creator = await ctx.db.get(d.creatorId);
         return {
           _id: d._id,
@@ -183,7 +184,7 @@ export const listAllDonations = query({
           creatorName: creator?.displayName ?? "Unknown",
           creatorSlug: creator?.slug ?? null,
         };
-      })
+      }),
     );
   },
 });
@@ -223,7 +224,7 @@ export const sendNotification = mutation({
 // ── Admin: list sent notifications ───────────────────────────────────────
 export const listNotifications = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     await assertAdmin(ctx);
     return await ctx.db
       .query("notifications")

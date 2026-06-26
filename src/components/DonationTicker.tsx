@@ -57,14 +57,14 @@ export function DonationTicker({ donations, className }: DonationTickerProps) {
 
       {/* Feed */}
       <div className="space-y-1.5">
-        {donations.map((d) => (
+        {donations.map(d => (
           <div
             key={d._id}
             className={cn(
               "flex items-center gap-2.5 px-3 py-2 rounded-lg border text-sm transition-colors duration-700",
               d._id === flashId
                 ? "border-fuel/40 bg-fuel/[0.07]"
-                : "border-border/30 bg-card/30"
+                : "border-border/30 bg-card/30",
             )}
           >
             <FuelGaugeMark className="size-3.5 text-fuel shrink-0" />
@@ -81,7 +81,7 @@ export function DonationTicker({ donations, className }: DonationTickerProps) {
                     <Link
                       to={`/${d.creatorSlug}`}
                       className="font-medium text-foreground hover:text-fuel transition-colors"
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={e => e.stopPropagation()}
                     >
                       {d.creatorName}
                     </Link>

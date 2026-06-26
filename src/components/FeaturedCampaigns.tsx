@@ -3,15 +3,15 @@
  * Shows isFeatured=true campaigns with optional featuredNote
  */
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { ExternalLink, Fuel, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Fuel, Star, ExternalLink } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
+import { api } from "../../convex/_generated/api";
 import { VERIFICATION_TIERS } from "../../convex/constants";
 
 const NETWORK_LABEL: Record<string, { label: string; color: string }> = {
-  wtpnews:       { label: "WTP News Pick", color: "text-fuel" },
-  civilrightshub:{ label: "Civil Rights Hub Pick", color: "text-blue-400" },
+  wtpnews: { label: "WTP News Pick", color: "text-fuel" },
+  civilrightshub: { label: "Civil Rights Hub Pick", color: "text-blue-400" },
 };
 
 export function FeaturedCampaigns() {
@@ -32,17 +32,27 @@ export function FeaturedCampaigns() {
                 Campaigns We Believe In
               </h2>
             </div>
-            <Link to="/explore" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              to="/explore"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
               Browse all →
             </Link>
           </div>
         </Reveal>
 
         <div className="grid sm:grid-cols-2 gap-4">
-          {featured.map((creator) => {
-            const tier = VERIFICATION_TIERS[(creator.verificationStatus ?? "unverified") as keyof typeof VERIFICATION_TIERS];
+          {featured.map(creator => {
+            const tier =
+              VERIFICATION_TIERS[
+                (creator.verificationStatus ??
+                  "unverified") as keyof typeof VERIFICATION_TIERS
+              ];
             const progress = creator.goal
-              ? Math.min(100, Math.round((creator.totalGallons / creator.goal) * 100))
+              ? Math.min(
+                  100,
+                  Math.round((creator.totalGallons / creator.goal) * 100),
+                )
               : null;
             const networkLabel = creator.networkSource
               ? NETWORK_LABEL[creator.networkSource]
@@ -70,7 +80,9 @@ export function FeaturedCampaigns() {
                   <div className="p-4">
                     {/* Network source badge */}
                     {networkLabel && (
-                      <div className={`text-xs font-semibold mb-1.5 ${networkLabel.color}`}>
+                      <div
+                        className={`text-xs font-semibold mb-1.5 ${networkLabel.color}`}
+                      >
                         ✦ {networkLabel.label}
                       </div>
                     )}
@@ -78,7 +90,11 @@ export function FeaturedCampaigns() {
                     {/* Creator info */}
                     <div className="flex items-start gap-3 mb-3">
                       {creator.avatarUrl ? (
-                        <img src={creator.avatarUrl} alt="" className="size-10 rounded-full object-cover border border-border/40 shrink-0" />
+                        <img
+                          src={creator.avatarUrl}
+                          alt=""
+                          className="size-10 rounded-full object-cover border border-border/40 shrink-0"
+                        />
                       ) : (
                         <div className="size-10 rounded-full bg-fuel/15 flex items-center justify-center text-sm font-bold text-fuel border border-fuel/20 shrink-0">
                           {creator.displayName[0]}
@@ -88,9 +104,12 @@ export function FeaturedCampaigns() {
                         <div className="font-bold truncate group-hover:text-fuel transition-colors">
                           {creator.displayName}
                         </div>
-                        {tier && creator.verificationStatus !== "unverified" && (
-                          <span className={`text-xs ${tier.color}`}>{tier.badge} {tier.label}</span>
-                        )}
+                        {tier &&
+                          creator.verificationStatus !== "unverified" && (
+                            <span className={`text-xs ${tier.color}`}>
+                              {tier.badge} {tier.label}
+                            </span>
+                          )}
                       </div>
                       <ExternalLink className="size-3.5 text-muted-foreground/30 group-hover:text-muted-foreground shrink-0 mt-1 ml-auto transition-colors" />
                     </div>

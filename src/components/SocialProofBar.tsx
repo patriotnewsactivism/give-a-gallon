@@ -83,7 +83,9 @@ export function SocialProofBar() {
         <Fuel className="size-4 text-fuel shrink-0" />
 
         <span className="flex-1 min-w-0 text-muted-foreground leading-snug">
-          <span className="font-semibold text-foreground">{toast.donorName}</span>
+          <span className="font-semibold text-foreground">
+            {toast.donorName}
+          </span>
           {" just gave "}
           <span className="font-bold text-fuel">{toast.gallons} gal</span>
           {toast.creatorSlug && toast.creatorName && (

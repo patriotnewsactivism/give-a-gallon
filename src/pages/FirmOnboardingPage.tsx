@@ -1,19 +1,19 @@
 import { useQuery } from "convex/react";
 import {
   ArrowRight,
-  Shield,
-  Zap,
   CheckCircle2,
-  Users,
   Fuel,
+  Shield,
   TrendingUp,
+  Users,
+  Zap,
 } from "lucide-react";
-import { Link, useParams, Navigate } from "react-router-dom";
-import { api } from "../../convex/_generated/api";
+import { useEffect } from "react";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useEffect } from "react";
 import { setReferral } from "@/hooks/useReferral";
+import { api } from "../../convex/_generated/api";
 
 export default function FirmOnboardingPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -52,9 +52,16 @@ export default function FirmOnboardingPage() {
           <div className="flex items-center gap-4">
             <div className="size-20 rounded-2xl bg-card border border-border/40 flex items-center justify-center overflow-hidden shadow-xl">
               {creator.avatarUrl ? (
-                <img src={creator.avatarUrl} alt={creator.displayName} className="size-full object-cover" />
+                <img
+                  src={creator.avatarUrl}
+                  alt={creator.displayName}
+                  className="size-full object-cover"
+                />
               ) : (
-                <span className="text-3xl font-bold text-amber-400" style={{ fontFamily: "var(--font-display)" }}>
+                <span
+                  className="text-3xl font-bold text-amber-400"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
                   {creator.displayName.charAt(0)}
                 </span>
               )}
@@ -70,11 +77,15 @@ export default function FirmOnboardingPage() {
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider">
               <Shield className="size-3" /> {creator.displayName} Network
             </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+            <h1
+              className="text-3xl md:text-4xl font-extrabold tracking-tight"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
               START YOUR CAMPAIGN
             </h1>
             <p className="text-muted-foreground leading-relaxed">
-              Join the {creator.displayName} network on Give-A-Gallon and get the fuel you need to keep fighting.
+              Join the {creator.displayName} network on Give-A-Gallon and get
+              the fuel you need to keep fighting.
             </p>
           </div>
         </div>
@@ -86,27 +97,31 @@ export default function FirmOnboardingPage() {
               icon: Zap,
               title: "Instant Payouts",
               desc: "Donations arrive on your PayPal account in ~30 minutes. No waiting for weekly payouts.",
-              color: "text-amber-400"
+              color: "text-amber-400",
             },
             {
               icon: Users,
               title: "Built-in Network",
               desc: `Joining through ${creator.displayName} gives your campaign immediate social proof and visibility.`,
-              color: "text-blue-400"
+              color: "text-blue-400",
             },
             {
               icon: TrendingUp,
               title: "Referral Bonus",
               desc: "Earn extra gallons for every donor you bring to the platform. We grow together.",
-              color: "text-green-400"
-            }
+              color: "text-green-400",
+            },
           ].map((feature, i) => (
             <Card key={i} className="p-6 bg-card/40 border-border/40 space-y-3">
-              <div className={`w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center ${feature.color}`}>
+              <div
+                className={`w-12 h-12 rounded-xl bg-muted/50 flex items-center justify-center ${feature.color}`}
+              >
                 <feature.icon className="size-6" />
               </div>
               <h3 className="font-bold text-lg">{feature.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {feature.desc}
+              </p>
             </Card>
           ))}
         </div>
@@ -116,23 +131,32 @@ export default function FirmOnboardingPage() {
           <div className="space-y-4 max-w-xl">
             <h2 className="text-2xl font-bold">Ready to get fueled?</h2>
             <p className="text-muted-foreground">
-              Setting up your campaign takes less than 5 minutes. Connect your PayPal account and start raising fuel for your mission today.
+              Setting up your campaign takes less than 5 minutes. Connect your
+              PayPal account and start raising fuel for your mission today.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-            <Button size="lg" className="flex-1 bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold text-lg h-14" asChild>
+            <Button
+              size="lg"
+              className="flex-1 bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold text-lg h-14"
+              asChild
+            >
               <Link to="/signup">
                 Create My Campaign <ArrowRight className="ml-2 size-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="flex-1 h-14 font-bold" asChild>
-              <Link to={`/${creator.slug}`}>
-                View {creator.displayName}
-              </Link>
+            <Button
+              size="lg"
+              variant="outline"
+              className="flex-1 h-14 font-bold"
+              asChild
+            >
+              <Link to={`/${creator.slug}`}>View {creator.displayName}</Link>
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            By joining, you'll be part of the verified network of {creator.displayName}.
+            By joining, you'll be part of the verified network of{" "}
+            {creator.displayName}.
           </p>
         </div>
 

@@ -101,7 +101,9 @@ export function SignIn() {
               try {
                 await signIn("password", formData);
               } catch (err: any) {
-                setError(err?.message ?? "Invalid or expired code. Please try again.");
+                setError(
+                  err?.message ?? "Invalid or expired code. Please try again.",
+                );
               } finally {
                 setLoading(false);
               }
@@ -153,7 +155,8 @@ export function SignIn() {
                   // Stay on verify screen to enter the code
                 } catch (err: any) {
                   setError(
-                    err?.message ?? "Could not send new code. Please try again.",
+                    err?.message ??
+                      "Could not send new code. Please try again.",
                   );
                 } finally {
                   setLoading(false);
@@ -194,7 +197,9 @@ export function SignIn() {
               try {
                 await signIn("password", formData);
               } catch (err: any) {
-                setError(err?.message ?? "Invalid code or password. Please try again.");
+                setError(
+                  err?.message ?? "Invalid code or password. Please try again.",
+                );
               } finally {
                 setLoading(false);
               }

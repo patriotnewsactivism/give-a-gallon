@@ -1,4 +1,4 @@
-import { Fuel, ArrowLeft } from "lucide-react";
+import { ArrowLeft, Fuel } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -16,16 +16,15 @@ export function DonationCancelPage() {
           Donation Cancelled
         </h1>
         <p className="text-muted-foreground mb-6">
-          No worries — no charge was made. You can always come back and give a gallon later.
+          No worries — no charge was made. You can always come back and give a
+          gallon later.
         </p>
         <div className="flex flex-col gap-3">
           <Button
             className="bg-fuel text-fuel-foreground hover:bg-fuel/90"
             asChild
           >
-            <Link to="/explore">
-              Browse Activists
-            </Link>
+            <Link to="/explore">Browse Activists</Link>
           </Button>
           <Button variant="outline" asChild>
             <Link to="/">

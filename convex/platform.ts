@@ -2,7 +2,7 @@ import { internalMutation, query } from "./_generated/server";
 
 export const getStats = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const stats = await ctx.db
       .query("platformStats")
       .withIndex("by_key", q => q.eq("key", "global"))
@@ -21,9 +21,14 @@ export const getStats = query({
       .withIndex("by_active", q => q.eq("isActive", true))
       .collect();
 
-    const totalDonationsCents = donations.reduce((s, d) => s + d.amountCents, 0);
+    const totalDonationsCents = donations.reduce(
+      (s, d) => s + d.amountCents,
+      0,
+    );
     const totalGallons = donations.reduce((s, d) => s + d.gallons, 0);
-    const uniqueDonors = new Set(donations.map(d => d.donorEmail).filter(Boolean)).size;
+    const uniqueDonors = new Set(
+      donations.map(d => d.donorEmail).filter(Boolean),
+    ).size;
 
     return {
       totalDonationsCents,
@@ -39,7 +44,7 @@ export const getStats = query({
 
 export const recompute = internalMutation({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const donations = await ctx.db
       .query("donations")
       .withIndex("by_status", q => q.eq("status", "completed"))
@@ -50,9 +55,14 @@ export const recompute = internalMutation({
       .withIndex("by_active", q => q.eq("isActive", true))
       .collect();
 
-    const totalDonationsCents = donations.reduce((s, d) => s + d.amountCents, 0);
+    const totalDonationsCents = donations.reduce(
+      (s, d) => s + d.amountCents,
+      0,
+    );
     const totalGallons = donations.reduce((s, d) => s + d.gallons, 0);
-    const uniqueDonors = new Set(donations.map(d => d.donorEmail).filter(Boolean)).size;
+    const uniqueDonors = new Set(
+      donations.map(d => d.donorEmail).filter(Boolean),
+    ).size;
 
     const existing = await ctx.db
       .query("platformStats")

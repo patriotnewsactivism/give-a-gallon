@@ -11,10 +11,9 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { api } from "../../convex/_generated/api";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
-
+import { api } from "../../convex/_generated/api";
 
 function ReferralShare({ slug, code }: { slug: string; code: string }) {
   const [copied, setCopied] = useState(false);
@@ -39,8 +38,20 @@ function ReferralShare({ slug, code }: { slug: string; code: string }) {
       <code className="flex-1 truncate rounded-lg bg-muted/30 border border-border/30 px-2.5 py-1.5 text-xs font-mono text-muted-foreground">
         {refUrl}
       </code>
-      <Button size="sm" variant="outline" onClick={shareNative} className="shrink-0">
-        {copied ? "Copied!" : <><Share2 className="size-3.5 mr-1" />Share</>}
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={shareNative}
+        className="shrink-0"
+      >
+        {copied ? (
+          "Copied!"
+        ) : (
+          <>
+            <Share2 className="size-3.5 mr-1" />
+            Share
+          </>
+        )}
       </Button>
     </div>
   );
@@ -58,12 +69,12 @@ export function DonationSuccessPage() {
   // Poll for the donation record tied to this session
   const donation = useQuery(
     api.donations.getByPayPalOrder,
-    sessionId ? { sessionId } : "skip"
+    sessionId ? { sessionId } : "skip",
   );
 
   const creator = useQuery(
     api.creators.getById,
-    donation?.creatorId ? { id: donation.creatorId } : "skip"
+    donation?.creatorId ? { id: donation.creatorId } : "skip",
   );
 
   const [copied, setCopied] = useState(false);
@@ -99,7 +110,10 @@ export function DonationSuccessPage() {
             <div className="inline-flex items-center justify-center size-20 rounded-2xl bg-fuel/10 border border-fuel/20 mb-6">
               <Sparkles className="size-10 text-fuel" />
             </div>
-            <h1 className="text-3xl font-black mb-3" style={{ fontFamily: "var(--font-display)" }}>
+            <h1
+              className="text-3xl font-black mb-3"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
               Welcome to the Movement!
             </h1>
             <p className="text-muted-foreground mb-8 text-base">
@@ -107,7 +121,10 @@ export function DonationSuccessPage() {
               Every month your gallons flow to the people doing the work.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button className="bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold" asChild>
+              <Button
+                className="bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold"
+                asChild
+              >
                 <Link to="/dashboard">
                   <Fuel className="size-4 mr-2" /> Go to Dashboard
                 </Link>
@@ -122,10 +139,13 @@ export function DonationSuccessPage() {
     );
   }
 
-  const shareUrl = creator ? `${window.location.origin}/${creator.slug}` : window.location.origin;
-  const shareText = creator && donation
-    ? `I just fueled ${creator.displayName} with ${donation.gallons} gallon${donation.gallons !== 1 ? "s" : ""} on @GiveAGallon ⛽ Every gallon counts. ${shareUrl}`
-    : `I just fueled a cause on @GiveAGallon ⛽ Every gallon counts. ${window.location.origin}`;
+  const shareUrl = creator
+    ? `${window.location.origin}/${creator.slug}`
+    : window.location.origin;
+  const shareText =
+    creator && donation
+      ? `I just fueled ${creator.displayName} with ${donation.gallons} gallon${donation.gallons !== 1 ? "s" : ""} on @GiveAGallon ⛽ Every gallon counts. ${shareUrl}`
+      : `I just fueled a cause on @GiveAGallon ⛽ Every gallon counts. ${window.location.origin}`;
 
   function copyLink() {
     navigator.clipboard.writeText(shareUrl);
@@ -134,7 +154,10 @@ export function DonationSuccessPage() {
   }
 
   function tweetIt() {
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, "_blank");
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`,
+      "_blank",
+    );
   }
 
   // If no session ID at all, something is wrong
@@ -142,21 +165,30 @@ export function DonationSuccessPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 text-center">
         <div>
-          <p className="text-muted-foreground mb-4">No session found. If you were charged, your donation went through.</p>
-          <a href="/explore" className="text-fuel underline">Back to campaigns</a>
+          <p className="text-muted-foreground mb-4">
+            No session found. If you were charged, your donation went through.
+          </p>
+          <a href="/explore" className="text-fuel underline">
+            Back to campaigns
+          </a>
         </div>
       </div>
     );
   }
 
   // Waiting for capture to complete
-  if (donation === undefined || (donation && donation.status === "pending" && waitSeconds < 15)) {
+  if (
+    donation === undefined ||
+    (donation && donation.status === "pending" && waitSeconds < 15)
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
           <div className="size-16 rounded-full border-4 border-fuel border-t-transparent animate-spin mx-auto mb-5" />
           <h2 className="text-xl font-bold mb-2">Confirming your donation…</h2>
-          <p className="text-muted-foreground text-sm">Hang tight — we're locking in your gallons.</p>
+          <p className="text-muted-foreground text-sm">
+            Hang tight — we're locking in your gallons.
+          </p>
           {captureError && (
             <p className="text-destructive text-xs mt-3">{captureError}</p>
           )}
@@ -168,7 +200,6 @@ export function DonationSuccessPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full">
-
         {/* Success card */}
         <Reveal className="rounded-2xl border border-fuel/20 bg-card/60 p-7 text-center mb-4">
           {/* Animated check */}
@@ -194,13 +225,21 @@ export function DonationSuccessPage() {
           {donation && creator ? (
             <p className="text-muted-foreground leading-relaxed mb-2">
               You gave{" "}
-              <span className="text-fuel font-bold">{donation.gallons} gallon{donation.gallons !== 1 ? "s" : ""}</span>
-              {" "}to{" "}
-              <Link to={`/${creator.slug}`} className="font-semibold text-foreground hover:text-fuel transition-colors">
+              <span className="text-fuel font-bold">
+                {donation.gallons} gallon{donation.gallons !== 1 ? "s" : ""}
+              </span>{" "}
+              to{" "}
+              <Link
+                to={`/${creator.slug}`}
+                className="font-semibold text-foreground hover:text-fuel transition-colors"
+              >
                 {creator.displayName}
-              </Link>
-              {" "}— that's{" "}
-              <span className="font-semibold">≈{Math.round(donation.gallons * 30)} miles</span> of road.
+              </Link>{" "}
+              — that's{" "}
+              <span className="font-semibold">
+                ≈{Math.round(donation.gallons * 30)} miles
+              </span>{" "}
+              of road.
             </p>
           ) : (
             <p className="text-muted-foreground leading-relaxed mb-2">
@@ -211,17 +250,23 @@ export function DonationSuccessPage() {
 
           {donation && (
             <p className="text-xs text-muted-foreground mb-4">
-              ${(donation.amountCents / 100).toFixed(2)} processed · 5% platform fee · ~92% to creator
+              ${(donation.amountCents / 100).toFixed(2)} processed · 5% platform
+              fee · ~92% to creator
             </p>
           )}
 
           {/* What happens next */}
           <div className="rounded-xl bg-muted/20 border border-border/30 p-4 text-left space-y-2 mb-5">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">What happens next</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+              What happens next
+            </p>
             {[
               { icon: "⛽", text: "Creator receives your gallons immediately" },
               { icon: "📍", text: "They'll post an update showing the impact" },
-              { icon: "✦", text: "You'll see their outcome on their campaign page" },
+              {
+                icon: "✦",
+                text: "You'll see their outcome on their campaign page",
+              },
             ].map(item => (
               <div key={item.text} className="flex items-start gap-2 text-sm">
                 <span className="shrink-0 text-base">{item.icon}</span>
@@ -261,11 +306,17 @@ export function DonationSuccessPage() {
                 <Link2 className="size-4 text-fuel" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold mb-0.5">Earn gallons for every friend you fuel</p>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Share {creator.displayName}'s referral link — you both get credit when friends donate.
+                <p className="text-sm font-semibold mb-0.5">
+                  Earn gallons for every friend you fuel
                 </p>
-                <ReferralShare slug={creator.slug} code={creator.referralCode} />
+                <p className="text-xs text-muted-foreground mb-3">
+                  Share {creator.displayName}'s referral link — you both get
+                  credit when friends donate.
+                </p>
+                <ReferralShare
+                  slug={creator.slug}
+                  code={creator.referralCode}
+                />
               </div>
             </div>
           </Reveal>
@@ -274,9 +325,14 @@ export function DonationSuccessPage() {
         {/* Back to creator */}
         {creator && (
           <Reveal>
-            <Button variant="ghost" className="w-full text-muted-foreground" asChild>
+            <Button
+              variant="ghost"
+              className="w-full text-muted-foreground"
+              asChild
+            >
               <Link to={`/${creator.slug}`}>
-                <ArrowRight className="size-4 mr-2" /> Back to {creator.displayName}'s page
+                <ArrowRight className="size-4 mr-2" /> Back to{" "}
+                {creator.displayName}'s page
               </Link>
             </Button>
           </Reveal>

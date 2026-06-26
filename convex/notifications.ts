@@ -6,7 +6,7 @@ import { query } from "./_generated/server";
 
 export const getRecent = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     return await ctx.db
       .query("notifications")
       .withIndex("by_created")
@@ -18,7 +18,7 @@ export const getRecent = query({
 // Alias for unauthenticated contexts
 export const getRecentPublic = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     return await ctx.db
       .query("notifications")
       .withIndex("by_created")

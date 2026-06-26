@@ -10,16 +10,16 @@ export const listForCreator = query({
   handler: async (ctx, { creatorId, limit }) => {
     const donations = await ctx.db
       .query("donations")
-      .withIndex("by_creator", (q) => q.eq("creatorId", creatorId))
+      .withIndex("by_creator", q => q.eq("creatorId", creatorId))
       .order("desc")
       .take(limit ?? 50);
 
     // Hide emails, show donor names (or "Anonymous")
-    return donations.map((d) => ({
+    return donations.map(d => ({
       _id: d._id,
       gallons: d.gallons,
       amountCents: d.amountCents,
-      donorName: d.isAnonymous ? "Anonymous" : (d.donorName || "Someone"),
+      donorName: d.isAnonymous ? "Anonymous" : d.donorName || "Someone",
       message: d.message,
       isAnonymous: d.isAnonymous,
       createdAt: d.createdAt,
@@ -81,23 +81,23 @@ export const getRecent = query({
   handler: async (ctx, { limit }) => {
     const donations = await ctx.db
       .query("donations")
-      .withIndex("by_status", (q) => q.eq("status", "completed"))
+      .withIndex("by_status", q => q.eq("status", "completed"))
       .order("desc")
       .take(limit ?? 8);
 
     const withCreators = await Promise.all(
-      donations.map(async (d) => {
+      donations.map(async d => {
         const creator = await ctx.db.get(d.creatorId);
         return {
           _id: d._id,
           gallons: d.gallons,
-          donorName: d.isAnonymous ? "Anonymous" : (d.donorName || "Someone"),
+          donorName: d.isAnonymous ? "Anonymous" : d.donorName || "Someone",
           message: d.message,
           createdAt: d.createdAt,
           creatorSlug: creator?.slug ?? "",
           creatorName: creator?.displayName ?? "",
         };
-      })
+      }),
     );
 
     return withCreators;
@@ -107,11 +107,11 @@ export const getRecent = query({
 // Get platform stats (public) — reads from materialized platformStats table
 export const platformStats = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     // Try the fast materialized record first
     const stats = await ctx.db
       .query("platformStats")
-      .withIndex("by_key", (q) => q.eq("key", "global"))
+      .withIndex("by_key", q => q.eq("key", "global"))
       .first();
 
     if (stats) {
@@ -126,9 +126,12 @@ export const platformStats = query({
 
     // Fallback: compute from creators (no stats record yet)
     const creators = await ctx.db.query("creators").collect();
-    const activeCreators = creators.filter((c) => c.isActive);
+    const activeCreators = creators.filter(c => c.isActive);
     const totalGallons = creators.reduce((sum, c) => sum + c.totalGallons, 0);
-    const totalDonations = creators.reduce((sum, c) => sum + c.totalDonations, 0);
+    const totalDonations = creators.reduce(
+      (sum, c) => sum + c.totalDonations,
+      0,
+    );
 
     return {
       totalCreators: activeCreators.length,
@@ -171,36 +174,38 @@ export const getByPayPalOrder = query({
 
 export const getMyDonations = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
 
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), identity.email))
+      .filter(q => q.eq(q.field("email"), identity.email))
       .first();
     if (!user) return [];
 
     // Match donations by email
     const donations = await ctx.db
       .query("donations")
-      .withIndex("by_status", (q) => q.eq("status", "completed"))
+      .withIndex("by_status", q => q.eq("status", "completed"))
       .order("desc")
       .collect();
 
     const myDonations = donations.filter(
-      (d) => d.donorEmail && d.donorEmail.toLowerCase() === (identity.email ?? "").toLowerCase()
+      d =>
+        d.donorEmail &&
+        d.donorEmail.toLowerCase() === (identity.email ?? "").toLowerCase(),
     );
 
     const withCreators = await Promise.all(
-      myDonations.map(async (d) => {
+      myDonations.map(async d => {
         const creator = await ctx.db.get(d.creatorId);
         // Get updates posted after this donation
         const updates = creator
           ? await ctx.db
               .query("updates")
-              .withIndex("by_creator", (q) =>
-                q.eq("creatorId", d.creatorId).gt("createdAt", d.createdAt)
+              .withIndex("by_creator", q =>
+                q.eq("creatorId", d.creatorId).gt("createdAt", d.createdAt),
               )
               .take(3)
           : [];
@@ -216,14 +221,14 @@ export const getMyDonations = query({
           creatorName: creator?.displayName ?? "",
           creatorCategory: creator?.category ?? "",
           creatorVerification: creator?.verificationStatus ?? "unverified",
-          recentUpdates: updates.map((u) => ({
+          recentUpdates: updates.map(u => ({
             _id: u._id,
             title: u.title,
             impactTag: u.impactTag,
             createdAt: u.createdAt,
           })),
         };
-      })
+      }),
     );
 
     return withCreators;
@@ -233,22 +238,28 @@ export const getMyDonations = query({
 // Donor impact summary
 export const getMyImpactSummary = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
 
     const donations = await ctx.db
       .query("donations")
-      .withIndex("by_status", (q) => q.eq("status", "completed"))
+      .withIndex("by_status", q => q.eq("status", "completed"))
       .collect();
 
     const myDonations = donations.filter(
-      (d) => d.donorEmail && d.donorEmail.toLowerCase() === (identity.email ?? "").toLowerCase()
+      d =>
+        d.donorEmail &&
+        d.donorEmail.toLowerCase() === (identity.email ?? "").toLowerCase(),
     );
 
     const totalGallons = myDonations.reduce((sum, d) => sum + d.gallons, 0);
-    const totalAmountCents = myDonations.reduce((sum, d) => sum + d.amountCents, 0);
-    const uniqueCreators = new Set(myDonations.map((d) => d.creatorId.toString())).size;
+    const totalAmountCents = myDonations.reduce(
+      (sum, d) => sum + d.amountCents,
+      0,
+    );
+    const uniqueCreators = new Set(myDonations.map(d => d.creatorId.toString()))
+      .size;
     const estimatedMiles = Math.round(totalGallons * 30); // ~30 miles per gallon
 
     return {

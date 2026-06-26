@@ -3,7 +3,7 @@ import { internalMutation } from "./_generated/server";
 
 export const seedCreators = internalMutation({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     // Check if we already have creators to avoid double-seeding
     const existing = await ctx.db.query("creators").take(1);
     if (existing.length > 0) return { message: "Creators already seeded" };
@@ -98,14 +98,27 @@ export const seedCreators = internalMutation({
       },
     ];
 
-    const creatorIds: { id: Id<"creators">; slug: string; displayName: string }[] = [];
+    const creatorIds: {
+      id: Id<"creators">;
+      slug: string;
+      displayName: string;
+    }[] = [];
     for (const creator of creators) {
       const id = await ctx.db.insert("creators", {
         ...creator,
-        verificationStatus: creator.verificationStatus as "unverified" | "community" | "journalist" | "organization" | "platform",
+        verificationStatus: creator.verificationStatus as
+          | "unverified"
+          | "community"
+          | "journalist"
+          | "organization"
+          | "platform",
         userId: "jd74v6ksf8m9p0q2r4t5v6x7" as any,
       });
-      creatorIds.push({ id, slug: creator.slug, displayName: creator.displayName });
+      creatorIds.push({
+        id,
+        slug: creator.slug,
+        displayName: creator.displayName,
+      });
     }
 
     // Seed some donations
@@ -146,6 +159,8 @@ export const seedCreators = internalMutation({
       });
     }
 
-    return { message: `${creators.length} creators, ${donationData.length} donations, and updates seeded` };
+    return {
+      message: `${creators.length} creators, ${donationData.length} donations, and updates seeded`,
+    };
   },
 });

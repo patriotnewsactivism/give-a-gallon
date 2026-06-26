@@ -1,7 +1,6 @@
 import { useAction, useMutation, useQuery } from "convex/react";
 import {
   AlertCircle,
-  Zap,
   ArrowDownToLine,
   CheckCircle2,
   Clock,
@@ -15,22 +14,23 @@ import {
   TrendingUp,
   Users,
   Wallet,
+  Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-import { api } from "../../convex/_generated/api";
 import { FuelGauge } from "@/components/FuelGauge";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { GALLON_PRICE } from "@/lib/constants";
+import { api } from "../../convex/_generated/api";
 
 export function DashboardPage() {
   const creator = useQuery(api.creators.getMine);
   const donations = useQuery(
     api.donations.listForCreator,
-    creator ? { creatorId: creator._id, limit: 50 } : "skip"
+    creator ? { creatorId: creator._id, limit: 50 } : "skip",
   );
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -56,11 +56,8 @@ export function DashboardPage() {
       <div className="p-6 space-y-4">
         <div className="h-8 w-48 bg-muted rounded animate-pulse" />
         <div className="grid sm:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-28 rounded-xl bg-muted animate-pulse"
-            />
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-28 rounded-xl bg-muted animate-pulse" />
           ))}
         </div>
       </div>
@@ -222,8 +219,7 @@ export function DashboardPage() {
                     </p>
                   )}
                   <div className="text-xs text-muted-foreground/60 mt-0.5">
-                    ${(d.amountCents / 100).toFixed(2)} ·{" "}
-                    {timeAgo(d.createdAt)}
+                    ${(d.amountCents / 100).toFixed(2)} · {timeAgo(d.createdAt)}
                   </div>
                 </div>
               </div>
@@ -275,9 +271,16 @@ function PostUpdatePanel() {
     if (!title.trim() || !body.trim()) return;
     setSaving(true);
     try {
-      await postUpdate({ title: title.trim(), body: body.trim(), impactTag: impactTag.trim() || undefined });
+      await postUpdate({
+        title: title.trim(),
+        body: body.trim(),
+        impactTag: impactTag.trim() || undefined,
+      });
       toast.success("Update posted!");
-      setTitle(""); setBody(""); setImpactTag(""); setOpen(false);
+      setTitle("");
+      setBody("");
+      setImpactTag("");
+      setOpen(false);
     } catch (e: any) {
       toast.error(e.message ?? "Failed to post update");
     } finally {
@@ -329,15 +332,20 @@ function PostUpdatePanel() {
           onClick={handlePost}
           disabled={saving || !title.trim() || !body.trim()}
         >
-          {saving ? <Loader2 className="size-3.5 mr-1.5 animate-spin" /> : <Plus className="size-3.5 mr-1.5" />}
+          {saving ? (
+            <Loader2 className="size-3.5 mr-1.5 animate-spin" />
+          ) : (
+            <Plus className="size-3.5 mr-1.5" />
+          )}
           Post Update
         </Button>
-        <Button size="sm" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+        <Button size="sm" variant="ghost" onClick={() => setOpen(false)}>
+          Cancel
+        </Button>
       </div>
     </div>
   );
 }
-
 
 function PayoutPanel({ creator }: { creator: any }) {
   const startOnboarding = useAction(api.paypalConnect.startOnboarding);
@@ -347,7 +355,10 @@ function PayoutPanel({ creator }: { creator: any }) {
   const [loading, setLoading] = useState(false);
   const [paypalEmailInput, setPaypalEmailInput] = useState("");
   const [payoutResult, setPayoutResult] = useState<{
-    payoutId: string; feeCents: number; netCents: number; method: string;
+    payoutId: string;
+    feeCents: number;
+    netCents: number;
+    method: string;
   } | null>(null);
   const [balance, setBalance] = useState<{
     availableCents: number;
@@ -387,12 +398,15 @@ function PayoutPanel({ creator }: { creator: any }) {
     setLoading(true);
     setPayoutResult(null);
     try {
-      const result = await requestPayout({ amountCents: balance.availableCents, instant });
+      const result = await requestPayout({
+        amountCents: balance.availableCents,
+        instant,
+      });
       setPayoutResult(result);
       toast.success(
         instant
           ? `⚡ $${(result.netCents / 100).toFixed(2)} on its way — hits your card in ~30 min!`
-          : `Payout initiated — $${(result.netCents / 100).toFixed(2)} arrives in 1–2 business days.`
+          : `Payout initiated — $${(result.netCents / 100).toFixed(2)} arrives in 1–2 business days.`,
       );
       const updated = await getBalance();
       setBalance(updated);
@@ -411,32 +425,51 @@ function PayoutPanel({ creator }: { creator: any }) {
         <div className="bg-gradient-to-r from-fuel/20 to-fuel/5 px-5 py-4 border-b border-fuel/20">
           <div className="flex items-center gap-2 mb-1">
             <Zap className="size-4 text-fuel fill-fuel" />
-            <span className="text-xs font-black tracking-widest text-fuel uppercase">Instant Payouts Available</span>
+            <span className="text-xs font-black tracking-widest text-fuel uppercase">
+              Instant Payouts Available
+            </span>
           </div>
           <p className="text-sm font-semibold">
-            Get your money in <span className="text-fuel">~30 minutes.</span> Not days.
+            Get your money in <span className="text-fuel">~30 minutes.</span>{" "}
+            Not days.
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Other platforms make you wait 2–5 days. We don't. Gas when you need it — <em>now.</em>
+            Other platforms make you wait 2–5 days. We don't. Gas when you need
+            it — <em>now.</em>
           </p>
         </div>
         <div className="p-5">
           <h3 className="font-semibold mb-3">Connect PayPal to Get Paid</h3>
           <ul className="space-y-1.5 mb-4">
             {[
-              { icon: "⚡", text: "Instant payout — ~30 min to your debit card (1.5% fee, min $0.50)" },
-              { icon: "🏦", text: "Standard payout — 1–2 business days, no fee" },
-              { icon: "🔒", text: "Quick KYC — name, DOB, SSN last-4, debit card" },
+              {
+                icon: "⚡",
+                text: "Instant payout — ~30 min to your debit card (1.5% fee, min $0.50)",
+              },
+              {
+                icon: "🏦",
+                text: "Standard payout — 1–2 business days, no fee",
+              },
+              {
+                icon: "🔒",
+                text: "Quick KYC — name, DOB, SSN last-4, debit card",
+              },
               { icon: "💸", text: "Donations route straight to your account" },
-            ].map((item) => (
-              <li key={item.text} className="flex items-start gap-2 text-xs text-muted-foreground">
+            ].map(item => (
+              <li
+                key={item.text}
+                className="flex items-start gap-2 text-xs text-muted-foreground"
+              >
                 <span className="shrink-0 mt-px">{item.icon}</span>
                 {item.text}
               </li>
             ))}
           </ul>
           <div className="space-y-1.5 mb-4">
-            <label htmlFor="paypal-email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            <label
+              htmlFor="paypal-email"
+              className="text-xs font-semibold text-muted-foreground uppercase tracking-wide"
+            >
               PayPal Email Address
             </label>
             <Input
@@ -444,7 +477,7 @@ function PayoutPanel({ creator }: { creator: any }) {
               type="email"
               placeholder="your-paypal-email@example.com"
               value={paypalEmailInput}
-              onChange={(e) => setPaypalEmailInput(e.target.value)}
+              onChange={e => setPaypalEmailInput(e.target.value)}
               className="bg-card text-sm"
               required
             />
@@ -454,7 +487,11 @@ function PayoutPanel({ creator }: { creator: any }) {
             onClick={handleConnect}
             disabled={loading}
           >
-            {loading ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Zap className="size-4 mr-2" />}
+            {loading ? (
+              <Loader2 className="size-4 mr-2 animate-spin" />
+            ) : (
+              <Zap className="size-4 mr-2" />
+            )}
             Connect PayPal — Start Getting Paid
           </Button>
         </div>
@@ -473,16 +510,23 @@ function PayoutPanel({ creator }: { creator: any }) {
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold mb-1">Almost There — Finish Setup</h3>
             <p className="text-sm text-muted-foreground mb-1">
-              Complete your PayPal onboarding to unlock payouts — including instant.
+              Complete your PayPal onboarding to unlock payouts — including
+              instant.
             </p>
-            <p className="text-xs text-fuel font-medium mb-4">⚡ Instant payouts unlock once verified.</p>
+            <p className="text-xs text-fuel font-medium mb-4">
+              ⚡ Instant payouts unlock once verified.
+            </p>
             <Button
               variant="outline"
               className="border-yellow-500/30 text-yellow-600 hover:bg-yellow-500/10"
               onClick={handleConnect}
               disabled={loading}
             >
-              {loading ? <Loader2 className="size-4 mr-2 animate-spin" /> : <ArrowDownToLine className="size-4 mr-2" />}
+              {loading ? (
+                <Loader2 className="size-4 mr-2 animate-spin" />
+              ) : (
+                <ArrowDownToLine className="size-4 mr-2" />
+              )}
               Resume Onboarding
             </Button>
           </div>
@@ -502,9 +546,15 @@ function PayoutPanel({ creator }: { creator: any }) {
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold mb-1">Action Required</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              PayPal needs more information before enabling payouts on your account.
+              PayPal needs more information before enabling payouts on your
+              account.
             </p>
-            <Button variant="outline" className="border-red-500/30 text-red-600 hover:bg-red-500/10" onClick={handleConnect} disabled={loading}>
+            <Button
+              variant="outline"
+              className="border-red-500/30 text-red-600 hover:bg-red-500/10"
+              onClick={handleConnect}
+              disabled={loading}
+            >
               {loading && <Loader2 className="size-4 mr-2 animate-spin" />}
               Resolve with PayPal
             </Button>
@@ -540,13 +590,21 @@ function PayoutPanel({ creator }: { creator: any }) {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-lg border border-fuel/20 bg-fuel/[0.08] p-3 text-center">
-            <div className="text-2xl font-bold text-fuel" style={{ fontFamily: "var(--font-display)" }}>
+            <div
+              className="text-2xl font-bold text-fuel"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
               ${(available / 100).toFixed(2)}
             </div>
-            <div className="text-xs text-muted-foreground mt-0.5">Available</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              Available
+            </div>
           </div>
           <div className="rounded-lg border border-border/50 bg-card/50 p-3 text-center">
-            <div className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
+            <div
+              className="text-2xl font-bold"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
               ${(pending / 100).toFixed(2)}
             </div>
             <div className="text-xs text-muted-foreground mt-0.5">Pending</div>
@@ -558,14 +616,23 @@ function PayoutPanel({ creator }: { creator: any }) {
       <div className="p-4 border-b border-border/20 bg-gradient-to-r from-fuel/10 to-transparent">
         <div className="flex items-center gap-1.5 mb-1">
           <Zap className="size-3.5 text-fuel fill-fuel" />
-          <span className="text-xs font-black tracking-wider text-fuel uppercase">Instant Payout</span>
+          <span className="text-xs font-black tracking-wider text-fuel uppercase">
+            Instant Payout
+          </span>
           <span className="ml-auto text-xs text-muted-foreground">~30 min</span>
         </div>
         <p className="text-xs text-muted-foreground mb-3">
           Money on your debit card in about 30 minutes. No waiting days.
           {canPayout && (
             <span className="text-foreground/70">
-              {" "}Stripe charges <strong>${(instantFeeCents / 100).toFixed(2)}</strong> to process instantly — you receive <strong className="text-fuel">${(instantNetCents / 100).toFixed(2)}</strong>. We keep nothing.
+              {" "}
+              Stripe charges{" "}
+              <strong>${(instantFeeCents / 100).toFixed(2)}</strong> to process
+              instantly — you receive{" "}
+              <strong className="text-fuel">
+                ${(instantNetCents / 100).toFixed(2)}
+              </strong>
+              . We keep nothing.
             </span>
           )}
         </p>
@@ -588,8 +655,12 @@ function PayoutPanel({ creator }: { creator: any }) {
       {/* Standard payout — secondary option */}
       <div className="p-4">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Standard Payout</span>
-          <span className="text-xs text-muted-foreground">1–2 business days · free</span>
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            Standard Payout
+          </span>
+          <span className="text-xs text-muted-foreground">
+            1–2 business days · free
+          </span>
         </div>
         <Button
           variant="outline"
@@ -621,19 +692,30 @@ function PayoutPanel({ creator }: { creator: any }) {
 
       {/* Post-payout confirmation */}
       {payoutResult && (
-        <div className={`mx-4 mb-4 rounded-lg border p-3 text-xs ${payoutResult.method === "instant" ? "border-fuel/30 bg-fuel/5 text-fuel" : "border-border/50 bg-card/50 text-muted-foreground"}`}>
+        <div
+          className={`mx-4 mb-4 rounded-lg border p-3 text-xs ${payoutResult.method === "instant" ? "border-fuel/30 bg-fuel/5 text-fuel" : "border-border/50 bg-card/50 text-muted-foreground"}`}
+        >
           {payoutResult.method === "instant" ? (
-            <>⚡ <strong>${(payoutResult.netCents / 100).toFixed(2)}</strong> is on its way — ~30 min to your card. (Stripe processing fee: ${(payoutResult.feeCents / 100).toFixed(2)} — passed through at cost)</>
+            <>
+              ⚡ <strong>${(payoutResult.netCents / 100).toFixed(2)}</strong> is
+              on its way — ~30 min to your card. (Stripe processing fee: $
+              {(payoutResult.feeCents / 100).toFixed(2)} — passed through at
+              cost)
+            </>
           ) : (
-            <>✓ <strong>${(payoutResult.netCents / 100).toFixed(2)}</strong> transfer initiated — arrives in 1–2 business days.</>
+            <>
+              ✓ <strong>${(payoutResult.netCents / 100).toFixed(2)}</strong>{" "}
+              transfer initiated — arrives in 1–2 business days.
+            </>
           )}
-          <div className="text-muted-foreground/60 mt-0.5">Payout ID: {payoutResult.payoutId}</div>
+          <div className="text-muted-foreground/60 mt-0.5">
+            Payout ID: {payoutResult.payoutId}
+          </div>
         </div>
       )}
     </div>
   );
 }
-
 
 function StatCard({
   icon,
@@ -650,9 +732,7 @@ function StatCard({
     <div
       className={`p-4 rounded-xl border ${accent ? "border-fuel/20 bg-fuel/[0.03]" : "border-border/50 bg-card/50"}`}
     >
-      <div
-        className={`mb-2 ${accent ? "text-fuel" : "text-muted-foreground"}`}
-      >
+      <div className={`mb-2 ${accent ? "text-fuel" : "text-muted-foreground"}`}>
         {icon}
       </div>
       <div

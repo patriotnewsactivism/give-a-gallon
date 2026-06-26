@@ -15,17 +15,24 @@ http.route({
     const payload = await request.text();
     // Use Object.fromEntries — works in all Convex runtimes without .entries()
     const headers: Record<string, string> = {};
-    request.headers.forEach((value: string, key: string) => { headers[key] = value; });
+    request.headers.forEach((value: string, key: string) => {
+      headers[key] = value;
+    });
     try {
-      await ctx.runAction(api.paypal.handleWebhook, { payload, headers: JSON.stringify(headers) });
+      await ctx.runAction(api.paypal.handleWebhook, {
+        payload,
+        headers: JSON.stringify(headers),
+      });
       return new Response(JSON.stringify({ received: true }), {
-        status: 200, headers: { "Content-Type": "application/json" },
+        status: 200,
+        headers: { "Content-Type": "application/json" },
       });
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error("PayPal webhook error:", msg);
       return new Response(JSON.stringify({ error: msg }), {
-        status: 400, headers: { "Content-Type": "application/json" },
+        status: 400,
+        headers: { "Content-Type": "application/json" },
       });
     }
   }),
@@ -37,9 +44,12 @@ http.route({
   method: "GET",
   handler: httpAction(async (ctx, request) => {
     const limit = new URL(request.url).searchParams.get("limit") || "50";
-    const donations = await ctx.runQuery(api.donations.getRecent, { limit: parseInt(limit, 10) });
+    const donations = await ctx.runQuery(api.donations.getRecent, {
+      limit: parseInt(limit, 10),
+    });
     return new Response(JSON.stringify(donations), {
-      status: 200, headers: { "Content-Type": "application/json" },
+      status: 200,
+      headers: { "Content-Type": "application/json" },
     });
   }),
 });
@@ -50,9 +60,12 @@ http.route({
   method: "GET",
   handler: httpAction(async (ctx, request) => {
     const limit = new URL(request.url).searchParams.get("limit") || "50";
-    const creators = await ctx.runQuery(api.creators.listRecentCreators, { limit: parseInt(limit, 10) });
+    const creators = await ctx.runQuery(api.creators.listRecentCreators, {
+      limit: parseInt(limit, 10),
+    });
     return new Response(JSON.stringify(creators), {
-      status: 200, headers: { "Content-Type": "application/json" },
+      status: 200,
+      headers: { "Content-Type": "application/json" },
     });
   }),
 });
@@ -66,9 +79,19 @@ http.route({
     if (!secret || request.headers.get("x-support-secret") !== secret) {
       return new Response("Unauthorized", { status: 401 });
     }
-    let payload: { from?: string; name?: string; subject?: string; body?: string };
-    try { payload = await request.json(); } catch { return new Response("Invalid JSON", { status: 400 }); }
-    if (!payload.from || !payload.body) return new Response("Missing from/body", { status: 400 });
+    let payload: {
+      from?: string;
+      name?: string;
+      subject?: string;
+      body?: string;
+    };
+    try {
+      payload = await request.json();
+    } catch {
+      return new Response("Invalid JSON", { status: 400 });
+    }
+    if (!payload.from || !payload.body)
+      return new Response("Missing from/body", { status: 400 });
     await ctx.runMutation(internal.support.intakeInboundEmail, {
       from: payload.from,
       name: payload.name,
@@ -76,7 +99,8 @@ http.route({
       body: payload.body,
     });
     return new Response(JSON.stringify({ ok: true }), {
-      status: 200, headers: { "Content-Type": "application/json" },
+      status: 200,
+      headers: { "Content-Type": "application/json" },
     });
   }),
 });

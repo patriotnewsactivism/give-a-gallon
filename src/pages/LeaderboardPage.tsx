@@ -1,28 +1,36 @@
 import { useQuery } from "convex/react";
-import {
-  Fuel,
-  Medal,
-  Share2,
-  TrendingUp,
-  Trophy,
-  Users,
-} from "lucide-react";
+import { Fuel, Medal, Share2, TrendingUp, Trophy, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import { api } from "../../convex/_generated/api";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
+import { api } from "../../convex/_generated/api";
 
 const MEDAL: Record<number, { emoji: string; color: string; bg: string }> = {
-  1: { emoji: "🥇", color: "text-yellow-400", bg: "bg-yellow-400/10 border-yellow-400/30" },
-  2: { emoji: "🥈", color: "text-slate-300",  bg: "bg-slate-300/10 border-slate-300/30" },
-  3: { emoji: "🥉", color: "text-amber-600",  bg: "bg-amber-600/10 border-amber-600/30" },
+  1: {
+    emoji: "🥇",
+    color: "text-yellow-400",
+    bg: "bg-yellow-400/10 border-yellow-400/30",
+  },
+  2: {
+    emoji: "🥈",
+    color: "text-slate-300",
+    bg: "bg-slate-300/10 border-slate-300/30",
+  },
+  3: {
+    emoji: "🥉",
+    color: "text-amber-600",
+    bg: "bg-amber-600/10 border-amber-600/30",
+  },
 };
 
 function shareLeaderboard() {
   const url = `${window.location.origin}/leaderboard`;
-  const text = "⛽ See who's fueling the most activism on Give a Gallon — real people, real impact.";
+  const text =
+    "⛽ See who's fueling the most activism on Give a Gallon — real people, real impact.";
   if (navigator.share) {
-    navigator.share({ title: "Give a Gallon Leaderboard", text, url }).catch(() => {});
+    navigator
+      .share({ title: "Give a Gallon Leaderboard", text, url })
+      .catch(() => {});
   } else {
     navigator.clipboard.writeText(`${text} ${url}`);
   }
@@ -39,7 +47,6 @@ export function LeaderboardPage() {
   return (
     <div className="min-h-screen">
       <div className="container py-10 max-w-3xl">
-
         {/* Header */}
         <Reveal className="text-center mb-10">
           <div className="inline-flex items-center justify-center size-16 rounded-2xl bg-fuel/10 border border-fuel/20 mb-5">
@@ -52,7 +59,8 @@ export function LeaderboardPage() {
             REFERRAL <span className="text-fuel">LEADERBOARD</span>
           </h1>
           <p className="text-muted-foreground max-w-md mx-auto">
-            The activists fueling the most movement — ranked by gallons sent through referral links.
+            The activists fueling the most movement — ranked by gallons sent
+            through referral links.
           </p>
           <Button
             variant="outline"
@@ -67,9 +75,21 @@ export function LeaderboardPage() {
         {/* Platform stats bar */}
         <Reveal className="grid grid-cols-3 gap-3 mb-8">
           {[
-            { icon: <Fuel className="size-4 text-fuel" />, value: totalGallons.toLocaleString(), label: "Total Gallons" },
-            { icon: <Users className="size-4 text-fuel" />, value: totalCreators.toLocaleString(), label: "Campaigners" },
-            { icon: <TrendingUp className="size-4 text-fuel" />, value: totalDonations.toLocaleString(), label: "Donations" },
+            {
+              icon: <Fuel className="size-4 text-fuel" />,
+              value: totalGallons.toLocaleString(),
+              label: "Total Gallons",
+            },
+            {
+              icon: <Users className="size-4 text-fuel" />,
+              value: totalCreators.toLocaleString(),
+              label: "Campaigners",
+            },
+            {
+              icon: <TrendingUp className="size-4 text-fuel" />,
+              value: totalDonations.toLocaleString(),
+              label: "Donations",
+            },
           ].map(stat => (
             <div
               key={stat.label}
@@ -82,7 +102,9 @@ export function LeaderboardPage() {
               >
                 {stat.value}
               </div>
-              <div className="text-xs text-muted-foreground mt-0.5">{stat.label}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {stat.label}
+              </div>
             </div>
           ))}
         </Reveal>
@@ -91,7 +113,10 @@ export function LeaderboardPage() {
         {!top ? (
           <div className="space-y-3">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="h-20 rounded-xl border border-border/30 bg-card/30 animate-pulse" />
+              <div
+                key={i}
+                className="h-20 rounded-xl border border-border/30 bg-card/30 animate-pulse"
+              />
             ))}
           </div>
         ) : top.length === 0 ? (
@@ -101,7 +126,10 @@ export function LeaderboardPage() {
             <p className="text-sm text-muted-foreground mb-6">
               Be the first to share your referral link and climb the board.
             </p>
-            <Button asChild className="bg-fuel text-fuel-foreground hover:bg-fuel/90">
+            <Button
+              asChild
+              className="bg-fuel text-fuel-foreground hover:bg-fuel/90"
+            >
               <Link to="/referrals">Get My Referral Link</Link>
             </Button>
           </div>
@@ -111,7 +139,9 @@ export function LeaderboardPage() {
               const rank = i + 1;
               const medal = MEDAL[rank];
               const maxGallons = top[0]?.referralGallons ?? 1;
-              const barPct = Math.round((entry.referralGallons / maxGallons) * 100);
+              const barPct = Math.round(
+                (entry.referralGallons / maxGallons) * 100,
+              );
 
               return (
                 <Reveal key={entry.slug}>
@@ -153,7 +183,8 @@ export function LeaderboardPage() {
                           {entry.displayName}
                         </span>
                         <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                          {entry.referralCount} donation{entry.referralCount !== 1 ? "s" : ""}
+                          {entry.referralCount} donation
+                          {entry.referralCount !== 1 ? "s" : ""}
                         </span>
                       </div>
                       {/* Progress bar */}
@@ -173,7 +204,9 @@ export function LeaderboardPage() {
                       >
                         {entry.referralGallons}
                       </div>
-                      <div className="text-[10px] text-muted-foreground leading-none">gal</div>
+                      <div className="text-[10px] text-muted-foreground leading-none">
+                        gal
+                      </div>
                     </div>
                   </Link>
                 </Reveal>
@@ -184,14 +217,21 @@ export function LeaderboardPage() {
 
         {/* CTA */}
         <Reveal className="mt-10 rounded-2xl border border-fuel/20 bg-fuel/5 p-6 text-center">
-          <h3 className="font-black text-lg mb-1" style={{ fontFamily: "var(--font-display)" }}>
+          <h3
+            className="font-black text-lg mb-1"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
             Want to climb the board?
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Share your referral link. Every gallon someone sends through your link counts toward your rank.
+            Share your referral link. Every gallon someone sends through your
+            link counts toward your rank.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button className="bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold" asChild>
+            <Button
+              className="bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold"
+              asChild
+            >
               <Link to="/referrals">
                 <Fuel className="size-4 mr-1.5" /> Get My Referral Link
               </Link>
@@ -201,7 +241,6 @@ export function LeaderboardPage() {
             </Button>
           </div>
         </Reveal>
-
       </div>
     </div>
   );

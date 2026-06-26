@@ -51,7 +51,7 @@ export function PatrioticBackground() {
                C 850 250, 650 100, 500 100 Z"
             fill="currentColor"
             opacity="0.8"
-            style={{ mixBlendMode: 'overlay' }}
+            style={{ mixBlendMode: "overlay" }}
           />
 
           {/* Focal Star / Compass point */}

@@ -1,7 +1,6 @@
 import { useQuery } from "convex/react";
 import {
   ArrowRight,
-  Zap,
   ChevronRight,
   Fuel,
   Gavel,
@@ -13,20 +12,20 @@ import {
   Sparkles,
   TrendingUp,
   Users,
+  Zap,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CountUp } from "@/components/CountUp";
+import { DonationTicker } from "@/components/DonationTicker";
+import { FeaturedCampaigns } from "@/components/FeaturedCampaigns";
 import { FuelGauge } from "@/components/FuelGauge";
 import { FuelGaugeMark } from "@/components/FuelGaugeMark";
-import { DonationTicker } from "@/components/DonationTicker";
-import { Reveal } from "@/components/Reveal";
 import { NetworkBanner } from "@/components/NetworkBanner";
-import { FeaturedCampaigns } from "@/components/FeaturedCampaigns";
 import { NewestCreators } from "@/components/NewestCreators";
+import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
-import { GALLON_PRICE } from "@/lib/constants";
+import { CATEGORIES, GALLON_PRICE } from "@/lib/constants";
 import { api } from "../../convex/_generated/api";
-import { CATEGORIES } from "@/lib/constants";
 import { VERIFICATION_TIERS } from "../../convex/constants";
 
 function HeroSection() {
@@ -54,41 +53,64 @@ function HeroSection() {
         <div className="absolute top-20 left-[3%] h-80 w-80 rounded-full bg-blue-600/[0.14] blur-3xl" />
         <div className="absolute top-32 right-[3%] h-64 w-64 rounded-full bg-blue-600/[0.14] blur-3xl" />
         <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-background to-transparent" />
-        <div className="absolute inset-0 opacity-[0.04]" style={{backgroundImage: "linear-gradient(oklch(0.45 0.18 255) 1px, transparent 1px), linear-gradient(90deg, oklch(0.45 0.18 255) 1px, transparent 1px)", backgroundSize: "80px 80px"}} />
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              "linear-gradient(oklch(0.45 0.18 255) 1px, transparent 1px), linear-gradient(90deg, oklch(0.45 0.18 255) 1px, transparent 1px)",
+            backgroundSize: "80px 80px",
+          }}
+        />
       </div>
 
       <div className="container relative pt-16 pb-16 sm:pt-24 sm:pb-24">
         {/* Desktop 3-col layout */}
         <div className="flex flex-col xl:flex-row xl:items-start xl:gap-10">
-
           {/* ── LEFT RAIL — stats + instant payout callout (desktop only) ── */}
           <div className="hidden xl:flex xl:flex-col xl:w-64 xl:shrink-0 xl:pt-8 gap-4">
             {/* Live platform stats */}
             <div className="rounded-2xl border border-border/40 bg-card/50 backdrop-blur-sm p-4">
               <div className="flex items-center gap-1.5 mb-3">
                 <div className="size-1.5 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Live Stats</span>
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                  Live Stats
+                </span>
               </div>
               <div className="space-y-3">
                 <div>
-                  <div className="text-2xl font-extrabold text-fuel" style={{fontFamily:"var(--font-display)"}}>
+                  <div
+                    className="text-2xl font-extrabold text-fuel"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
                     <CountUp value={stats?.totalGallons ?? 0} />
                   </div>
-                  <div className="text-xs text-muted-foreground">Gallons Fueled</div>
+                  <div className="text-xs text-muted-foreground">
+                    Gallons Fueled
+                  </div>
                 </div>
                 <div className="h-px bg-border/30" />
                 <div>
-                  <div className="text-2xl font-extrabold" style={{fontFamily:"var(--font-display)"}}>
+                  <div
+                    className="text-2xl font-extrabold"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
                     <CountUp value={stats?.totalCreators ?? 0} />
                   </div>
-                  <div className="text-xs text-muted-foreground">Active Campaigns</div>
+                  <div className="text-xs text-muted-foreground">
+                    Active Campaigns
+                  </div>
                 </div>
                 <div className="h-px bg-border/30" />
                 <div>
-                  <div className="text-2xl font-extrabold" style={{fontFamily:"var(--font-display)"}}>
+                  <div
+                    className="text-2xl font-extrabold"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
                     <CountUp value={stats?.totalDonors ?? 0} />
                   </div>
-                  <div className="text-xs text-muted-foreground">Supporters</div>
+                  <div className="text-xs text-muted-foreground">
+                    Supporters
+                  </div>
                 </div>
               </div>
             </div>
@@ -97,22 +119,41 @@ function HeroSection() {
             <div className="rounded-2xl border border-fuel/30 bg-fuel/[0.07] p-4">
               <div className="flex items-center gap-1.5 mb-2">
                 <Zap className="size-4 text-fuel fill-fuel" />
-                <span className="text-xs font-black text-fuel uppercase tracking-wider">Instant Payouts</span>
+                <span className="text-xs font-black text-fuel uppercase tracking-wider">
+                  Instant Payouts
+                </span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                Eligible accounts get money on your debit card in <strong className="text-foreground">~30 minutes</strong>. Powered by PayPal — <strong className="text-foreground">92% goes directly to the creator</strong>.
+                Eligible accounts get money on your debit card in{" "}
+                <strong className="text-foreground">~30 minutes</strong>.
+                Powered by PayPal —{" "}
+                <strong className="text-foreground">
+                  92% goes directly to the creator
+                </strong>
+                .
               </p>
               <Link to="/signup">
-                <Button size="sm" className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90 text-xs font-bold">
-                  <Zap className="size-3.5 mr-1 fill-current" /> Start a Campaign
+                <Button
+                  size="sm"
+                  className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90 text-xs font-bold"
+                >
+                  <Zap className="size-3.5 mr-1 fill-current" /> Start a
+                  Campaign
                 </Button>
               </Link>
             </div>
 
             {/* 92% stat */}
             <div className="rounded-2xl border border-border/40 bg-card/50 p-4 text-center">
-              <div className="text-3xl font-extrabold text-fuel mb-1" style={{fontFamily:"var(--font-display)"}}>92%</div>
-              <div className="text-xs text-muted-foreground">of every donation goes directly to the creator</div>
+              <div
+                className="text-3xl font-extrabold text-fuel mb-1"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                92%
+              </div>
+              <div className="text-xs text-muted-foreground">
+                of every donation goes directly to the creator
+              </div>
             </div>
           </div>
 
@@ -121,7 +162,9 @@ function HeroSection() {
             {/* Eyebrow */}
             <div className="mb-7 inline-flex animate-in fade-in slide-in-from-bottom-2 items-center gap-2 rounded-full border border-fuel/20 bg-fuel/5 px-3 py-1.5 text-sm font-medium text-fuel duration-700">
               <Sparkles className="size-3.5" />
-              <span className="font-bold tracking-wide">FUNDRAISING, BY THE GALLON</span>
+              <span className="font-bold tracking-wide">
+                FUNDRAISING, BY THE GALLON
+              </span>
             </div>
 
             {/* Headline */}
@@ -143,7 +186,8 @@ function HeroSection() {
               <span className="font-semibold text-foreground">
                 verified activists, journalists, veterans, and families
               </span>{" "}
-              who need to get somewhere important. Fast, transparent, and direct.
+              who need to get somewhere important. Fast, transparent, and
+              direct.
             </p>
 
             {/* CTAs */}
@@ -206,7 +250,10 @@ function HeroSection() {
               <div className="xl:hidden mx-auto mt-12 grid max-w-xl grid-cols-3 gap-4 border-t border-border/40 pt-8">
                 <HeroStat value={stats.totalGallons} label="Gallons Given" />
                 <HeroStat value={stats.totalCreators} label="Activists" />
-                <HeroStat value={stats.totalDonors ?? stats.totalDonations} label="Supporters" />
+                <HeroStat
+                  value={stats.totalDonors ?? stats.totalDonations}
+                  label="Supporters"
+                />
               </div>
             )}
 
@@ -225,30 +272,49 @@ function HeroSection() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-1.5">
                   <div className="size-1.5 rounded-full bg-fuel animate-pulse" />
-                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Live Campaigns</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    Live Campaigns
+                  </span>
                 </div>
-                <Link to="/explore" className="text-xs text-fuel hover:underline font-medium">See all →</Link>
+                <Link
+                  to="/explore"
+                  className="text-xs text-fuel hover:underline font-medium"
+                >
+                  See all →
+                </Link>
               </div>
               <div className="space-y-3">
-                {featuredCreators && featuredCreators.length > 0 ? featuredCreators.map((cr: any) => (
-                  <Link key={cr._id} to={`/${cr.slug}`} className="block group">
-                    <div className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-fuel/5 transition-colors">
-                      <div className="size-8 rounded-full bg-fuel/20 border border-fuel/30 flex items-center justify-center shrink-0 text-xs font-bold text-fuel">
-                        {cr.displayName?.[0] ?? "?"}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs font-semibold truncate group-hover:text-fuel transition-colors">{cr.displayName}</div>
-                        <div className="text-xs text-muted-foreground truncate">{cr.category ?? "Activism"}</div>
-                        <div className="mt-1 h-1 rounded-full bg-border/50 overflow-hidden">
-                          <div
-                            className="h-full bg-fuel rounded-full transition-all"
-                            style={{width: `${Math.min(100, Math.round(((cr.totalGallons ?? 0) / Math.max(cr.goalGallons ?? 100, 1)) * 100))}%`}}
-                          />
+                {featuredCreators && featuredCreators.length > 0 ? (
+                  featuredCreators.map((cr: any) => (
+                    <Link
+                      key={cr._id}
+                      to={`/${cr.slug}`}
+                      className="block group"
+                    >
+                      <div className="flex items-start gap-2.5 p-2 rounded-lg hover:bg-fuel/5 transition-colors">
+                        <div className="size-8 rounded-full bg-fuel/20 border border-fuel/30 flex items-center justify-center shrink-0 text-xs font-bold text-fuel">
+                          {cr.displayName?.[0] ?? "?"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-semibold truncate group-hover:text-fuel transition-colors">
+                            {cr.displayName}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate">
+                            {cr.category ?? "Activism"}
+                          </div>
+                          <div className="mt-1 h-1 rounded-full bg-border/50 overflow-hidden">
+                            <div
+                              className="h-full bg-fuel rounded-full transition-all"
+                              style={{
+                                width: `${Math.min(100, Math.round(((cr.totalGallons ?? 0) / Math.max(cr.goalGallons ?? 100, 1)) * 100))}%`,
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                )) : (
+                    </Link>
+                  ))
+                ) : (
                   <div className="text-xs text-muted-foreground text-center py-4">
                     Be the first to start a campaign.
                   </div>
@@ -261,14 +327,18 @@ function HeroSection() {
               <div className="rounded-2xl border border-border/40 bg-card/50 p-4">
                 <div className="flex items-center gap-1.5 mb-3">
                   <div className="size-1.5 rounded-full bg-green-400 animate-pulse" />
-                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Recent Fuel</span>
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    Recent Fuel
+                  </span>
                 </div>
                 <div className="space-y-2">
                   {recentDonations.slice(0, 3).map((d: any, i: number) => (
                     <div key={i} className="flex items-center gap-2 text-xs">
                       <Fuel className="size-3 text-fuel shrink-0" />
                       <span className="text-muted-foreground truncate">
-                        <span className="text-foreground font-medium">{d.gallons ?? 1} gal</span>
+                        <span className="text-foreground font-medium">
+                          {d.gallons ?? 1} gal
+                        </span>
                         {d.campaignName ? ` → ${d.campaignName}` : " donated"}
                       </span>
                     </div>
@@ -281,16 +351,21 @@ function HeroSection() {
             <div className="rounded-2xl border border-fuel/20 bg-gradient-to-b from-fuel/[0.08] to-transparent p-4 text-center">
               <Fuel className="size-8 text-fuel mx-auto mb-2" />
               <div className="text-sm font-bold mb-1">Start Your Campaign</div>
-              <div className="text-xs text-muted-foreground mb-3">Live in 60 seconds. Get paid instantly.</div>
+              <div className="text-xs text-muted-foreground mb-3">
+                Live in 60 seconds. Get paid instantly.
+              </div>
               <Link to="/signup">
-                <Button size="sm" className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90 text-xs font-bold">
+                <Button
+                  size="sm"
+                  className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90 text-xs font-bold"
+                >
                   Get Started <ArrowRight className="size-3 ml-1" />
                 </Button>
               </Link>
             </div>
           </div>
-
-        </div>{/* end 3-col */}
+        </div>
+        {/* end 3-col */}
       </div>
 
       <GallonMarquee />
@@ -449,10 +524,14 @@ function TrustSection() {
               style={{ fontFamily: "var(--font-display)" }}
             >
               KNOW WHERE YOUR <br />
-              <span className="text-fuel uppercase text-glow-fuel">Gallons Go.</span>
+              <span className="text-fuel uppercase text-glow-fuel">
+                Gallons Go.
+              </span>
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-              Transparency isn't just a feature — it's our foundation. We use a multi-tiered verification system to ensure every gallon fuels a real mission.
+              Transparency isn't just a feature — it's our foundation. We use a
+              multi-tiered verification system to ensure every gallon fuels a
+              real mission.
             </p>
             <div className="space-y-6">
               <div className="flex gap-4">
@@ -461,7 +540,10 @@ function TrustSection() {
                 </div>
                 <div>
                   <h4 className="font-bold mb-1">PayPal Protected</h4>
-                  <p className="text-sm text-muted-foreground">All payments are processed securely through PayPal, trusted by hundreds of millions of people worldwide.</p>
+                  <p className="text-sm text-muted-foreground">
+                    All payments are processed securely through PayPal, trusted
+                    by hundreds of millions of people worldwide.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4">
@@ -470,7 +552,10 @@ function TrustSection() {
                 </div>
                 <div>
                   <h4 className="font-bold mb-1">Proof After Payout</h4>
-                  <p className="text-sm text-muted-foreground">Creators post updates, photos, and receipts after receiving fuel so you can see the impact of your support.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Creators post updates, photos, and receipts after receiving
+                    fuel so you can see the impact of your support.
+                  </p>
                 </div>
               </div>
             </div>
@@ -478,10 +563,15 @@ function TrustSection() {
 
           <Reveal delayMs={200}>
             <div className="grid gap-4">
-              {tiers.map((t) => (
-                <div key={t.title} className="group p-5 rounded-2xl border border-border/50 bg-card/50 hover:border-fuel/40 transition-all">
+              {tiers.map(t => (
+                <div
+                  key={t.title}
+                  className="group p-5 rounded-2xl border border-border/50 bg-card/50 hover:border-fuel/40 transition-all"
+                >
                   <div className="flex items-center gap-3 mb-2">
-                    <div className={`text-sm font-bold ${t.color}`}>{t.badge} {t.title}</div>
+                    <div className={`text-sm font-bold ${t.color}`}>
+                      {t.badge} {t.title}
+                    </div>
                     <t.icon className={`size-4 ml-auto ${t.color}`} />
                   </div>
                   <p className="text-sm text-muted-foreground leading-relaxed">
@@ -491,7 +581,8 @@ function TrustSection() {
               ))}
               <div className="mt-4 p-4 rounded-xl border border-dashed border-border/50 text-center">
                 <p className="text-xs text-muted-foreground italic">
-                  Donors can filter campaigns by verification level to choose their preferred level of trust.
+                  Donors can filter campaigns by verification level to choose
+                  their preferred level of trust.
                 </p>
               </div>
             </div>
@@ -579,7 +670,7 @@ function WhoItsForSection() {
                   {p.description}
                 </p>
                 <ul className="space-y-1.5">
-                  {p.examples.map((ex) => (
+                  {p.examples.map(ex => (
                     <li
                       key={ex}
                       className="flex items-center gap-2 text-xs text-muted-foreground"
@@ -597,7 +688,6 @@ function WhoItsForSection() {
     </section>
   );
 }
-
 
 function WhyGiveAGallonSection() {
   return (
@@ -748,7 +838,11 @@ function CreatorCard({
     verificationStatus?: string;
   };
 }) {
-  const tier = VERIFICATION_TIERS[(creator.verificationStatus ?? "unverified") as keyof typeof VERIFICATION_TIERS];
+  const tier =
+    VERIFICATION_TIERS[
+      (creator.verificationStatus ??
+        "unverified") as keyof typeof VERIFICATION_TIERS
+    ];
   const milesFunded = Math.round(creator.totalGallons * 25);
 
   return (
@@ -771,7 +865,10 @@ function CreatorCard({
               {creator.displayName}
             </h3>
             {tier && creator.verificationStatus !== "unverified" && (
-              <span className={`${tier.color} text-[10px] font-bold`} title={tier.label}>
+              <span
+                className={`${tier.color} text-[10px] font-bold`}
+                title={tier.label}
+              >
                 {tier.badge}
               </span>
             )}
@@ -800,10 +897,8 @@ function CreatorCard({
             showReadout={false}
           />
           <div className="-mt-3 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-            <span className="text-fuel">
-              {creator.totalGallons}
-            </span>{" "}
-            / {creator.goal} gallons
+            <span className="text-fuel">{creator.totalGallons}</span> /{" "}
+            {creator.goal} gallons
           </div>
         </div>
       ) : (
@@ -823,7 +918,6 @@ function CreatorCard({
     </Link>
   );
 }
-
 
 function InstantPayoutSection() {
   return (
@@ -848,9 +942,15 @@ function InstantPayoutSection() {
                 NOT DAYS LATER.
               </h2>
               <p className="text-muted-foreground text-sm sm:text-base leading-relaxed mb-6">
-                Most platforms hold your money for 2–5 business days. We do better.
-                Standard payouts arrive in 1–2 business days at no cost. Eligible accounts can unlock instant payouts — money on your debit card in <strong className="text-foreground">~30 minutes</strong>.
-                PayPal charges a small fee (~3%) for instant transfers. <strong className="text-foreground">We pass it straight through — no markup, no cut.</strong>
+                Most platforms hold your money for 2–5 business days. We do
+                better. Standard payouts arrive in 1–2 business days at no cost.
+                Eligible accounts can unlock instant payouts — money on your
+                debit card in{" "}
+                <strong className="text-foreground">~30 minutes</strong>. PayPal
+                charges a small fee (~3%) for instant transfers.{" "}
+                <strong className="text-foreground">
+                  We pass it straight through — no markup, no cut.
+                </strong>
               </p>
               <Link to="/signup">
                 <Button className="bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold w-full sm:w-auto">
@@ -863,15 +963,30 @@ function InstantPayoutSection() {
             <div className="p-8 sm:p-10 border-t sm:border-t-0 sm:border-l border-fuel/20 flex flex-col justify-center gap-4">
               {/* Them */}
               <div className="rounded-xl border border-border/40 bg-card/40 p-4">
-                <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Other Platforms</div>
+                <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
+                  Other Platforms
+                </div>
                 {[
-                  { label: "Payout speed", val: "2–5 business days", bad: true },
-                  { label: "Instant option", val: "Usually not available", bad: true },
+                  {
+                    label: "Payout speed",
+                    val: "2–5 business days",
+                    bad: true,
+                  },
+                  {
+                    label: "Instant option",
+                    val: "Usually not available",
+                    bad: true,
+                  },
                   { label: "You wait", val: "Up to a week", bad: true },
                 ].map(row => (
-                  <div key={row.label} className="flex items-center justify-between py-1.5 text-sm border-b border-border/20 last:border-0">
+                  <div
+                    key={row.label}
+                    className="flex items-center justify-between py-1.5 text-sm border-b border-border/20 last:border-0"
+                  >
                     <span className="text-muted-foreground">{row.label}</span>
-                    <span className="text-red-400 font-medium text-xs">{row.val}</span>
+                    <span className="text-red-400 font-medium text-xs">
+                      {row.val}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -882,17 +997,27 @@ function InstantPayoutSection() {
                 </div>
                 {[
                   { label: "Standard payout", val: "1–2 business days · free" },
-                  { label: "⚡ Instant payout", val: "~30 min · PayPal processing" },
+                  {
+                    label: "⚡ Instant payout",
+                    val: "~30 min · PayPal processing",
+                  },
                   { label: "We charge you", val: "Nothing extra. Ever." },
                 ].map(row => (
-                  <div key={row.label} className="flex items-center justify-between py-1.5 text-sm border-b border-fuel/10 last:border-0">
+                  <div
+                    key={row.label}
+                    className="flex items-center justify-between py-1.5 text-sm border-b border-fuel/10 last:border-0"
+                  >
                     <span className="text-muted-foreground">{row.label}</span>
-                    <span className="text-fuel font-semibold text-xs">{row.val}</span>
+                    <span className="text-fuel font-semibold text-xs">
+                      {row.val}
+                    </span>
                   </div>
                 ))}
               </div>
               <p className="text-xs text-muted-foreground text-center">
-                Instant payout uses PayPal's standard processing fee. New accounts have a standard verification period before first payout. Give-A-Gallon keeps nothing extra.
+                Instant payout uses PayPal's standard processing fee. New
+                accounts have a standard verification period before first
+                payout. Give-A-Gallon keeps nothing extra.
               </p>
             </div>
           </div>
@@ -971,7 +1096,11 @@ function CtaSection() {
             THE STORY REQUIRES <span className="text-fuel">GETTING THERE</span>
           </h2>
           <p className="mx-auto mb-8 max-w-lg text-lg text-muted-foreground">
-            Every story told, every vote challenged, every rally covered — someone had to drive there. <span className="font-semibold text-foreground">Let your supporters cover the gas.</span>
+            Every story told, every vote challenged, every rally covered —
+            someone had to drive there.{" "}
+            <span className="font-semibold text-foreground">
+              Let your supporters cover the gas.
+            </span>
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button
@@ -1017,7 +1146,12 @@ function FounderStorySection() {
               </div>
 
               <blockquote className="text-xl sm:text-2xl font-medium leading-relaxed text-foreground mb-6">
-                &#8220;I built Give-A-Gallon because I needed it. Being on the road constantly &#8212; covering stories, getting to hearings, showing up where it matters &#8212; costs money that most people don&#39;t have. I knew if there was a way I could help my own situation, it would most certainly be a way I could help others.&#8221;
+                &#8220;I built Give-A-Gallon because I needed it. Being on the
+                road constantly &#8212; covering stories, getting to hearings,
+                showing up where it matters &#8212; costs money that most people
+                don&#39;t have. I knew if there was a way I could help my own
+                situation, it would most certainly be a way I could help
+                others.&#8221;
               </blockquote>
 
               <div className="flex items-center gap-3">
@@ -1025,10 +1159,17 @@ function FounderStorySection() {
                   MR
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-foreground">Matthew Reardon</div>
+                  <div className="text-sm font-semibold text-foreground">
+                    Matthew Reardon
+                  </div>
                   <div className="text-xs text-muted-foreground mt-0.5">
-                    Founder of We The People News{" "}·{" "}
-                    <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer" className="hover:text-fuel transition-colors font-medium text-foreground/80">
+                    Founder of We The People News ·{" "}
+                    <a
+                      href="https://www.wtpnews.org"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-fuel transition-colors font-medium text-foreground/80"
+                    >
                       wtpnews.org
                     </a>
                   </div>
@@ -1066,8 +1207,12 @@ function CategoryBrowseSection() {
                 className="group flex flex-col items-center gap-2 rounded-xl border border-border/50 bg-card/40 p-4 text-center transition-all hover:-translate-y-0.5 hover:border-fuel/40 hover:bg-fuel/[0.04] hover:shadow-md"
               >
                 <span className="text-2xl">{cat.icon}</span>
-                <span className="text-xs font-semibold leading-tight">{cat.label}</span>
-                <span className="text-xs text-muted-foreground leading-snug hidden sm:block">{cat.description}</span>
+                <span className="text-xs font-semibold leading-tight">
+                  {cat.label}
+                </span>
+                <span className="text-xs text-muted-foreground leading-snug hidden sm:block">
+                  {cat.description}
+                </span>
               </Link>
             </Reveal>
           ))}

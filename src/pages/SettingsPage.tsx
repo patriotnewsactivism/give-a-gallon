@@ -3,15 +3,13 @@ import { Check, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { api } from "../../convex/_generated/api";
 import { ProfilePhotos } from "@/components/ProfilePhotos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GALLON_PRICE } from "@/lib/constants";
+import { api } from "../../convex/_generated/api";
 import { CATEGORIES as CATEGORY_LIST } from "../../convex/constants";
-
-
 
 const BIO_TEMPLATES = [
   {
@@ -82,7 +80,7 @@ export function SettingsPage() {
           .replace(/[^a-z0-9\s-]/g, "")
           .replace(/\s+/g, "-")
           .replace(/-+/g, "-")
-          .slice(0, 30)
+          .slice(0, 30),
       );
     }
   };
@@ -162,7 +160,7 @@ export function SettingsPage() {
         <Field label="Display Name *">
           <Input
             value={displayName}
-            onChange={(e) => handleNameChange(e.target.value)}
+            onChange={e => handleNameChange(e.target.value)}
             placeholder="Don Matthews"
             className="bg-background"
           />
@@ -176,12 +174,8 @@ export function SettingsPage() {
             </span>
             <Input
               value={slug}
-              onChange={(e) =>
-                setSlug(
-                  e.target.value
-                    .toLowerCase()
-                    .replace(/[^a-z0-9-]/g, "")
-                )
+              onChange={e =>
+                setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))
               }
               placeholder="donmatthews"
               className="bg-background rounded-l-none"
@@ -192,8 +186,10 @@ export function SettingsPage() {
         {/* Bio */}
         <Field label="Bio">
           <div className="mb-2 flex flex-wrap gap-1.5">
-            <span className="text-[10px] uppercase font-bold text-muted-foreground mr-1 self-center">Templates:</span>
-            {BIO_TEMPLATES.map((t) => (
+            <span className="text-[10px] uppercase font-bold text-muted-foreground mr-1 self-center">
+              Templates:
+            </span>
+            {BIO_TEMPLATES.map(t => (
               <button
                 key={t.label}
                 onClick={() => setBio(t.text)}
@@ -205,7 +201,7 @@ export function SettingsPage() {
           </div>
           <Textarea
             value={bio}
-            onChange={(e) => setBio(e.target.value)}
+            onChange={e => setBio(e.target.value)}
             placeholder="Tell supporters about your cause and what you're fighting for..."
             rows={4}
             className="bg-background resize-none"
@@ -216,11 +212,11 @@ export function SettingsPage() {
         <Field label="Category">
           <select
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={e => setCategory(e.target.value)}
             className="w-full h-10 rounded-md border border-border/50 bg-background px-3 text-sm"
           >
             <option value="">Select a category...</option>
-            {CATEGORY_LIST.map((cat) => (
+            {CATEGORY_LIST.map(cat => (
               <option key={cat.id} value={cat.id}>
                 {cat.icon} {cat.label}
               </option>
@@ -232,7 +228,7 @@ export function SettingsPage() {
         <Field label="Location">
           <Input
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={e => setLocation(e.target.value)}
             placeholder="Mississippi, USA"
             className="bg-background"
           />
@@ -245,7 +241,7 @@ export function SettingsPage() {
               type="number"
               min={1}
               value={goal}
-              onChange={(e) => setGoal(e.target.value)}
+              onChange={e => setGoal(e.target.value)}
               placeholder="100"
               className="bg-background"
             />
@@ -267,7 +263,7 @@ export function SettingsPage() {
             <Field label="YouTube">
               <Input
                 value={youtube}
-                onChange={(e) => setYoutube(e.target.value)}
+                onChange={e => setYoutube(e.target.value)}
                 placeholder="https://youtube.com/@yourchannel"
                 className="bg-background"
               />
@@ -275,7 +271,7 @@ export function SettingsPage() {
             <Field label="Twitter / X">
               <Input
                 value={twitter}
-                onChange={(e) => setTwitter(e.target.value)}
+                onChange={e => setTwitter(e.target.value)}
                 placeholder="https://twitter.com/yourhandle"
                 className="bg-background"
               />
@@ -283,7 +279,7 @@ export function SettingsPage() {
             <Field label="Website">
               <Input
                 value={website}
-                onChange={(e) => setWebsite(e.target.value)}
+                onChange={e => setWebsite(e.target.value)}
                 placeholder="https://yourwebsite.com"
                 className="bg-background"
               />
@@ -291,7 +287,7 @@ export function SettingsPage() {
             <Field label="Instagram">
               <Input
                 value={instagram}
-                onChange={(e) => setInstagram(e.target.value)}
+                onChange={e => setInstagram(e.target.value)}
                 placeholder="https://instagram.com/yourhandle"
                 className="bg-background"
               />

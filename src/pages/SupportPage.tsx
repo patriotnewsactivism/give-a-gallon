@@ -3,10 +3,10 @@ import { Mail, MessageSquare, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { api } from "../../convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { api } from "../../convex/_generated/api";
 
 const CATEGORIES = [
   { id: "donation", label: "Donations & receipts" },
@@ -56,7 +56,7 @@ export function SupportPage() {
   });
 
   const update = (k: keyof typeof form, val: string) =>
-    setForm((f) => ({ ...f, [k]: val }));
+    setForm(f => ({ ...f, [k]: val }));
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +102,7 @@ export function SupportPage() {
             <MessageSquare className="size-4" /> Common questions
           </h2>
           <div className="space-y-5">
-            {FAQS.map((f) => (
+            {FAQS.map(f => (
               <div
                 key={f.q}
                 className="border-l-[3px] border-fuel/40 pl-4 py-1"
@@ -153,7 +153,7 @@ export function SupportPage() {
                   </label>
                   <Input
                     value={form.name}
-                    onChange={(e) => update("name", e.target.value)}
+                    onChange={e => update("name", e.target.value)}
                     placeholder="Jane Doe"
                   />
                 </div>
@@ -165,7 +165,7 @@ export function SupportPage() {
                     type="email"
                     required
                     value={form.email}
-                    onChange={(e) => update("email", e.target.value)}
+                    onChange={e => update("email", e.target.value)}
                     placeholder="you@example.com"
                   />
                 </div>
@@ -177,10 +177,10 @@ export function SupportPage() {
                 </label>
                 <select
                   value={form.category}
-                  onChange={(e) => update("category", e.target.value)}
+                  onChange={e => update("category", e.target.value)}
                   className="w-full h-10 rounded-md border border-border/60 bg-background px-3 text-sm"
                 >
-                  {CATEGORIES.map((c) => (
+                  {CATEGORIES.map(c => (
                     <option key={c.id} value={c.id}>
                       {c.label}
                     </option>
@@ -194,7 +194,7 @@ export function SupportPage() {
                 </label>
                 <Input
                   value={form.subject}
-                  onChange={(e) => update("subject", e.target.value)}
+                  onChange={e => update("subject", e.target.value)}
                   placeholder="Brief summary"
                   maxLength={200}
                 />
@@ -207,7 +207,7 @@ export function SupportPage() {
                 <Textarea
                   required
                   value={form.message}
-                  onChange={(e) => update("message", e.target.value)}
+                  onChange={e => update("message", e.target.value)}
                   placeholder="Tell us what's going on…"
                   rows={6}
                   maxLength={4000}
@@ -223,7 +223,10 @@ export function SupportPage() {
               </Button>
               <p className="text-[11px] text-muted-foreground text-center">
                 We'll reply to your email. By submitting you agree to our{" "}
-                <Link to="/privacy-policy" className="text-fuel hover:underline">
+                <Link
+                  to="/privacy-policy"
+                  className="text-fuel hover:underline"
+                >
                   Privacy Policy
                 </Link>
                 .

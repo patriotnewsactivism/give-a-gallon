@@ -7,25 +7,25 @@ import { PublicOnlyRoute } from "./components/PublicOnlyRoute";
 import { Toaster } from "./components/ui/sonner";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import {
+  AdminDashboard,
   CreatorProfilePage,
   DashboardPage,
   ExplorePage,
+  FirmOnboardingPage,
   ImpactPage,
-  LeaderboardPage,
-  MembershipPage,
   LandingPage,
+  LeaderboardPage,
   LoginPage,
+  MembershipPage,
   MyImpactPage,
+  PrivacyPolicyPage,
   SettingsPage,
   SignupPage,
-  AdminDashboard,
-  PrivacyPolicyPage,
-  TermsOfServicePage,
   SupportPage,
-  FirmOnboardingPage,
+  TermsOfServicePage,
 } from "./pages";
-import { DonationSuccessPage } from "./pages/DonationSuccessPage";
 import { DonationCancelPage } from "./pages/DonationCancelPage";
+import { DonationSuccessPage } from "./pages/DonationSuccessPage";
 import ReferralPage from "./pages/ReferralPage";
 
 function App() {
@@ -52,8 +52,14 @@ function App() {
             <Route path="/tos" element={<TermsOfServicePage />} />
             <Route path="/support" element={<SupportPage />} />
             {/* Common URL aliases — redirect before the /:slug catch-all */}
-            <Route path="/browse" element={<Navigate to="/explore" replace />} />
-            <Route path="/campaigns" element={<Navigate to="/explore" replace />} />
+            <Route
+              path="/browse"
+              element={<Navigate to="/explore" replace />}
+            />
+            <Route
+              path="/campaigns"
+              element={<Navigate to="/explore" replace />}
+            />
             <Route path="/start" element={<Navigate to="/signup" replace />} />
             {/* Firm Onboarding — tailored link for organizations */}
             <Route path="/:slug/join" element={<FirmOnboardingPage />} />

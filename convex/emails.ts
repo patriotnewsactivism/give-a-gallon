@@ -2,8 +2,9 @@
  * give-a-gallon — transactional email helpers (Resend)
  * Called from stripe.ts (webhooks) and subscriptions.ts
  */
-import { internalAction } from "./_generated/server";
+
 import { v } from "convex/values";
+import { internalAction } from "./_generated/server";
 
 declare const process: { env: Record<string, string | undefined> };
 
@@ -56,7 +57,10 @@ async function send(to: string, subject: string, html: string): Promise<void> {
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ from: FROM, to: [to], subject, html }),
     });
 
@@ -73,8 +77,20 @@ async function send(to: string, subject: string, html: string): Promise<void> {
 // ── Email templates ───────────────────────────────────────────────────────────
 
 function donationReceivedHtml({
-  creatorName: _creatorName, donorName, gallons, amountDollars, message, creatorSlug,
-}: { creatorName: string; donorName: string; gallons: number; amountDollars: string; message?: string; creatorSlug: string }) {
+  creatorName: _creatorName,
+  donorName,
+  gallons,
+  amountDollars,
+  message,
+  creatorSlug,
+}: {
+  creatorName: string;
+  donorName: string;
+  gallons: number;
+  amountDollars: string;
+  message?: string;
+  creatorSlug: string;
+}) {
   return wrap(`
     <div style="padding:28px 28px 0;">
       <h1 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 6px;">
@@ -107,8 +123,20 @@ function donationReceivedHtml({
 }
 
 function donationConfirmationHtml({
-  donorName, gallons, amountDollars, creatorName, creatorSlug, estimatedMiles,
-}: { donorName: string; gallons: number; amountDollars: string; creatorName: string; creatorSlug: string; estimatedMiles: number }) {
+  donorName,
+  gallons,
+  amountDollars,
+  creatorName,
+  creatorSlug,
+  estimatedMiles,
+}: {
+  donorName: string;
+  gallons: number;
+  amountDollars: string;
+  creatorName: string;
+  creatorSlug: string;
+  estimatedMiles: number;
+}) {
   return wrap(`
     <div style="padding:28px 28px 0;">
       <h1 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 6px;">
@@ -139,8 +167,18 @@ function donationConfirmationHtml({
 }
 
 function subscriptionConfirmedHtml({
-  donorName, tierName, gallonsPerMonth, amountDollars, nextBillingDate,
-}: { donorName: string; tierName: string; gallonsPerMonth: number; amountDollars: string; nextBillingDate: string }) {
+  donorName,
+  tierName,
+  gallonsPerMonth,
+  amountDollars,
+  nextBillingDate,
+}: {
+  donorName: string;
+  tierName: string;
+  gallonsPerMonth: number;
+  amountDollars: string;
+  nextBillingDate: string;
+}) {
   return wrap(`
     <div style="padding:28px 28px 0;">
       <h1 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 6px;">
@@ -166,8 +204,14 @@ function subscriptionConfirmedHtml({
 }
 
 function subscriptionCanceledHtml({
-  donorName, tierName, endDate,
-}: { donorName: string; tierName: string; endDate: string }) {
+  donorName,
+  tierName,
+  endDate,
+}: {
+  donorName: string;
+  tierName: string;
+  endDate: string;
+}) {
   return wrap(`
     <div style="padding:28px;">
       <h1 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 6px;">Membership canceled</h1>
@@ -252,8 +296,12 @@ export const sendSubscriptionConfirmed = internalAction({
   },
   handler: async (_ctx, args) => {
     const amountDollars = `$${(args.amountCents / 100).toFixed(2)}`;
-    const nextBillingDate = new Date(args.currentPeriodEndMs).toLocaleDateString("en-US", {
-      month: "long", day: "numeric", year: "numeric",
+    const nextBillingDate = new Date(
+      args.currentPeriodEndMs,
+    ).toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
     });
     await send(
       args.donorEmail,
@@ -277,9 +325,14 @@ export const sendSubscriptionCanceled = internalAction({
     currentPeriodEndMs: v.number(),
   },
   handler: async (_ctx, args) => {
-    const endDate = new Date(args.currentPeriodEndMs).toLocaleDateString("en-US", {
-      month: "long", day: "numeric", year: "numeric",
-    });
+    const endDate = new Date(args.currentPeriodEndMs).toLocaleDateString(
+      "en-US",
+      {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      },
+    );
     await send(
       args.donorEmail,
       "Your Give-A-Gallon membership has been canceled",

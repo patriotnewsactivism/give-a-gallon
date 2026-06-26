@@ -1,12 +1,12 @@
 import { createAccount } from "@convex-dev/auth/server";
-import { internalAction, internalMutation } from "./_generated/server";
-import { internal } from "./_generated/api";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
+import { internalAction, internalMutation } from "./_generated/server";
 
 // ─── Seed platform stats (safe to call any time) ──────────────────────────
 export const seedPlatformStats = internalMutation({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const now = Date.now();
     const statsExists = await ctx.db
       .query("platformStats")
@@ -213,31 +213,47 @@ export const seedAll = internalAction({
         // Create auth user
         const { user } = await createAccount(ctx, {
           provider: "test",
-          account: { id: campaign.email, secret: "seed-password-not-for-login" },
-          profile: { email: campaign.email, name: campaign.name, emailVerificationTime: now },
+          account: {
+            id: campaign.email,
+            secret: "seed-password-not-for-login",
+          },
+          profile: {
+            email: campaign.email,
+            name: campaign.name,
+            emailVerificationTime: now,
+          },
           shouldLinkViaEmail: false,
         });
 
         // Create creator profile
-        const creatorId = await ctx.runMutation(internal.devTools.createSeedCreator, {
-          userId: user._id as any,
-          slug: campaign.slug,
-          displayName: campaign.displayName,
-          bio: campaign.bio,
-          category: campaign.category,
-          location: campaign.location,
-          totalGallons: campaign.totalGallons,
-          goal: campaign.goal,
-          verificationStatus: campaign.verificationStatus,
-          tags: campaign.tags,
-          urgency: campaign.urgency,
-          isFeatured: campaign.isFeatured ?? false,
-        });
+        const creatorId = await ctx.runMutation(
+          internal.devTools.createSeedCreator,
+          {
+            userId: user._id as any,
+            slug: campaign.slug,
+            displayName: campaign.displayName,
+            bio: campaign.bio,
+            category: campaign.category,
+            location: campaign.location,
+            totalGallons: campaign.totalGallons,
+            goal: campaign.goal,
+            verificationStatus: campaign.verificationStatus,
+            tags: campaign.tags,
+            urgency: campaign.urgency,
+            isFeatured: campaign.isFeatured ?? false,
+          },
+        );
 
         createdIds.push(String(creatorId));
 
         // Seed a few donations per campaign
-        const donorNames = ["Sarah M.", "James T.", "Anonymous", "Pat K.", "Robin L."];
+        const donorNames = [
+          "Sarah M.",
+          "James T.",
+          "Anonymous",
+          "Pat K.",
+          "Robin L.",
+        ];
         for (let i = 0; i < 3; i++) {
           await ctx.runMutation(internal.devTools.createSeedDonation, {
             creatorId: creatorId as any,

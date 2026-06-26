@@ -68,7 +68,11 @@ function NavLink({
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild isActive={isActive}>
-        <Link to={href} onClick={() => setOpenMobile(false)} className="flex items-center gap-2">
+        <Link
+          to={href}
+          onClick={() => setOpenMobile(false)}
+          className="flex items-center gap-2"
+        >
           <Icon className="size-4" />
           <span className="flex-1">{label}</span>
           {badge && (
@@ -91,7 +95,7 @@ function SidebarNav() {
         <SidebarGroupLabel>My Account</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
-            {navItems.map((item) => (
+            {navItems.map(item => (
               <NavLink
                 key={item.href}
                 href={item.href}
@@ -109,7 +113,7 @@ function SidebarNav() {
         <SidebarGroupLabel>Discover</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
-            {discoverItems.map((item) => (
+            {discoverItems.map(item => (
               <NavLink
                 key={item.href}
                 href={item.href}

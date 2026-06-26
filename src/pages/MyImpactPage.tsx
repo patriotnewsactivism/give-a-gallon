@@ -1,9 +1,17 @@
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import {
+  Award,
+  ExternalLink,
+  Fuel,
+  Heart,
+  MapPin,
+  TrendingUp,
+  Users,
+  Zap,
+} from "lucide-react";
 import { Link } from "react-router-dom";
-import { Fuel, MapPin, Heart, ExternalLink, Zap, TrendingUp, Users, Award } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
-
+import { api } from "../../convex/_generated/api";
 
 function formatDate(ts: number) {
   return new Date(ts).toLocaleDateString("en-US", {
@@ -18,20 +26,20 @@ function formatCents(cents: number) {
 }
 
 const VERIFICATION_BADGE: Record<string, { label: string; color: string }> = {
-  unverified:   { label: "Unverified",        color: "text-muted-foreground" },
-  community:    { label: "Community ✓",        color: "text-blue-400" },
-  journalist:   { label: "Journalist ✓",       color: "text-purple-400" },
-  organization: { label: "Organization ✓",     color: "text-orange-400" },
-  platform:     { label: "Platform Verified ✓", color: "text-fuel" },
+  unverified: { label: "Unverified", color: "text-muted-foreground" },
+  community: { label: "Community ✓", color: "text-blue-400" },
+  journalist: { label: "Journalist ✓", color: "text-purple-400" },
+  organization: { label: "Organization ✓", color: "text-orange-400" },
+  platform: { label: "Platform Verified ✓", color: "text-fuel" },
 };
 
 const IMPACT_TAG_ICON: Record<string, string> = {
-  "miles driven":   "🛣️",
-  "records filed":  "📄",
-  "case won":       "⚖️",
-  "story published":"📰",
-  "hearing attended":"🏛️",
-  "default":        "✦",
+  "miles driven": "🛣️",
+  "records filed": "📄",
+  "case won": "⚖️",
+  "story published": "📰",
+  "hearing attended": "🏛️",
+  default: "✦",
 };
 
 export function MyImpactPage() {
@@ -55,8 +63,13 @@ export function MyImpactPage() {
         <div className="text-center">
           <Fuel className="size-10 text-fuel mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Sign in to see your impact</h2>
-          <p className="text-muted-foreground text-sm mb-6">Every gallon you've given is tracked here.</p>
-          <Link to="/login" className="inline-flex items-center gap-2 bg-fuel text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-fuel/90 transition-colors">
+          <p className="text-muted-foreground text-sm mb-6">
+            Every gallon you've given is tracked here.
+          </p>
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-2 bg-fuel text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-fuel/90 transition-colors"
+          >
             Sign In
           </Link>
         </div>
@@ -119,11 +132,13 @@ export function MyImpactPage() {
               <h2 className="text-lg font-bold mb-5 flex items-center gap-2">
                 <Zap className="size-4 text-fuel" />
                 Your Giving History
-                <span className="ml-auto text-xs text-muted-foreground font-normal">{donations.length} donation{donations.length !== 1 ? "s" : ""}</span>
+                <span className="ml-auto text-xs text-muted-foreground font-normal">
+                  {donations.length} donation{donations.length !== 1 ? "s" : ""}
+                </span>
               </h2>
             </Reveal>
             <div className="space-y-4">
-              {donations.map((d) => (
+              {donations.map(d => (
                 <DonationCard key={d._id} donation={d} />
               ))}
             </div>
@@ -134,7 +149,15 @@ export function MyImpactPage() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function StatCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="rounded-xl border border-border/40 bg-card/40 p-4">
       <div className="flex items-center gap-2 mb-1">
@@ -147,7 +170,9 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
 }
 
 function DonationCard({ donation }: { donation: any }) {
-  const badge = VERIFICATION_BADGE[donation.creatorVerification] ?? VERIFICATION_BADGE.unverified;
+  const badge =
+    VERIFICATION_BADGE[donation.creatorVerification] ??
+    VERIFICATION_BADGE.unverified;
   const estimatedMiles = Math.round(donation.gallons * 30);
 
   return (
@@ -163,29 +188,43 @@ function DonationCard({ donation }: { donation: any }) {
               >
                 {donation.creatorName}
               </Link>
-              <span className={`text-xs font-medium ${badge.color}`}>{badge.label}</span>
+              <span className={`text-xs font-medium ${badge.color}`}>
+                {badge.label}
+              </span>
             </div>
             {donation.creatorCategory && (
-              <span className="text-xs text-muted-foreground capitalize">{donation.creatorCategory.replace(/_/g, " ")}</span>
+              <span className="text-xs text-muted-foreground capitalize">
+                {donation.creatorCategory.replace(/_/g, " ")}
+              </span>
             )}
             {donation.message && (
-              <p className="mt-2 text-sm text-muted-foreground italic">"{donation.message}"</p>
+              <p className="mt-2 text-sm text-muted-foreground italic">
+                "{donation.message}"
+              </p>
             )}
           </div>
 
           <div className="text-right shrink-0">
-            <div className="text-xl font-black text-fuel">{donation.gallons} <span className="text-sm font-normal text-muted-foreground">gal</span></div>
-            <div className="text-xs text-muted-foreground">{formatCents(donation.amountCents)}</div>
+            <div className="text-xl font-black text-fuel">
+              {donation.gallons}{" "}
+              <span className="text-sm font-normal text-muted-foreground">
+                gal
+              </span>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {formatCents(donation.amountCents)}
+            </div>
           </div>
         </div>
 
         {/* Impact bar */}
         <div className="border-t border-border/20 bg-muted/10 px-5 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <MapPin className="size-3" />
-            ~{estimatedMiles} miles fueled
+            <MapPin className="size-3" />~{estimatedMiles} miles fueled
           </div>
-          <div className="text-xs text-muted-foreground">{formatDate(donation.createdAt)}</div>
+          <div className="text-xs text-muted-foreground">
+            {formatDate(donation.createdAt)}
+          </div>
           <Link
             to={`/${donation.creatorSlug}`}
             className="flex items-center gap-1 text-xs text-fuel hover:underline ml-auto"
@@ -202,9 +241,13 @@ function DonationCard({ donation }: { donation: any }) {
             </div>
             {donation.recentUpdates.map((u: any) => (
               <div key={u._id} className="flex items-center gap-2 text-xs">
-                <span>{IMPACT_TAG_ICON[u.impactTag] ?? IMPACT_TAG_ICON.default}</span>
+                <span>
+                  {IMPACT_TAG_ICON[u.impactTag] ?? IMPACT_TAG_ICON.default}
+                </span>
                 <span className="text-foreground/80">{u.title}</span>
-                <span className="text-muted-foreground ml-auto shrink-0">{formatDate(u.createdAt)}</span>
+                <span className="text-muted-foreground ml-auto shrink-0">
+                  {formatDate(u.createdAt)}
+                </span>
               </div>
             ))}
           </div>
@@ -221,7 +264,8 @@ function EmptyState() {
         <Fuel className="size-12 text-fuel/30 mx-auto mb-4" />
         <h3 className="text-lg font-bold mb-2">No gallons given yet</h3>
         <p className="text-muted-foreground text-sm mb-6 max-w-xs mx-auto">
-          Find a journalist, activist, or creator doing work that matters — and fuel their mission.
+          Find a journalist, activist, or creator doing work that matters — and
+          fuel their mission.
         </p>
         <Link
           to="/explore"

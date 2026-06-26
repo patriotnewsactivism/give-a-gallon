@@ -1,26 +1,27 @@
 import { useQuery } from "convex/react";
-import {
-  Fuel,
-  MapPin,
-  Search,
-  SlidersHorizontal,
-  X,
-  Zap,
-} from "lucide-react";
+import { Fuel, MapPin, Search, SlidersHorizontal, X, Zap } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../../convex/_generated/api";
-import { CATEGORIES, VERIFICATION_TIERS, URGENCY_LEVELS } from "@/lib/constants";
 import { FuelGaugeMark } from "@/components/FuelGaugeMark";
 import { NetworkBanner } from "@/components/NetworkBanner";
 import { Input } from "@/components/ui/input";
+import {
+  CATEGORIES,
+  URGENCY_LEVELS,
+  VERIFICATION_TIERS,
+} from "@/lib/constants";
+import { api } from "../../convex/_generated/api";
 
 function VerificationBadge({ status }: { status?: string }) {
-  const tier = VERIFICATION_TIERS[(status ?? "unverified") as keyof typeof VERIFICATION_TIERS]
-    ?? VERIFICATION_TIERS.unverified;
+  const tier =
+    VERIFICATION_TIERS[
+      (status ?? "unverified") as keyof typeof VERIFICATION_TIERS
+    ] ?? VERIFICATION_TIERS.unverified;
   if (status === "unverified" || !status) return null;
   return (
-    <span className={`inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full font-medium ${tier.color} ${tier.bg}`}>
+    <span
+      className={`inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full font-medium ${tier.color} ${tier.bg}`}
+    >
       {tier.badge} {tier.label}
     </span>
   );
@@ -57,7 +58,6 @@ export function ExplorePage() {
   return (
     <div className="min-h-screen">
       <div className="container py-8 sm:py-12">
-
         {/* Header */}
         <div className="max-w-2xl mx-auto text-center mb-8">
           <h1
@@ -67,7 +67,8 @@ export function ExplorePage() {
             FIND A <span className="text-fuel">CAMPAIGN</span>
           </h1>
           <p className="text-muted-foreground">
-            Activists, journalists, veterans, creators — real people, real causes. Fuel them.
+            Activists, journalists, veterans, creators — real people, real
+            causes. Fuel them.
           </p>
         </div>
 
@@ -116,7 +117,9 @@ export function ExplorePage() {
                 <button
                   key={cat.id}
                   type="button"
-                  onClick={() => setActiveCategory(activeCategory === cat.id ? null : cat.id)}
+                  onClick={() =>
+                    setActiveCategory(activeCategory === cat.id ? null : cat.id)
+                  }
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5 ${activeCategory === cat.id ? "bg-fuel text-fuel-foreground" : "bg-card border border-border/50 text-muted-foreground hover:text-foreground"}`}
                 >
                   <span>{cat.icon}</span>
@@ -131,22 +134,29 @@ export function ExplorePage() {
         {creators && (
           <p className="text-center text-xs text-muted-foreground mb-6">
             {filtered.length} campaign{filtered.length !== 1 ? "s" : ""}
-            {activeCategory ? ` in ${CATEGORIES.find(c => c.id === activeCategory)?.label}` : ""}
+            {activeCategory
+              ? ` in ${CATEGORIES.find(c => c.id === activeCategory)?.label}`
+              : ""}
           </p>
         )}
 
         {/* Grid */}
         {!creators ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-            {[1,2,3,4,5,6].map(i => (
-              <div key={i} className="h-52 rounded-xl border border-border/30 bg-card/30 animate-pulse" />
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div
+                key={i}
+                className="h-52 rounded-xl border border-border/30 bg-card/30 animate-pulse"
+              />
             ))}
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-20">
             <Fuel className="size-12 text-muted-foreground/30 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">
-              {search || activeCategory ? "No campaigns found" : "No campaigns yet"}
+              {search || activeCategory
+                ? "No campaigns found"
+                : "No campaigns yet"}
             </h3>
             <p className="text-sm text-muted-foreground mb-6">
               {search || activeCategory
@@ -167,7 +177,12 @@ export function ExplorePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
             {filtered.map((creator: any) => {
               const catInfo = CATEGORIES.find(c => c.id === creator.category);
-              const pct = creator.goal ? Math.min(100, Math.round((creator.totalGallons / creator.goal) * 100)) : null;
+              const pct = creator.goal
+                ? Math.min(
+                    100,
+                    Math.round((creator.totalGallons / creator.goal) * 100),
+                  )
+                : null;
               return (
                 <Link
                   key={creator._id}
@@ -177,7 +192,11 @@ export function ExplorePage() {
                   {/* Cover / color bar */}
                   {creator.coverUrl ? (
                     <div className="h-24 overflow-hidden">
-                      <img src={creator.coverUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <img
+                        src={creator.coverUrl}
+                        alt=""
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
                     </div>
                   ) : (
                     <div className="h-2 bg-gradient-to-r from-fuel/60 via-fuel/30 to-transparent" />
@@ -188,9 +207,16 @@ export function ExplorePage() {
                     <div className="flex items-start gap-3 mb-3">
                       <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-fuel/10 border border-border/30">
                         {creator.avatarUrl ? (
-                          <img src={creator.avatarUrl} alt={creator.displayName} className="size-full object-cover" />
+                          <img
+                            src={creator.avatarUrl}
+                            alt={creator.displayName}
+                            className="size-full object-cover"
+                          />
                         ) : (
-                          <span className="text-fuel font-bold" style={{ fontFamily: "var(--font-display)" }}>
+                          <span
+                            className="text-fuel font-bold"
+                            style={{ fontFamily: "var(--font-display)" }}
+                          >
                             {creator.displayName.charAt(0).toUpperCase()}
                           </span>
                         )}
@@ -207,7 +233,8 @@ export function ExplorePage() {
                         <div className="flex items-center gap-2 flex-wrap mt-0.5">
                           {creator.location && (
                             <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
-                              <MapPin className="size-3" />{creator.location}
+                              <MapPin className="size-3" />
+                              {creator.location}
                             </span>
                           )}
                           <UrgencyPip urgency={creator.urgency} />
@@ -237,8 +264,15 @@ export function ExplorePage() {
                       {pct !== null ? (
                         <div>
                           <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                            <span><span className="text-fuel font-semibold">{creator.totalGallons}</span> of {creator.goal} gal</span>
-                            <span className="text-fuel font-semibold">{pct}%</span>
+                            <span>
+                              <span className="text-fuel font-semibold">
+                                {creator.totalGallons}
+                              </span>{" "}
+                              of {creator.goal} gal
+                            </span>
+                            <span className="text-fuel font-semibold">
+                              {pct}%
+                            </span>
                           </div>
                           <div className="h-1.5 rounded-full bg-muted/50 overflow-hidden">
                             <div
@@ -250,8 +284,12 @@ export function ExplorePage() {
                       ) : (
                         <div className="flex items-center gap-1.5 text-sm">
                           <FuelGaugeMark className="size-4 text-fuel" />
-                          <span className="text-fuel font-semibold">{creator.totalGallons}</span>
-                          <span className="text-muted-foreground">gallons funded</span>
+                          <span className="text-fuel font-semibold">
+                            {creator.totalGallons}
+                          </span>
+                          <span className="text-muted-foreground">
+                            gallons funded
+                          </span>
                         </div>
                       )}
                     </div>

@@ -4,11 +4,17 @@
  * Pops a toast for each new notification that arrives in real time.
  */
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Bell, Megaphone, Trophy, AlertTriangle, ExternalLink } from "lucide-react";
+import {
+  AlertTriangle,
+  Bell,
+  ExternalLink,
+  Megaphone,
+  Trophy,
+} from "lucide-react";
 import { type ReactElement, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { api } from "../../convex/_generated/api";
 
 const TYPE_ICON: Record<string, ReactElement> = {
   announcement: <Megaphone className="size-3.5 text-blue-400" />,
@@ -42,20 +48,29 @@ export function NotificationBell() {
     try {
       const stored = localStorage.getItem("notif_read_ids");
       return new Set(stored ? JSON.parse(stored) : []);
-    } catch { return new Set(); }
+    } catch {
+      return new Set();
+    }
   });
 
   const markRead = (id: string) => {
     setReadIds(prev => {
       const next = new Set(prev);
       next.add(id);
-      try { localStorage.setItem("notif_read_ids", JSON.stringify([...next].slice(-100))); } catch {}
+      try {
+        localStorage.setItem(
+          "notif_read_ids",
+          JSON.stringify([...next].slice(-100)),
+        );
+      } catch {}
       return next;
     });
   };
 
   const markAllRead = () => {
-    notifications?.forEach((n: any) => { void markRead(n._id); });
+    notifications?.forEach((n: any) => {
+      void markRead(n._id);
+    });
   };
 
   // Fire toast for genuinely new notifications
@@ -77,12 +92,16 @@ export function NotificationBell() {
     });
   }, [notifications]);
 
-  const unreadCount = notifications?.filter((n: any) => !readIds.has(n._id)).length ?? 0;
+  const unreadCount =
+    notifications?.filter((n: any) => !readIds.has(n._id)).length ?? 0;
 
   return (
     <div className="relative">
       <button
-        onClick={() => { setOpen(o => !o); if (!open) markAllRead(); }}
+        onClick={() => {
+          setOpen(o => !o);
+          if (!open) markAllRead();
+        }}
         className="relative p-2 rounded-lg hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground"
         aria-label="Notifications"
       >
@@ -94,37 +113,64 @@ export function NotificationBell() {
 
       {open && (
         <>
-          <div className="fixed inset-0 z-40" role="button" tabIndex={-1} aria-label="Close" onClick={() => setOpen(false)} onKeyDown={e => { if (e.key === "Escape") setOpen(false); }} />
+          <div
+            className="fixed inset-0 z-40"
+            role="button"
+            tabIndex={-1}
+            aria-label="Close"
+            onClick={() => setOpen(false)}
+            onKeyDown={e => {
+              if (e.key === "Escape") setOpen(false);
+            }}
+          />
           <div className="absolute right-0 top-full mt-2 w-80 rounded-2xl border border-border/50 bg-card shadow-2xl shadow-black/30 z-50 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
               <span className="text-sm font-semibold">Notifications</span>
               {notifications && notifications.length > 0 && (
-                <button onClick={markAllRead} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                <button
+                  onClick={markAllRead}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
                   Mark all read
                 </button>
               )}
             </div>
             <div className="max-h-96 overflow-y-auto">
               {!notifications || notifications.length === 0 ? (
-                <div className="px-4 py-8 text-center text-sm text-muted-foreground">No notifications yet</div>
+                <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  No notifications yet
+                </div>
               ) : (
                 <div className="p-2 space-y-1">
                   {notifications.map((n: any) => {
                     const isUnread = !readIds.has(n._id);
                     return (
-                      <div key={n._id}
+                      <div
+                        key={n._id}
                         className={`relative p-3 rounded-xl border text-sm ${TYPE_COLOR[n.type] ?? "border-border/30 bg-card/30"} ${isUnread ? "opacity-100" : "opacity-60"}`}
                       >
-                        {isUnread && <span className="absolute top-3 right-3 size-1.5 rounded-full bg-fuel" />}
+                        {isUnread && (
+                          <span className="absolute top-3 right-3 size-1.5 rounded-full bg-fuel" />
+                        )}
                         <div className="flex items-center gap-1.5 mb-1">
                           {TYPE_ICON[n.type]}
-                          <span className="font-semibold text-foreground">{n.title}</span>
+                          <span className="font-semibold text-foreground">
+                            {n.title}
+                          </span>
                         </div>
-                        <p className="text-muted-foreground text-xs leading-relaxed">{n.body}</p>
+                        <p className="text-muted-foreground text-xs leading-relaxed">
+                          {n.body}
+                        </p>
                         <div className="flex items-center justify-between mt-2">
-                          <span className="text-xs text-muted-foreground/60">{timeAgo(n.createdAt)}</span>
+                          <span className="text-xs text-muted-foreground/60">
+                            {timeAgo(n.createdAt)}
+                          </span>
                           {n.link && (
-                            <Link to={n.link} className="inline-flex items-center gap-1 text-xs text-fuel hover:underline" onClick={() => setOpen(false)}>
+                            <Link
+                              to={n.link}
+                              className="inline-flex items-center gap-1 text-xs text-fuel hover:underline"
+                              onClick={() => setOpen(false)}
+                            >
                               View <ExternalLink className="size-3" />
                             </Link>
                           )}

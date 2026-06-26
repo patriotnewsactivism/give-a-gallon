@@ -1,8 +1,8 @@
 // Give a Gallon — PayPal internal mutations & queries (non-Node runtime)
 import { v } from "convex/values";
-import { internalMutation, internalQuery } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { Doc } from "./_generated/dataModel";
+import type { Doc } from "./_generated/dataModel";
+import { internalMutation, internalQuery } from "./_generated/server";
 
 export const createPendingDonation = internalMutation({
   args: {
@@ -17,7 +17,11 @@ export const createPendingDonation = internalMutation({
     referralCode: v.optional(v.string()),
   },
   handler: async (ctx, args) =>
-    ctx.db.insert("donations", { ...args, status: "pending", createdAt: Date.now() }),
+    ctx.db.insert("donations", {
+      ...args,
+      status: "pending",
+      createdAt: Date.now(),
+    }),
 });
 
 export const setPayPalOrderId = internalMutation({
@@ -34,7 +38,9 @@ export const getByPayPalOrder = internalQuery({
 export const completeDonation = internalMutation({
   args: { donationId: v.string(), paypalCaptureId: v.optional(v.string()) },
   handler: async (ctx, { donationId, paypalCaptureId }) => {
-    const donation = await ctx.db.get(donationId as any) as Doc<"donations"> | null;
+    const donation = (await ctx.db.get(
+      donationId as any,
+    )) as Doc<"donations"> | null;
     if (!donation || donation.status === "completed") return;
 
     await ctx.db.patch(donation._id, {
@@ -42,7 +48,9 @@ export const completeDonation = internalMutation({
       ...(paypalCaptureId ? { stripePaymentIntentId: paypalCaptureId } : {}),
     });
 
-    const creator = await ctx.db.get(donation.creatorId) as Doc<"creators"> | null;
+    const creator = (await ctx.db.get(
+      donation.creatorId,
+    )) as Doc<"creators"> | null;
     if (creator) {
       await ctx.db.patch(creator._id, {
         totalGallons: creator.totalGallons + donation.gallons,

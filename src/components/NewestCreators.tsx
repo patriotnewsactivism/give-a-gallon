@@ -4,12 +4,12 @@
  * social proof and encourage new signups.
  */
 import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Link } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
 import { Fuel, Sparkles, UserPlus } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Reveal } from "@/components/Reveal";
 import { CATEGORIES } from "@/lib/constants";
-import { formatDistanceToNow } from "date-fns";
+import { api } from "../../convex/_generated/api";
 
 function timeAgo(ts: number) {
   try {
@@ -21,7 +21,9 @@ function timeAgo(ts: number) {
 
 function categoryLabel(cat?: string) {
   if (!cat) return null;
-  const found = CATEGORIES.find((c: { id: string; label: string }) => c.id === cat);
+  const found = CATEGORIES.find(
+    (c: { id: string; label: string }) => c.id === cat,
+  );
   return found?.label ?? cat;
 }
 
@@ -59,7 +61,9 @@ export function NewestCreators() {
         <div className="flex gap-4 overflow-x-auto pb-3 sm:pb-0 sm:grid sm:grid-cols-3 lg:grid-cols-4 sm:overflow-visible snap-x snap-mandatory">
           {creators.map((creator, i) => {
             const catLabel = categoryLabel(creator.category);
-            const joined = creator.createdAt ? timeAgo(creator.createdAt) : null;
+            const joined = creator.createdAt
+              ? timeAgo(creator.createdAt)
+              : null;
 
             return (
               <Reveal key={creator._id} delayMs={i * 40}>
@@ -98,7 +102,9 @@ export function NewestCreators() {
                           {creator.displayName}
                         </div>
                         {catLabel && (
-                          <div className="text-xs text-muted-foreground truncate">{catLabel}</div>
+                          <div className="text-xs text-muted-foreground truncate">
+                            {catLabel}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -130,7 +136,10 @@ export function NewestCreators() {
 
         {/* Mobile "browse all" link */}
         <div className="mt-4 text-center sm:hidden">
-          <Link to="/explore" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/explore"
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
             Browse all campaigns →
           </Link>
         </div>

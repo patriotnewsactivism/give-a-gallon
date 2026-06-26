@@ -100,7 +100,7 @@ export function FuelGauge({
         />
 
         {/* Tick marks */}
-        {TICK_ANGLES.map((angle) => {
+        {TICK_ANGLES.map(angle => {
           const outer = polar(angle, R + 9);
           const inner = polar(angle, R + 3);
           return (

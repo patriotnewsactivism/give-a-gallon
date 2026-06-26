@@ -14,13 +14,13 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { api } from "../../convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { api } from "../../convex/_generated/api";
 
 const SITE_URL = "https://www.giveagallon.org";
 
@@ -30,17 +30,20 @@ function MiniBarChart({
 }: {
   data: { month: string; gallons: number; donations: number }[];
 }) {
-  if (!data.length) return (
-    <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
-      No referral data yet — share your link to get started!
-    </div>
-  );
-  const max = Math.max(...data.map((d) => d.gallons), 1);
+  if (!data.length)
+    return (
+      <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
+        No referral data yet — share your link to get started!
+      </div>
+    );
+  const max = Math.max(...data.map(d => d.gallons), 1);
   return (
     <div className="flex items-end gap-2 h-32 px-1">
-      {data.map((d) => (
+      {data.map(d => (
         <div key={d.month} className="flex-1 flex flex-col items-center gap-1">
-          <span className="text-[10px] text-muted-foreground">{d.gallons}g</span>
+          <span className="text-[10px] text-muted-foreground">
+            {d.gallons}g
+          </span>
           <div
             className="w-full rounded-t-sm bg-gradient-to-t from-amber-600 to-amber-400 transition-all"
             style={{ height: `${Math.max((d.gallons / max) * 96, 4)}px` }}
@@ -69,7 +72,7 @@ export default function ReferralPage() {
   const leaderboard = useQuery(api.referrals.getReferralLeaderboard);
   const generateCode = useMutation(api.referrals.getMyReferralCode);
   const updateCode = useMutation(api.referrals.updateReferralCode);
-  
+
   const [copied, setCopied] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -145,18 +148,34 @@ export default function ReferralPage() {
           <h1 className="text-2xl font-bold">Referral Program</h1>
         </div>
         <p className="text-muted-foreground">
-          Share your link — earn bonus gallons for every friend who fuels a campaign.
+          Share your link — earn bonus gallons for every friend who fuels a
+          campaign.
         </p>
       </div>
 
       {/* How it works */}
       <div className="grid grid-cols-3 gap-4 text-center">
         {[
-          { icon: Share2, label: "Share your link", desc: "Copy and post it anywhere" },
-          { icon: Users, label: "Friends donate", desc: "Anyone who uses your link" },
-          { icon: Fuel, label: "You earn gallons", desc: "Credited to your campaign" },
+          {
+            icon: Share2,
+            label: "Share your link",
+            desc: "Copy and post it anywhere",
+          },
+          {
+            icon: Users,
+            label: "Friends donate",
+            desc: "Anyone who uses your link",
+          },
+          {
+            icon: Fuel,
+            label: "You earn gallons",
+            desc: "Credited to your campaign",
+          },
         ].map(({ icon: Icon, label, desc }) => (
-          <Card key={label} className="p-4 bg-card/60 border-border/40 space-y-2">
+          <Card
+            key={label}
+            className="p-4 bg-card/60 border-border/40 space-y-2"
+          >
             <div className="w-10 h-10 rounded-full bg-amber-400/10 flex items-center justify-center mx-auto">
               <Icon className="size-5 text-amber-400" />
             </div>
@@ -196,7 +215,7 @@ export default function ReferralPage() {
                   </span>
                   <Input
                     value={newCode}
-                    onChange={(e) => setNewCode(e.target.value.toUpperCase())}
+                    onChange={e => setNewCode(e.target.value.toUpperCase())}
                     className="pl-12 font-mono text-sm h-10 uppercase"
                     placeholder="MY-CODE"
                     maxLength={20}
@@ -232,7 +251,11 @@ export default function ReferralPage() {
                   onClick={handleCopy}
                   className="shrink-0 gap-1.5"
                 >
-                  {copied ? <Check className="size-4 text-green-400" /> : <Copy className="size-4" />}
+                  {copied ? (
+                    <Check className="size-4 text-green-400" />
+                  ) : (
+                    <Copy className="size-4" />
+                  )}
                   {copied ? "Copied" : "Copy"}
                 </Button>
                 <Button
@@ -269,7 +292,10 @@ export default function ReferralPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Badge variant="outline" className="gap-1 cursor-pointer hover:bg-muted">
+              <Badge
+                variant="outline"
+                className="gap-1 cursor-pointer hover:bg-muted"
+              >
                 <ExternalLink className="size-3" /> Share on X
               </Badge>
             </a>
@@ -278,7 +304,10 @@ export default function ReferralPage() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Badge variant="outline" className="gap-1 cursor-pointer hover:bg-muted">
+              <Badge
+                variant="outline"
+                className="gap-1 cursor-pointer hover:bg-muted"
+              >
                 <ExternalLink className="size-3" /> Share on Facebook
               </Badge>
             </a>
@@ -332,7 +361,9 @@ export default function ReferralPage() {
         <div className="flex items-center gap-2">
           <Trophy className="size-5 text-amber-400" />
           <h2 className="font-semibold">Top Referrers</h2>
-          <Badge variant="secondary" className="ml-auto text-xs">All time</Badge>
+          <Badge variant="secondary" className="ml-auto text-xs">
+            All time
+          </Badge>
         </div>
 
         {(leaderboard?.length ?? 0) === 0 ? (
@@ -341,9 +372,9 @@ export default function ReferralPage() {
           </p>
         ) : (
           <div className="space-y-2">
-            {leaderboard?.map((entry) => {
+            {leaderboard?.map(entry => {
               const isMe = stats?.leaderboard?.find(
-                (l) => l.isMe && l.rank === entry.rank
+                l => l.isMe && l.rank === entry.rank,
               );
               return (
                 <div
@@ -394,11 +425,13 @@ export default function ReferralPage() {
           </li>
           <li className="flex gap-2">
             <span className="text-amber-400 mt-0.5">✓</span>
-            Share it at the end of your articles or videos with a call to action.
+            Share it at the end of your articles or videos with a call to
+            action.
           </li>
           <li className="flex gap-2">
             <span className="text-amber-400 mt-0.5">✓</span>
-            Every gallon your referrals donate counts toward your campaign total.
+            Every gallon your referrals donate counts toward your campaign
+            total.
           </li>
           <li className="flex gap-2">
             <span className="text-amber-400 mt-0.5">✓</span>

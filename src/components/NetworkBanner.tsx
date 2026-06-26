@@ -9,7 +9,8 @@ const NETWORK_SITES = [
   {
     name: "We The People News",
     url: "https://www.wtpnews.org",
-    description: "Independent boots-on-the-ground journalism. The outlet that built this platform.",
+    description:
+      "Independent boots-on-the-ground journalism. The outlet that built this platform.",
     icon: <Radio className="size-4" />,
     accent: "text-fuel",
     border: "border-fuel/20",
@@ -19,7 +20,8 @@ const NETWORK_SITES = [
   {
     name: "Civil Rights Hub",
     url: "https://www.civilrightshub.org",
-    description: "Know your rights. Find legal help. Connect with advocates fighting for you.",
+    description:
+      "Know your rights. Find legal help. Connect with advocates fighting for you.",
     icon: <Scale className="size-4" />,
     accent: "text-blue-400",
     border: "border-blue-400/20",
@@ -41,13 +43,14 @@ export function NetworkBanner() {
               Part of Something Bigger
             </h2>
             <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
-              Give-A-Gallon is one piece of an independent media and advocacy ecosystem built for people in the fight.
+              Give-A-Gallon is one piece of an independent media and advocacy
+              ecosystem built for people in the fight.
             </p>
           </div>
         </Reveal>
 
         <div className="grid sm:grid-cols-2 gap-4">
-          {NETWORK_SITES.map((site) => (
+          {NETWORK_SITES.map(site => (
             <Reveal key={site.name}>
               <a
                 href={site.url}
@@ -55,12 +58,16 @@ export function NetworkBanner() {
                 rel="noopener noreferrer"
                 className={`group block rounded-2xl border ${site.border} ${site.bg} p-5 hover:brightness-110 transition-all`}
               >
-                <div className={`inline-flex items-center gap-1.5 text-xs font-semibold mb-3 ${site.accent} opacity-70`}>
+                <div
+                  className={`inline-flex items-center gap-1.5 text-xs font-semibold mb-3 ${site.accent} opacity-70`}
+                >
                   {site.tag}
                 </div>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className={`flex items-center gap-2 font-bold text-base mb-1 ${site.accent}`}>
+                    <div
+                      className={`flex items-center gap-2 font-bold text-base mb-1 ${site.accent}`}
+                    >
                       {site.icon}
                       {site.name}
                     </div>

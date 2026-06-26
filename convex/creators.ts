@@ -176,29 +176,29 @@ export const getById = query({
 // Get editorially featured campaigns (Phase 5)
 export const listFeatured = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const creators = await ctx.db
       .query("creators")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active", q => q.eq("isActive", true))
       .order("desc")
       .collect();
 
-    const featured = creators.filter((c) => c.isFeatured === true);
-    return await Promise.all(featured.map((c) => withImageUrls(ctx, c)));
+    const featured = creators.filter(c => c.isFeatured === true);
+    return await Promise.all(featured.map(c => withImageUrls(ctx, c)));
   },
 });
 
 // Platform-wide aggregate stats for the public leaderboard page
 export const getPlatformStats = query({
   args: {},
-  handler: async (ctx) => {
+  handler: async ctx => {
     const creators = await ctx.db
       .query("creators")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active", q => q.eq("isActive", true))
       .collect();
 
     const donations = await ctx.db.query("donations").collect();
-    const completed = donations.filter((d) => d.status === "completed");
+    const completed = donations.filter(d => d.status === "completed");
 
     return {
       totalCreators: creators.length,
@@ -215,12 +215,14 @@ export const listNewest = query({
   handler: async (ctx, { limit }) => {
     const creators = await ctx.db
       .query("creators")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active", q => q.eq("isActive", true))
       .order("desc")
       .take(limit ?? 12);
     // Sort by createdAt descending so newest appear first
-    const sorted = creators.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
-    return await Promise.all(sorted.map((c) => withImageUrls(ctx, c)));
+    const sorted = creators.sort(
+      (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0),
+    );
+    return await Promise.all(sorted.map(c => withImageUrls(ctx, c)));
   },
 });
 
@@ -230,7 +232,7 @@ export const listRecentCreators = query({
   handler: async (ctx, { limit }) => {
     const creators = await ctx.db
       .query("creators")
-      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .withIndex("by_active", q => q.eq("isActive", true))
       .order("desc")
       .take(limit ?? 50);
     return creators.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));

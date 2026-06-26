@@ -21,7 +21,7 @@ export function Logo({
       <span
         className={cn(
           "flex size-8 shrink-0 items-center justify-center rounded-lg border border-fuel/20 bg-fuel/10",
-          markBoxClassName
+          markBoxClassName,
         )}
       >
         <FuelGaugeMark className="size-5 text-fuel" />

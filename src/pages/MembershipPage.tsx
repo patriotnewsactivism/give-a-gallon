@@ -1,13 +1,24 @@
-import { useConvexAuth, useQuery, useAction } from "convex/react";
-import { useState } from "react";
+import { useAction, useConvexAuth, useQuery } from "convex/react";
 import {
-  ArrowRight, CheckCircle2, Crown, Flame, Heart, Shield, Star, Zap,
-  Loader2, AlertCircle, BadgeCheck, XCircle} from "lucide-react";
+  AlertCircle,
+  ArrowRight,
+  BadgeCheck,
+  CheckCircle2,
+  Crown,
+  Flame,
+  Heart,
+  Loader2,
+  Shield,
+  Star,
+  XCircle,
+  Zap,
+} from "lucide-react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 import { api } from "../../convex/_generated/api";
-import { toast } from "sonner";
 
 const TIERS = [
   {
@@ -25,7 +36,8 @@ const TIERS = [
       "1 gallon/month to any campaign",
       "Supporter badge on donor wall",
       "Monthly impact digest",
-    ]},
+    ],
+  },
   {
     id: "community-builder",
     name: "Community Builder",
@@ -42,7 +54,8 @@ const TIERS = [
       "Community Builder badge",
       "Weekly impact updates",
       "Early access to new campaigns",
-    ]},
+    ],
+  },
   {
     id: "freedom-partner",
     name: "Freedom Partner",
@@ -62,7 +75,8 @@ const TIERS = [
       "Direct creator updates in feed",
       "Vote on platform features",
       "Monthly transparency report",
-    ]},
+    ],
+  },
   {
     id: "impact-champion",
     name: "Impact Champion",
@@ -83,7 +97,8 @@ const TIERS = [
       "Direct line to platform team",
       "Annual impact report with your name",
       "Founding member recognition",
-    ]},
+    ],
+  },
 ] as const;
 
 export function MembershipPage() {
@@ -114,11 +129,18 @@ export function MembershipPage() {
   };
 
   const handleCancel = async () => {
-    if (!confirm("Cancel your membership? You'll keep access until the end of your billing period.")) return;
+    if (
+      !confirm(
+        "Cancel your membership? You'll keep access until the end of your billing period.",
+      )
+    )
+      return;
     setCanceling(true);
     try {
       await cancelSub({});
-      toast.success("Membership canceled. You'll keep access until your billing period ends.");
+      toast.success(
+        "Membership canceled. You'll keep access until your billing period ends.",
+      );
     } catch (err: any) {
       toast.error(err.message ?? "Failed to cancel — contact support.");
     } finally {
@@ -131,7 +153,6 @@ export function MembershipPage() {
   return (
     <div className="min-h-screen">
       <div className="container py-12 sm:py-20 max-w-5xl">
-
         {/* Header */}
         <Reveal className="text-center mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-fuel/10 text-fuel text-xs font-semibold mb-5">
@@ -142,11 +163,12 @@ export function MembershipPage() {
             style={{ fontFamily: "var(--font-display)" }}
           >
             FUEL THE <span className="text-fuel">MOVEMENT</span>
-            <br />EVERY MONTH
+            <br />
+            EVERY MONTH
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto text-lg">
-            A one-time donation changes a day. A membership changes a life.
-            Join monthly supporters keeping the fight funded.
+            A one-time donation changes a day. A membership changes a life. Join
+            monthly supporters keeping the fight funded.
           </p>
 
           {/* Live subscriber count */}
@@ -154,8 +176,12 @@ export function MembershipPage() {
             <div className="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/60 border border-border/40 text-sm">
               <div className="size-2 rounded-full bg-green-400 animate-pulse" />
               <span className="text-muted-foreground">
-                <strong className="text-foreground">{stats.activeCount}</strong> active members ·{" "}
-                <strong className="text-fuel">{stats.totalGallonsPerMonth.toLocaleString()}</strong> gal/month flowing
+                <strong className="text-foreground">{stats.activeCount}</strong>{" "}
+                active members ·{" "}
+                <strong className="text-fuel">
+                  {stats.totalGallonsPerMonth.toLocaleString()}
+                </strong>{" "}
+                gal/month flowing
               </span>
             </div>
           )}
@@ -168,7 +194,9 @@ export function MembershipPage() {
               <div className="flex items-center gap-3">
                 <BadgeCheck className="size-6 text-fuel shrink-0" />
                 <div>
-                  <div className="font-bold text-sm">You're a {mySubscription.tierName}</div>
+                  <div className="font-bold text-sm">
+                    You're a {mySubscription.tierName}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     {mySubscription.gallonsPerMonth} gal/month ·{" "}
                     {mySubscription.currentPeriodEnd
@@ -184,7 +212,11 @@ export function MembershipPage() {
                 onClick={handleCancel}
                 disabled={canceling}
               >
-                {canceling ? <Loader2 className="size-3.5 animate-spin" /> : <XCircle className="size-3.5" />}
+                {canceling ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <XCircle className="size-3.5" />
+                )}
                 {canceling ? "Canceling..." : "Cancel Membership"}
               </Button>
             </div>
@@ -198,14 +230,22 @@ export function MembershipPage() {
               <Zap className="size-6 text-fuel fill-fuel" />
             </div>
             <div className="flex-1">
-              <div className="text-xs font-black tracking-widest text-fuel uppercase mb-1">For Creators & Campaigners</div>
+              <div className="text-xs font-black tracking-widest text-fuel uppercase mb-1">
+                For Creators & Campaigners
+              </div>
               <h3 className="font-bold text-lg leading-tight mb-1">
-                Get your money in <span className="text-fuel">30 minutes.</span> Not days.
+                Get your money in <span className="text-fuel">30 minutes.</span>{" "}
+                Not days.
               </h3>
               <p className="text-sm text-muted-foreground">
-                Every other platform makes you wait 2–5 business days. Give-A-Gallon offers instant payouts to your debit card — gas when you need it most.
-                PayPal charges a small processing fee (~1.5%) for instant transfers.{" "}
-                <strong className="text-foreground">We pass it through at cost — Give-A-Gallon keeps nothing extra.</strong>
+                Every other platform makes you wait 2–5 business days.
+                Give-A-Gallon offers instant payouts to your debit card — gas
+                when you need it most. PayPal charges a small processing fee
+                (~1.5%) for instant transfers.{" "}
+                <strong className="text-foreground">
+                  We pass it through at cost — Give-A-Gallon keeps nothing
+                  extra.
+                </strong>
               </p>
             </div>
             <Link to="/signup" className="shrink-0">
@@ -226,10 +266,14 @@ export function MembershipPage() {
 
             return (
               <Reveal key={tier.id} delayMs={i * 80}>
-                <div className={`relative flex flex-col rounded-2xl border p-5 h-full transition-all ${
-                  isActive ? "border-fuel/60 ring-1 ring-fuel/20" : tier.borderClass
-                } ${tier.bgClass}`}>
-                  {'badge' in tier && tier.badge && !isActive && (
+                <div
+                  className={`relative flex flex-col rounded-2xl border p-5 h-full transition-all ${
+                    isActive
+                      ? "border-fuel/60 ring-1 ring-fuel/20"
+                      : tier.borderClass
+                  } ${tier.bgClass}`}
+                >
+                  {"badge" in tier && tier.badge && !isActive && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-fuel text-fuel-foreground text-xs font-bold whitespace-nowrap">
                       {(tier as any).badge}
                     </div>
@@ -240,11 +284,16 @@ export function MembershipPage() {
                     </div>
                   )}
 
-                  <div className={`rounded-xl p-2.5 inline-block mb-3 ${tier.bgClass} border ${tier.borderClass}`}>
+                  <div
+                    className={`rounded-xl p-2.5 inline-block mb-3 ${tier.bgClass} border ${tier.borderClass}`}
+                  >
                     <Icon className={`size-5 ${tier.color}`} />
                   </div>
 
-                  <h3 className={`font-bold text-base mb-1 ${tier.color}`} style={{ fontFamily: "var(--font-display)" }}>
+                  <h3
+                    className={`font-bold text-base mb-1 ${tier.color}`}
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
                     {tier.name.toUpperCase()}
                   </h3>
 
@@ -252,21 +301,29 @@ export function MembershipPage() {
                     <span className="text-3xl font-bold">${tier.price}</span>
                     <span className="text-muted-foreground text-sm">/mo</span>
                     <div className="text-xs text-muted-foreground mt-0.5">
-                      ≈ {tier.gallons} gallon{tier.gallons !== 1 ? "s" : ""}/month
+                      ≈ {tier.gallons} gallon{tier.gallons !== 1 ? "s" : ""}
+                      /month
                     </div>
                   </div>
 
                   <ul className="space-y-2 mb-5 flex-1">
                     {tier.perks.map(perk => (
                       <li key={perk} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className={`size-3.5 mt-0.5 shrink-0 ${tier.color}`} />
+                        <CheckCircle2
+                          className={`size-3.5 mt-0.5 shrink-0 ${tier.color}`}
+                        />
                         <span className="text-muted-foreground">{perk}</span>
                       </li>
                     ))}
                   </ul>
 
                   {isActive ? (
-                    <Button variant="outline" size="sm" className="w-full font-semibold border-fuel/30 text-fuel cursor-default" disabled>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full font-semibold border-fuel/30 text-fuel cursor-default"
+                      disabled
+                    >
                       <BadgeCheck className="size-3.5 mr-1" /> Active
                     </Button>
                   ) : (
@@ -278,9 +335,15 @@ export function MembershipPage() {
                       disabled={isLoading || !!activeTierId}
                     >
                       {isLoading ? (
-                        <><Loader2 className="size-3.5 animate-spin mr-1" /> Redirecting…</>
+                        <>
+                          <Loader2 className="size-3.5 animate-spin mr-1" />{" "}
+                          Redirecting…
+                        </>
                       ) : (
-                        <>{isAuthenticated ? "Subscribe" : "Get Started"} <ArrowRight className="size-3.5 ml-1" /></>
+                        <>
+                          {isAuthenticated ? "Subscribe" : "Get Started"}{" "}
+                          <ArrowRight className="size-3.5 ml-1" />
+                        </>
                       )}
                     </Button>
                   )}
@@ -293,7 +356,10 @@ export function MembershipPage() {
         {/* Why monthly */}
         <Reveal>
           <div className="rounded-2xl border border-border/50 bg-card/40 p-6 sm:p-10">
-            <h2 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "var(--font-display)" }}>
+            <h2
+              className="text-2xl font-bold text-center mb-8"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
               WHY <span className="text-fuel">MONTHLY?</span>
             </h2>
             <div className="grid sm:grid-cols-3 gap-6">
@@ -301,15 +367,18 @@ export function MembershipPage() {
                 {
                   icon: Zap,
                   title: "Predictable fuel",
-                  desc: "Creators know what's coming. Predictable funding means they can plan investigations, file records requests, and commit to long-term campaigns."},
+                  desc: "Creators know what's coming. Predictable funding means they can plan investigations, file records requests, and commit to long-term campaigns.",
+                },
                 {
                   icon: Shield,
                   title: "Builds trust",
-                  desc: "Monthly supporters get priority updates and direct visibility into outcomes. You'll know exactly what your fuel made possible."},
+                  desc: "Monthly supporters get priority updates and direct visibility into outcomes. You'll know exactly what your fuel made possible.",
+                },
                 {
                   icon: Heart,
                   title: "Compounds impact",
-                  desc: "$15/month is $180/year — enough to fund a FOIA request, a week of travel, or dozens of miles for a family in crisis."},
+                  desc: "$15/month is $180/year — enough to fund a FOIA request, a week of travel, or dozens of miles for a family in crisis.",
+                },
               ].map(item => {
                 const Icon = item.icon;
                 return (
@@ -318,7 +387,9 @@ export function MembershipPage() {
                       <Icon className="size-5 text-fuel" />
                     </div>
                     <h3 className="font-semibold mb-2">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {item.desc}
+                    </p>
                   </div>
                 );
               })}
@@ -329,29 +400,38 @@ export function MembershipPage() {
         {/* FAQ */}
         <Reveal className="mt-10">
           <div className="space-y-4">
-            <h2 className="text-lg font-bold text-center mb-6">Common Questions</h2>
+            <h2 className="text-lg font-bold text-center mb-6">
+              Common Questions
+            </h2>
             {[
               {
                 q: "Can I cancel anytime?",
-                a: "Yes — cancel from this page or your dashboard. You keep access through the end of your billing period, then it stops. No runaround."},
+                a: "Yes — cancel from this page or your dashboard. You keep access through the end of your billing period, then it stops. No runaround.",
+              },
               {
                 q: "Where do my monthly gallons go?",
-                a: "Right now monthly gallons pool into the platform fuel fund and flow to the most urgent active campaigns. Campaign-level allocation is coming soon."},
+                a: "Right now monthly gallons pool into the platform fuel fund and flow to the most urgent active campaigns. Campaign-level allocation is coming soon.",
+              },
               {
                 q: "What's the 5% platform fee?",
-                a: "Give-A-Gallon takes 5% to cover PayPal fees, server costs, and platform development. The rest goes directly to creators via PayPal Payouts."},
+                a: "Give-A-Gallon takes 5% to cover PayPal fees, server costs, and platform development. The rest goes directly to creators via PayPal Payouts.",
+              },
             ].map(item => (
-              <div key={item.q} className="rounded-xl border border-border/40 bg-card/30 p-5">
+              <div
+                key={item.q}
+                className="rounded-xl border border-border/40 bg-card/30 p-5"
+              >
                 <div className="font-semibold text-sm mb-1.5 flex items-start gap-2">
                   <AlertCircle className="size-4 text-fuel shrink-0 mt-0.5" />
                   {item.q}
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed pl-6">{item.a}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed pl-6">
+                  {item.a}
+                </p>
               </div>
             ))}
           </div>
         </Reveal>
-
       </div>
     </div>
   );
