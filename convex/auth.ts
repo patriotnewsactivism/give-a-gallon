@@ -3,6 +3,7 @@ import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
 import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import { ResendEmail, ResendPasswordReset } from "./authEmail";
+import { TestCredentials } from "./testAuth";
 
 // Email verification + password reset are only enforced when Resend is
 // configured (RESEND_API_KEY set in the Convex deployment). This keeps local
@@ -28,7 +29,7 @@ const PasswordProvider = Password<DataModel>({
 });
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-  providers: [PasswordProvider],
+  providers: [PasswordProvider, TestCredentials],
 });
 
 export const currentUser = query({
