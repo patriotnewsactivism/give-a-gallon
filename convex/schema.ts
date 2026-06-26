@@ -30,6 +30,8 @@ const schema = defineSchema({
       }),
     ),
     stripeSessionId: v.optional(v.string()),
+    paypalEmail: v.optional(v.string()),
+    payoutsCents: v.optional(v.number()),
     // Stripe Connect
     stripeAccountId: v.optional(v.string()),
     stripeAccountStatus: v.optional(
