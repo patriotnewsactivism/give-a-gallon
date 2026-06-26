@@ -345,6 +345,7 @@ function PayoutPanel({ creator }: { creator: any }) {
   const requestPayout = useAction(api.paypalConnect.requestPayout);
 
   const [loading, setLoading] = useState(false);
+  const [paypalEmailInput, setPaypalEmailInput] = useState("");
   const [payoutResult, setPayoutResult] = useState<{
     payoutId: string; feeCents: number; netCents: number; method: string;
   } | null>(null);
@@ -363,12 +364,17 @@ function PayoutPanel({ creator }: { creator: any }) {
   }, [status, getBalance]);
 
   async function handleConnect() {
+    if (!paypalEmailInput.trim()) {
+      toast.error("Please enter a valid PayPal email address");
+      return;
+    }
     setLoading(true);
     try {
-      const { url } = await startOnboarding();
-      window.location.href = url;
+      await startOnboarding({ paypalEmail: paypalEmailInput.trim() });
+      toast.success("PayPal account connected successfully!");
     } catch (e: any) {
       toast.error(e.message ?? "Failed to start onboarding");
+    } finally {
       setLoading(false);
     }
   }
@@ -429,6 +435,20 @@ function PayoutPanel({ creator }: { creator: any }) {
               </li>
             ))}
           </ul>
+          <div className="space-y-1.5 mb-4">
+            <label htmlFor="paypal-email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              PayPal Email Address
+            </label>
+            <Input
+              id="paypal-email"
+              type="email"
+              placeholder="your-paypal-email@example.com"
+              value={paypalEmailInput}
+              onChange={(e) => setPaypalEmailInput(e.target.value)}
+              className="bg-card text-sm"
+              required
+            />
+          </div>
           <Button
             className="w-full bg-fuel text-fuel-foreground hover:bg-fuel/90 font-bold"
             onClick={handleConnect}
