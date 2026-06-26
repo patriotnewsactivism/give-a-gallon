@@ -15,7 +15,23 @@ export const getMyCreator = internalQuery({
 export const setPayPalEmail = internalMutation({
   args: { creatorId: v.id("creators"), paypalEmail: v.string() },
   handler: async (ctx, { creatorId, paypalEmail }) => {
-    await ctx.db.patch(creatorId, { paypalEmail } as any);
+    await ctx.db.patch(creatorId, {
+      paypalEmail,
+      stripeAccountId: "paypal_payout",
+      stripeAccountStatus: "active",
+    });
+  },
+});
+
+export const recordPayout = internalMutation({
+  args: { creatorId: v.id("creators"), amountCents: v.number() },
+  handler: async (ctx, { creatorId, amountCents }) => {
+    const creator = await ctx.db.get(creatorId);
+    if (!creator) throw new Error("Creator not found");
+    const currentPayouts = creator.payoutsCents ?? 0;
+    await ctx.db.patch(creatorId, {
+      payoutsCents: currentPayouts + amountCents,
+    });
   },
 });
 
