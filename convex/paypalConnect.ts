@@ -38,6 +38,7 @@ export const startOnboarding = action({
     if (!userId) throw new Error("Not authenticated");
     const creator: any = await ctx.runQuery(
       internal.paypalConnectMutations.getMyCreator,
+      {},
     );
     if (!creator) throw new Error("Creator profile not found");
     await ctx.runMutation(internal.paypalConnectMutations.setPayPalEmail, {
@@ -53,6 +54,7 @@ export const getBalance = action({
   handler: async ctx => {
     const creator: any = await ctx.runQuery(
       internal.paypalConnectMutations.getMyCreator,
+      {},
     );
     if (!creator) throw new Error("Creator not found");
     const totalPaidOut = creator.payoutsCents ?? 0;
@@ -73,6 +75,7 @@ export const requestPayout = action({
     if (!userId) throw new Error("Not authenticated");
     const creator: any = await ctx.runQuery(
       internal.paypalConnectMutations.getMyCreator,
+      {},
     );
     if (!creator) throw new Error("Creator not found");
     if (!(creator as any).paypalEmail)
