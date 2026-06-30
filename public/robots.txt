@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /my-impact
+Disallow: /referrals
+Disallow: /admin
+
+Sitemap: https://www.giveagallon.org/sitemap.xml
