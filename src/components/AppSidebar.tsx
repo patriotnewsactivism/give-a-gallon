@@ -40,7 +40,7 @@ import {
 const navItems = [
   { href: "/dashboard", label: "Your Tank", icon: LayoutDashboard },
   { href: "/my-impact", label: "My Impact", icon: Sparkles },
-  { href: "/referrals", label: "Referrals", icon: Gift, badge: "Earn ⛽" },
+  { href: "/referrals", label: "Referrals", icon: Gift, badge: "Ambassador" },
   { href: "/settings", label: "Profile", icon: Settings },
 ];
 

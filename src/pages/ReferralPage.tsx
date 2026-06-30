@@ -144,12 +144,12 @@ export default function ReferralPage() {
       {/* Header */}
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <Gift className="size-6 text-amber-400" />
-          <h1 className="text-2xl font-bold">Referral Program</h1>
+          <Trophy className="size-6 text-amber-400" />
+          <h1 className="text-2xl font-bold">Ambassador Program</h1>
         </div>
         <p className="text-muted-foreground">
-          Share your link — earn bonus gallons for every friend who fuels a
-          campaign.
+          Share your link — build your reputation and climb the leaderboard when
+          friends fuel campaigns through you.
         </p>
       </div>
 
@@ -167,9 +167,9 @@ export default function ReferralPage() {
             desc: "Anyone who uses your link",
           },
           {
-            icon: Fuel,
-            label: "You earn gallons",
-            desc: "Credited to your campaign",
+            icon: Trophy,
+            label: "You build reputation",
+            desc: "Climb the ambassador ranks",
           },
         ].map(({ icon: Icon, label, desc }) => (
           <Card
@@ -190,7 +190,7 @@ export default function ReferralPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Zap className="size-5 text-amber-400" />
-            <h2 className="font-semibold text-lg">Your Referral Link</h2>
+            <h2 className="font-semibold text-lg">            Your Ambassador Link</h2>
           </div>
           {referralLink && !isEditing && (
             <Button
@@ -272,7 +272,8 @@ export default function ReferralPage() {
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              You don't have a referral code yet. Generate one to start earning!
+              You don't have an ambassador link yet. Generate one to start
+              building your rank!
             </p>
             <Button
               onClick={handleGenerateCode}
@@ -331,7 +332,7 @@ export default function ReferralPage() {
             color: "text-green-400",
           },
           {
-            label: "Gallons Earned",
+            label: "Gallons Driven",
             value: `${stats?.referralGallons ?? 0}⛽`,
             icon: Fuel,
             color: "text-amber-400",
@@ -360,7 +361,7 @@ export default function ReferralPage() {
       <Card className="p-6 bg-card/60 border-border/40 space-y-4">
         <div className="flex items-center gap-2">
           <Trophy className="size-5 text-amber-400" />
-          <h2 className="font-semibold">Top Referrers</h2>
+          <h2 className="font-semibold">Top Ambassadors</h2>
           <Badge variant="secondary" className="ml-auto text-xs">
             All time
           </Badge>
@@ -368,7 +369,7 @@ export default function ReferralPage() {
 
         {(leaderboard?.length ?? 0) === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            No referrals yet — be the first on the board! 🏆
+            No ambassadors yet — be the first on the board! 🏆
           </p>
         ) : (
           <div className="space-y-2">
@@ -421,7 +422,7 @@ export default function ReferralPage() {
         <ul className="space-y-2 text-sm text-muted-foreground">
           <li className="flex gap-2">
             <span className="text-amber-400 mt-0.5">✓</span>
-            Pin your referral link in your bio on X, Instagram, or YouTube.
+            Pin your ambassador link in your bio on X, Instagram, or YouTube.
           </li>
           <li className="flex gap-2">
             <span className="text-amber-400 mt-0.5">✓</span>
@@ -430,12 +431,12 @@ export default function ReferralPage() {
           </li>
           <li className="flex gap-2">
             <span className="text-amber-400 mt-0.5">✓</span>
-            Every gallon your referrals donate counts toward your campaign
-            total.
+            Every donation driven through your link boosts your ambassador rank.
           </li>
           <li className="flex gap-2">
             <span className="text-amber-400 mt-0.5">✓</span>
-            Top referrers get featured on the public leaderboard — social proof!
+            Top ambassadors get featured on the public leaderboard — social
+            proof!
           </li>
         </ul>
       </Card>

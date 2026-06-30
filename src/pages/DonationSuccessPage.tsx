@@ -298,7 +298,7 @@ export function DonationSuccessPage() {
           </div>
         </Reveal>
 
-        {/* Referral nudge — share the creator's referral link */}
+        {/* Share the creator's link — help spread the word */}
         {creator?.referralCode && (
           <Reveal className="rounded-2xl border border-border/40 bg-card/40 p-5 mb-4">
             <div className="flex items-start gap-3">
@@ -307,11 +307,11 @@ export function DonationSuccessPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold mb-0.5">
-                  Earn gallons for every friend you fuel
+                  Help fuel the movement
                 </p>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Share {creator.displayName}'s referral link — you both get
-                  credit when friends donate.
+                  Share {creator.displayName}'s link — every gallon driven
+                  through you shows up on the ambassador leaderboard.
                 </p>
                 <ReferralShare
                   slug={creator.slug}
