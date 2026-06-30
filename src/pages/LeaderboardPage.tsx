@@ -224,8 +224,8 @@ export function LeaderboardPage() {
             Want to climb the board?
           </h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Share your referral link. Every gallon someone sends through your
-            link counts toward your rank.
+            Share your ambassador link. Every gallon someone donates through
+            your link boosts your rank.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button

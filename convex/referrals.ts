@@ -1,11 +1,12 @@
 /**
- * give-a-gallon — Referral System
+ * give-a-gallon — Ambassador/Referral System
  *
  * Flow:
- *  1. Creator gets a unique referral code (auto-generated on first access)
- *  2. Referral link: https://www.giveagallon.org/?ref=THEIRCODE
- *  3. When a donation completes, referral is credited to the referrer
- *  4. Referrer earns bonus gallons / leaderboard position
+ *  1. Creator gets a unique ambassador link code (auto-generated on first access)
+ *  2. Ambassador link: https://www.giveagallon.org/?ref=THEIRCODE
+ *  3. When a donation completes, the referrer is credited on the leaderboard
+ *  4. Referrer builds reputation and climbs the public ambassador leaderboard
+ *     (referralGallons are a vanity/tracking metric — no monetary reward)
  */
 
 import { getAuthUserId } from "@convex-dev/auth/server";
