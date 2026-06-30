@@ -4,8 +4,8 @@ import { internal } from "./_generated/api";
 const crons = cronJobs();
 
 crons.cron(
-  "weekly-creator-payouts",
-  "0 5 * * 5",
+  "daily-creator-payouts",
+  "0 0 * * *",
   internal.paypalPayouts.runWeeklyPayouts,
 );
 

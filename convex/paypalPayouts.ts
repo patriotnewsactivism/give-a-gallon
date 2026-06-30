@@ -1,7 +1,7 @@
 "use node";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { action } from "./_generated/server";
+import { internalAction } from "./_generated/server";
 import { PLATFORM_FEE_PCT } from "./constants";
 
 function paypalBase(): string {
@@ -27,7 +27,7 @@ async function getPayPalToken(): Promise<string> {
   return ((await res.json()) as { access_token: string }).access_token;
 }
 
-export const triggerPayout = action({
+export const triggerPayout = internalAction({
   args: {
     creatorId: v.id("creators"),
   },
@@ -118,7 +118,7 @@ export const triggerPayout = action({
   },
 });
 
-export const runWeeklyPayouts = action({
+export const runWeeklyPayouts = internalAction({
   args: {},
   handler: async (ctx) => {
     const eligibleCreators = await ctx.runQuery(
