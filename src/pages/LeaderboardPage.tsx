@@ -56,11 +56,11 @@ export function LeaderboardPage() {
             className="text-4xl sm:text-5xl font-black tracking-tight mb-3"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            REFERRAL <span className="text-fuel">LEADERBOARD</span>
+            AMBASSADOR <span className="text-fuel">LEADERBOARD</span>
           </h1>
           <p className="text-muted-foreground max-w-md mx-auto">
-            The activists fueling the most movement — ranked by gallons sent
-            through referral links.
+            The activists driving the most support — ranked by gallons donated
+            through their ambassador links.
           </p>
           <Button
             variant="outline"
@@ -122,9 +122,9 @@ export function LeaderboardPage() {
         ) : top.length === 0 ? (
           <div className="text-center py-20">
             <Medal className="size-12 text-muted-foreground/30 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No referrals yet</h3>
+            <h3 className="text-lg font-semibold mb-2">No ambassadors yet</h3>
             <p className="text-sm text-muted-foreground mb-6">
-              Be the first to share your referral link and climb the board.
+              Be the first to share your ambassador link and climb the board.
             </p>
             <Button
               asChild
