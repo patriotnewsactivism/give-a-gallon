@@ -1,5 +1,5 @@
 import { useConvexAuth } from "convex/react";
-import { ArrowRight, BarChart3, Menu, Star, Trophy, X } from "lucide-react";
+import { ArrowRight, BarChart3, ExternalLink, Globe, Menu, Star, Trophy, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Logo } from "./Logo";
@@ -67,6 +67,32 @@ export function Header() {
                 <Star className="size-3.5 mr-1" />
                 Membership
               </Link>
+            </Button>
+
+            <span className="w-px h-4 bg-border/60 mx-1" />
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-fuel hover:bg-white/5"
+              asChild
+            >
+              <a href="https://www.wtpnews.org" target="_blank" rel="noopener noreferrer">
+                <Globe className="size-3.5 mr-1" />
+                WTP News
+                <ExternalLink className="size-2.5 ml-0.5 opacity-50" />
+              </a>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-fuel hover:bg-white/5"
+              asChild
+            >
+              <a href="https://www.civilrightshub.org" target="_blank" rel="noopener noreferrer">
+                Civil Rights Hub
+                <ExternalLink className="size-2.5 ml-0.5 opacity-50" />
+              </a>
             </Button>
 
             {isLoading ? null : isAuthenticated ? (
@@ -151,6 +177,30 @@ export function Header() {
             >
               <Star className="size-3.5" /> Membership
             </Link>
+
+            <div className="border-t border-border/20 my-1" />
+
+            <a
+              href="https://www.wtpnews.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-2.5 text-sm text-muted-foreground hover:text-fuel rounded-md hover:bg-muted/50 flex items-center gap-2 font-medium"
+            >
+              <Globe className="size-3.5" /> We The People News
+              <ExternalLink className="size-2.5 opacity-40" />
+            </a>
+            <a
+              href="https://www.civilrightshub.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-2.5 text-sm text-muted-foreground hover:text-fuel rounded-md hover:bg-muted/50 flex items-center gap-2 font-medium"
+            >
+              <Globe className="size-3.5" /> Civil Rights Hub
+              <ExternalLink className="size-2.5 opacity-40" />
+            </a>
+
+            <div className="border-t border-border/20 my-1" />
+
             {isAuthenticated ? (
               <Link
                 to="/dashboard"
