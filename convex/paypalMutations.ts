@@ -125,6 +125,42 @@ export const getEligibleCreatorsForPayout = internalQuery({
   },
 });
 
+export const searchDonationsDebug = internalQuery({
+  args: { startDate: v.number(), endDate: v.number() },
+  handler: async (ctx, { startDate, endDate }) => {
+    const [donations, creators] = await Promise.all([
+      ctx.db.query("donations").order("desc").take(200),
+      ctx.db.query("creators").collect(),
+    ]);
+    const donationMatches = donations.filter(
+      (d) => d.createdAt >= startDate && d.createdAt <= endDate,
+    );
+    return {
+      totalDonations: donations.length,
+      totalCreators: creators.length,
+      donations: donationMatches.map((d) => ({
+        _id: d._id,
+        gallons: d.gallons,
+        amountCents: d.amountCents,
+        status: d.status,
+        donorName: d.donorName,
+        donorEmail: d.donorEmail,
+        createdAt: d.createdAt,
+        creatorId: d.creatorId,
+        stripeSessionId: d.stripeSessionId,
+      })),
+      creators: creators.map((c) => ({
+        _id: c._id,
+        displayName: c.displayName,
+        totalGallons: c.totalGallons,
+        totalDonations: c.totalDonations,
+        paypalEmail: c.paypalEmail,
+        isActive: c.isActive,
+      })),
+    };
+  },
+});
+
 export const updatePayoutsCents = internalMutation({
   args: {
     creatorId: v.id("creators"),
