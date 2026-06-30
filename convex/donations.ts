@@ -60,15 +60,8 @@ export const create = mutation({
       donorEmail: args.donorEmail,
       message: args.message,
       isAnonymous: args.isAnonymous,
-      status: "completed", // For MVP, mark as completed immediately
+      status: "pending",
       createdAt: Date.now(),
-    });
-
-    // Update creator totals
-    await ctx.db.patch(args.creatorId, {
-      totalGallons: creator.totalGallons + args.gallons,
-      totalDonations: creator.totalDonations + 1,
-      totalAmountCents: creator.totalAmountCents + amountCents,
     });
 
     return donationId;

@@ -1,5 +1,7 @@
 {
   "node": {
-    "externalPackages": ["@anthropic-ai/sdk"]
+    "externalPackages": [
+      "@anthropic-ai/sdk"
+    ]
   }
 }

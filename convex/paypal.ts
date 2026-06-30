@@ -156,7 +156,62 @@ export const captureOrder = action({
 
 export const handleWebhook = action({
   args: { payload: v.string(), headers: v.string() },
-  handler: async (ctx, { payload }): Promise<{ received: boolean }> => {
+  handler: async (ctx, { payload, headers }): Promise<{ received: boolean }> => {
+    const parsedHeaders = JSON.parse(headers) as Record<string, string>;
+
+    const transmissionId = parsedHeaders["paypal-transmission-id"];
+    const transmissionTime = parsedHeaders["paypal-transmission-time"];
+    const certUrl = parsedHeaders["paypal-cert-url"];
+    const authAlgo = parsedHeaders["paypal-auth-algo"];
+    const transmissionSig = parsedHeaders["paypal-transmission-sig"];
+
+    if (!transmissionId || !transmissionTime || !certUrl || !authAlgo || !transmissionSig) {
+      throw new Error("Missing PayPal webhook signature headers");
+    }
+
+    const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+    if (!webhookId) {
+      throw new Error("PAYPAL_WEBHOOK_ID environment variable not configured");
+    }
+
+    const token = await getPayPalToken();
+
+    const verifyRes = await fetch(
+      `${paypalBase()}/v1/notifications/verify-webhook-signature`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          auth_algo: authAlgo,
+          cert_url: certUrl,
+          transmission_id: transmissionId,
+          transmission_sig: transmissionSig,
+          transmission_time: transmissionTime,
+          webhook_id: webhookId,
+          webhook_event: JSON.parse(payload),
+        }),
+      },
+    );
+
+    if (!verifyRes.ok) {
+      const errorText = await verifyRes.text();
+      console.error(`PayPal webhook verification failed: ${errorText}`);
+      throw new Error("Webhook signature verification failed");
+    }
+
+    const verifyData = (await verifyRes.json()) as {
+      verification_status: string;
+    };
+
+    if (verifyData.verification_status !== "SUCCESS") {
+      throw new Error(
+        `Webhook verification status: ${verifyData.verification_status}`,
+      );
+    }
+
     const event = JSON.parse(payload) as {
       event_type: string;
       resource: {

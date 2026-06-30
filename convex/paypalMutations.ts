@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { internalMutation, internalQuery } from "./_generated/server";
+import { PLATFORM_FEE_PCT } from "./constants";
 
 export const createPendingDonation = internalMutation({
   args: {
@@ -90,5 +91,53 @@ export const completeDonation = internalMutation({
         donationId: donation._id,
       });
     }
+  },
+});
+
+export const getEligibleCreatorsForPayout = internalQuery({
+  args: {},
+  handler: async (
+    ctx,
+  ): Promise<
+    Array<{
+      _id: string;
+      paypalEmail: string;
+      totalAmountCents: number;
+      payoutsCents: number;
+    }>
+  > => {
+    const MIN_PAYOUT_CENTS = 500;
+    const creators = await ctx.db.query("creators").collect();
+
+    return creators
+      .filter((c) => {
+        if (!c.paypalEmail || !c.isActive) return false;
+        const owed =
+          c.totalAmountCents * (1 - PLATFORM_FEE_PCT) - (c.payoutsCents ?? 0);
+        return owed >= MIN_PAYOUT_CENTS;
+      })
+      .map((c) => ({
+        _id: c._id,
+        paypalEmail: c.paypalEmail!,
+        totalAmountCents: c.totalAmountCents,
+        payoutsCents: c.payoutsCents ?? 0,
+      }));
+  },
+});
+
+export const updatePayoutsCents = internalMutation({
+  args: {
+    creatorId: v.id("creators"),
+    payoutAmountCents: v.number(),
+  },
+  handler: async (ctx, { creatorId, payoutAmountCents }) => {
+    const creator = await ctx.db.get(creatorId);
+    if (!creator) throw new Error("Creator not found");
+
+    const currentPayoutsCents = creator.payoutsCents ?? 0;
+
+    await ctx.db.patch(creatorId, {
+      payoutsCents: currentPayoutsCents + payoutAmountCents,
+    });
   },
 });
