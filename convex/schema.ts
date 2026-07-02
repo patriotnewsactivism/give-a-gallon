@@ -262,6 +262,21 @@ const schema = defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_stripeAccount", ["stripeAccountId"]),
+  // ── Donation Matching Campaigns ─────────────────────────────────────────────
+  matchCampaigns: defineTable({
+    creatorId: v.id("creators"),
+    sponsorName: v.string(),
+    sponsorMessage: v.optional(v.string()),
+    matchRatio: v.number(),       // 2.0 = double, 3.0 = triple
+    maxMatchGallons: v.number(),  // cap
+    matchedGallons: v.number(),   // running total
+    startsAt: v.number(),
+    endsAt: v.number(),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_creator", ["creatorId"])
+    .index("by_active", ["isActive"]),
 });
 
 export default schema;
