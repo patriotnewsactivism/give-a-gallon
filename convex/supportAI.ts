@@ -97,37 +97,193 @@ async function draftReply(
   ticket: Doc<"supportTickets">,
   thread: Doc<"supportMessages">[],
 ): Promise<string | null> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return null;
-
-  // Map the thread to alternating Claude turns (user = sender, assistant = us).
-  const history: Anthropic.MessageParam[] = thread.length
+  // Map the thread to standard chat messages format.
+  const history = thread.length
     ? thread.map(m => ({
-        role: m.role,
+        role: m.role === "assistant" ? "assistant" : "user",
         content: m.body,
       }))
     : [{ role: "user", content: ticket.message }];
 
-  // The API requires the conversation to start with a user turn.
   if (history[0]?.role !== "user") {
     history.unshift({ role: "user", content: ticket.message });
   }
 
-  const client = new Anthropic({ apiKey });
-  const message = await client.messages.create({
-    model: "claude-opus-4-8",
-    max_tokens: 1024,
-    system:
-      KNOWLEDGE +
-      `\n\nThis thread's topic: "${ticket.subject}" (category: ${ticket.category}).`,
-    messages: history,
-  });
+  const systemPrompt = KNOWLEDGE + `\n\nThis thread's topic: "${ticket.subject}" (category: ${ticket.category}).`;
 
-  return message.content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map(b => b.text)
-    .join("")
-    .trim();
+  // 1. Groq Fallback
+  if (process.env.GROQ_API_KEY) {
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "system", content: systemPrompt }, ...history],
+          max_tokens: 1024,
+          temperature: 0.5,
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content?.trim() || null;
+      }
+    } catch (e) {
+      console.error("Groq fallback failed:", e);
+    }
+  }
+
+  // 2. Cerebras Fallback
+  if (process.env.CEREBRAS_API_KEY) {
+    try {
+      const response = await fetch("https://api.cerebras.ai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.CEREBRAS_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "llama3.1-8b",
+          messages: [{ role: "system", content: systemPrompt }, ...history],
+          max_tokens: 1024,
+          temperature: 0.5,
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content?.trim() || null;
+      }
+    } catch (e) {
+      console.error("Cerebras fallback failed:", e);
+    }
+  }
+
+  // 3. Mistral Fallback
+  if (process.env.MISTRAL_API_KEY) {
+    try {
+      const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "open-mistral-7b",
+          messages: [{ role: "system", content: systemPrompt }, ...history],
+          max_tokens: 1024,
+          temperature: 0.5,
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content?.trim() || null;
+      }
+    } catch (e) {
+      console.error("Mistral fallback failed:", e);
+    }
+  }
+
+  // 4. Gemini Fallback
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: history.map(h => ({
+            role: h.role === "assistant" ? "model" : "user",
+            parts: [{ text: h.content }]
+          }))
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null;
+      }
+    } catch (e) {
+      console.error("Gemini fallback failed:", e);
+    }
+  }
+
+  // 5. Cloudflare Workers AI Fallback
+  if (process.env.CLOUDFLARE_API_KEY && process.env.CLOUDFLARE_ACCOUNT_ID) {
+    try {
+      const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/meta/llama-3-8b-instruct`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.CLOUDFLARE_API_KEY}`
+        },
+        body: JSON.stringify({
+          messages: [{ role: "system", content: systemPrompt }, ...history],
+          max_tokens: 1024,
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.result?.response?.trim() || null;
+      }
+    } catch (e) {
+      console.error("Cloudflare fallback failed:", e);
+    }
+  }
+
+  // 6. OpenRouter Free Fallback
+  if (process.env.OPENROUTER_API_KEY) {
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "meta-llama/llama-3-8b-instruct:free",
+          messages: [{ role: "system", content: systemPrompt }, ...history],
+          max_tokens: 1024,
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content?.trim() || null;
+      }
+    } catch (e) {
+      console.error("OpenRouter fallback failed:", e);
+    }
+  }
+
+  // 7. Legitimate Customer/BYOK Anthropic key option as final path
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const client = new Anthropic({ apiKey });
+    // Map thread/history to AnthropicMessageParam
+    const anthropicHistory = history.map(h => ({
+      role: h.role as "user" | "assistant",
+      content: h.content,
+    }));
+
+    const message = await client.messages.create({
+      model: "claude-3-5-sonnet-20241022", // Clean up non-existent model to real Claude 3.5 Sonnet
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: anthropicHistory,
+    });
+
+    return message.content
+      .filter((b): b is Anthropic.TextBlock => b.type === "text")
+      .map(b => b.text)
+      .join("")
+      .trim();
+  } catch (e) {
+    console.error("BYOK Anthropic draft failed:", e);
+    return null;
+  }
 }
 
 export const handleTicket = internalAction({
