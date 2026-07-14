@@ -193,13 +193,11 @@ async function draftReply(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [
-            { role: "user", parts: [{ text: systemPrompt }] },
-            ...history.map(h => ({
-              role: h.role === "assistant" ? "model" : "user",
-              parts: [{ text: h.content }]
-            }))
-          ]
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: history.map(h => ({
+            role: h.role === "assistant" ? "model" : "user",
+            parts: [{ text: h.content }]
+          }))
         })
       });
       if (response.ok) {
