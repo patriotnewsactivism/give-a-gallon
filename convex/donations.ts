@@ -1,266 +1,98 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { GALLON_PRICE_CENTS, PLATFORM_FEE_PERCENTAGE } from "./constants";
 
-const GALLON_PRICE_CENTS = 425; // $4.25
-const PLATFORM_FEE_PCT = 0.05; // 5%
-
-// Get recent donations for a creator (public)
-export const listForCreator = query({
-  args: { creatorId: v.id("creators"), limit: v.optional(v.number()) },
-  handler: async (ctx, { creatorId, limit }) => {
-    const donations = await ctx.db
+export const getLiveTicker = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = Math.min(args.limit ?? 10, 50);
+    const recent = await ctx.db
       .query("donations")
-      .withIndex("by_creator", q => q.eq("creatorId", creatorId))
+      .withIndex("by_status_and_created", (q) => q.eq("status", "completed"))
       .order("desc")
-      .take(limit ?? 50);
+      .take(limit);
 
-    // Hide emails, show donor names (or "Anonymous")
-    return donations.map(d => ({
-      _id: d._id,
-      gallons: d.gallons,
-      amountCents: d.amountCents,
-      donorName: d.isAnonymous ? "Anonymous" : d.donorName || "Someone",
-      message: d.message,
-      isAnonymous: d.isAnonymous,
-      createdAt: d.createdAt,
-      status: d.status,
-    }));
+    const results = [];
+    for (const d of recent) {
+      const creator = await ctx.db.get(d.creatorId);
+      results.push({
+        _id: d._id,
+        gallons: d.gallons,
+        donorName: d.donorName,
+        createdAt: d.createdAt,
+        creatorSlug: creator?.slug ?? "",
+        creatorName: creator?.displayName ?? "Unknown Creator",
+      });
+    }
+    return results;
   },
 });
 
-// Create a donation (public — no auth required to donate)
-export const create = mutation({
+export const recordCompletedCheckoutSession = mutation({
   args: {
-    creatorId: v.id("creators"),
-    gallons: v.number(),
-    donorName: v.optional(v.string()),
+    stripeSessionId: v.string(),
+    stripePaymentIntentId: v.optional(v.string()),
+    creatorSlug: v.string(),
+    donorName: v.string(),
     donorEmail: v.optional(v.string()),
-    message: v.optional(v.string()),
-    isAnonymous: v.boolean(),
+    gallons: v.number(),
+    amountCents: v.number(),
   },
   handler: async (ctx, args) => {
-    if (args.gallons < 1 || args.gallons > 1000) {
-      throw new Error("Gallons must be between 1 and 1000");
+    // Deduplicate webhook execution to prevent double crediting
+    const dedup = await ctx.db
+      .query("webhookDeduplications")
+      .withIndex("by_eventKey", (q) => q.eq("eventKey", `stripe_session_${args.stripeSessionId}`))
+      .first();
+    if (dedup) {
+      return { duplicate: true };
     }
 
-    const creator = await ctx.db.get(args.creatorId);
-    if (!creator?.isActive) {
-      throw new Error("Creator not found or inactive");
+    await ctx.db.insert("webhookDeduplications", {
+      eventKey: `stripe_session_${args.stripeSessionId}`,
+      provider: "stripe",
+      processedAt: Date.now(),
+    });
+
+    const creator = await ctx.db
+      .query("creators")
+      .withIndex("by_slug", (q) => q.eq("slug", args.creatorSlug))
+      .first();
+
+    if (!creator) {
+      throw new Error(`Creator not found with slug: ${args.creatorSlug}`);
     }
 
-    const amountCents = Math.round(args.gallons * GALLON_PRICE_CENTS);
-    const platformFeeCents = Math.round(amountCents * PLATFORM_FEE_PCT);
+    const feeCents = Math.round(args.amountCents * PLATFORM_FEE_PERCENTAGE);
+    const netCents = args.amountCents - feeCents;
 
     const donationId = await ctx.db.insert("donations", {
-      creatorId: args.creatorId,
-      gallons: args.gallons,
-      amountCents,
-      platformFeeCents,
-      donorName: args.donorName,
+      creatorId: creator._id,
+      donorName: args.donorName || "Anonymous",
       donorEmail: args.donorEmail,
-      message: args.message,
-      isAnonymous: args.isAnonymous,
-      status: "pending",
+      gallons: args.gallons,
+      amountCents: args.amountCents,
+      netCents,
+      feeCents,
+      status: "completed",
+      stripeSessionId: args.stripeSessionId,
+      stripePaymentIntentId: args.paymentIntentId,
       createdAt: Date.now(),
     });
 
-    return donationId;
-  },
-});
+    const newTotalGallons = creator.totalGallons + args.gallons;
+    const newTotalCentsRaised = creator.totalCentsRaised + args.amountCents;
+    const newBalanceCents = creator.balanceCents + netCents;
 
-// Get the most recent completed donations across all creators (public live feed)
-export const getRecent = query({
-  args: { limit: v.optional(v.number()) },
-  handler: async (ctx, { limit }) => {
-    const donations = await ctx.db
-      .query("donations")
-      .withIndex("by_status", q => q.eq("status", "completed"))
-      .order("desc")
-      .take(limit ?? 8);
+    await ctx.db.patch(creator._id, {
+      totalGallons: newTotalGallons,
+      totalCentsRaised: newTotalCentsRaised,
+      balanceCents: newBalanceCents,
+      updatedAt: Date.now(),
+    });
 
-    const withCreators = await Promise.all(
-      donations.map(async d => {
-        const creator = await ctx.db.get(d.creatorId);
-        return {
-          _id: d._id,
-          gallons: d.gallons,
-          donorName: d.isAnonymous ? "Anonymous" : d.donorName || "Someone",
-          message: d.message,
-          createdAt: d.createdAt,
-          creatorSlug: creator?.slug ?? "",
-          creatorName: creator?.displayName ?? "",
-        };
-      }),
-    );
-
-    return withCreators;
-  },
-});
-
-// Get platform stats (public) — reads from materialized platformStats table
-export const platformStats = query({
-  args: {},
-  handler: async ctx => {
-    // Try the fast materialized record first
-    const stats = await ctx.db
-      .query("platformStats")
-      .withIndex("by_key", q => q.eq("key", "global"))
-      .first();
-
-    if (stats) {
-      return {
-        totalCreators: stats.totalCreators,
-        totalGallons: stats.totalGallons,
-        totalDonations: stats.totalCampaigns,
-        totalDonors: stats.totalDonors,
-        totalAmountCents: stats.totalDonationsCents,
-      };
-    }
-
-    // Fallback: compute from creators (no stats record yet)
-    const creators = await ctx.db.query("creators").collect();
-    const activeCreators = creators.filter(c => c.isActive);
-    const totalGallons = creators.reduce((sum, c) => sum + c.totalGallons, 0);
-    const totalDonations = creators.reduce(
-      (sum, c) => sum + c.totalDonations,
-      0,
-    );
-
-    return {
-      totalCreators: activeCreators.length,
-      totalGallons,
-      totalDonations,
-      totalDonors: totalDonations, // best guess without stats table
-      totalAmountCents: 0,
-    };
-  },
-});
-
-// Get a single donation by its Stripe session ID (for success page)
-export const getByStripeSession = query({
-  args: { sessionId: v.string() },
-  handler: async (ctx, { sessionId }) => {
-    return ctx.db
-      .query("donations")
-      .withIndex("by_stripeSession", q => q.eq("stripeSessionId", sessionId))
-      .first();
-  },
-});
-
-// Get all donations by a logged-in donor (by email)
-
-export const getByPayPalOrder = query({
-  args: { sessionId: v.string() },
-  handler: async (ctx, { sessionId }) => {
-    // sessionId is actually the donation record ID for PayPal flows
-    // Try direct ID lookup first, then fall back to stripeSessionId index (stores PayPal order ID)
-    try {
-      const byId = await ctx.db.get(sessionId as any);
-      if (byId) return byId;
-    } catch {}
-    return ctx.db
-      .query("donations")
-      .withIndex("by_stripeSession", q => q.eq("stripeSessionId", sessionId))
-      .first();
-  },
-});
-
-export const getMyDonations = query({
-  args: {},
-  handler: async ctx => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return [];
-
-    const user = await ctx.db
-      .query("users")
-      .filter(q => q.eq(q.field("email"), identity.email))
-      .first();
-    if (!user) return [];
-
-    // Match donations by email
-    const donations = await ctx.db
-      .query("donations")
-      .withIndex("by_status", q => q.eq("status", "completed"))
-      .order("desc")
-      .collect();
-
-    const myDonations = donations.filter(
-      d =>
-        d.donorEmail &&
-        d.donorEmail.toLowerCase() === (identity.email ?? "").toLowerCase(),
-    );
-
-    const withCreators = await Promise.all(
-      myDonations.map(async d => {
-        const creator = await ctx.db.get(d.creatorId);
-        // Get updates posted after this donation
-        const updates = creator
-          ? await ctx.db
-              .query("updates")
-              .withIndex("by_creator", q =>
-                q.eq("creatorId", d.creatorId).gt("createdAt", d.createdAt),
-              )
-              .take(3)
-          : [];
-
-        return {
-          _id: d._id,
-          gallons: d.gallons,
-          amountCents: d.amountCents,
-          message: d.message,
-          createdAt: d.createdAt,
-          creatorId: d.creatorId,
-          creatorSlug: creator?.slug ?? "",
-          creatorName: creator?.displayName ?? "",
-          creatorCategory: creator?.category ?? "",
-          creatorVerification: creator?.verificationStatus ?? "unverified",
-          recentUpdates: updates.map(u => ({
-            _id: u._id,
-            title: u.title,
-            impactTag: u.impactTag,
-            createdAt: u.createdAt,
-          })),
-        };
-      }),
-    );
-
-    return withCreators;
-  },
-});
-
-// Donor impact summary
-export const getMyImpactSummary = query({
-  args: {},
-  handler: async ctx => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return null;
-
-    const donations = await ctx.db
-      .query("donations")
-      .withIndex("by_status", q => q.eq("status", "completed"))
-      .collect();
-
-    const myDonations = donations.filter(
-      d =>
-        d.donorEmail &&
-        d.donorEmail.toLowerCase() === (identity.email ?? "").toLowerCase(),
-    );
-
-    const totalGallons = myDonations.reduce((sum, d) => sum + d.gallons, 0);
-    const totalAmountCents = myDonations.reduce(
-      (sum, d) => sum + d.amountCents,
-      0,
-    );
-    const uniqueCreators = new Set(myDonations.map(d => d.creatorId.toString()))
-      .size;
-    const estimatedMiles = Math.round(totalGallons * 30); // ~30 miles per gallon
-
-    return {
-      totalGallons,
-      totalAmountCents,
-      totalDonations: myDonations.length,
-      uniqueCreators,
-      estimatedMiles,
-    };
+    return { success: true, donationId };
   },
 });
