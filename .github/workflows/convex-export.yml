@@ -1,0 +1,30 @@
+name: Export Convex Production Backup
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/convex-export.yml'
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - name: Export production data and file storage
+        run: npx convex export --prod --include-file-storage --path convex-production-backup.zip
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: convex-production-backup
+          path: convex-production-backup.zip
+          retention-days: 7
+          if-no-files-found: error
