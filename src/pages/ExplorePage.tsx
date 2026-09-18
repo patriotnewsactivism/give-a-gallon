@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useQuery } from "@/lib/backend";
 import { Fuel, MapPin, Search, SlidersHorizontal, X, Zap } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -10,7 +10,7 @@ import {
   URGENCY_LEVELS,
   VERIFICATION_TIERS,
 } from "@/lib/constants";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 function VerificationBadge({ status }: { status?: string }) {
   const tier =
