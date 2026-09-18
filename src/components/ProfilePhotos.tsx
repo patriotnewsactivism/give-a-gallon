@@ -1,10 +1,10 @@
-import { useMutation } from "convex/react";
+import { useMutation } from "@/lib/backend";
 import { Camera, ImagePlus, Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useUploadFile } from "@/hooks/useUploadFile";
 import { cn } from "@/lib/utils";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8MB
 
