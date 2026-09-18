@@ -1,4 +1,4 @@
-import { useAction, useQuery } from "convex/react";
+import { useAction, useQuery } from "@/lib/backend";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -30,7 +30,7 @@ import {
   URGENCY_LEVELS,
   VERIFICATION_TIERS,
 } from "@/lib/constants";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 // ── LiveFuelFlash ─────────────────────────────────────────────────────────
 // Watches this campaign's donations live and flashes a banner whenever a
