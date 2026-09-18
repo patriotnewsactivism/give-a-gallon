@@ -1,4 +1,4 @@
-import { useConvexAuth } from "convex/react";
+import { useConvexAuth } from "@/lib/backend";
 import { ArrowRight, BarChart3, ExternalLink, Globe, Menu, Star, Trophy, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
