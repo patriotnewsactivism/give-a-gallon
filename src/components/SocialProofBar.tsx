@@ -7,11 +7,11 @@
  * - Each new donation triggers a slide-up toast with a link to that campaign
  * - Auto-dismisses after 6 seconds; user can also close it manually
  */
-import { useQuery } from "convex/react";
+import { useQuery } from "@/lib/backend";
 import { Fuel, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 interface ToastDonation {
   _id: string;
