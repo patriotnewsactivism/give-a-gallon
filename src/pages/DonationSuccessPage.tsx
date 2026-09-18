@@ -1,4 +1,4 @@
-import { useAction, useQuery } from "convex/react";
+import { useAction, useQuery } from "@/lib/backend";
 import {
   ArrowRight,
   CheckCircle2,
@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 function ReferralShare({ slug, code }: { slug: string; code: string }) {
   const [copied, setCopied] = useState(false);
