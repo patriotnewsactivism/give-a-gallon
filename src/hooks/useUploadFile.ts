@@ -1,25 +1,19 @@
-import { useMutation } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import type { Id } from "../../convex/_generated/dataModel";
+import { supabase } from "@/lib/supabase";
 
-/**
- * useUploadFile — uploads a File to Convex storage and returns its storageId.
- * Flow: ask the backend for a short-lived upload URL, POST the file to it,
- * read back the storageId. Attach that id to a record via a mutation.
- */
 export function useUploadFile() {
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
-  return async (file: File): Promise<Id<"_storage">> => {
-    const url = await generateUploadUrl();
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": file.type },
-      body: file,
+  return async (file: File): Promise<{ url: string; path: string }> => {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData.user) throw new Error("Not authenticated");
+    const rawExt = file.name.split(".").pop()?.toLowerCase();
+    const ext = rawExt && /^[a-z0-9]+$/.test(rawExt) ? rawExt : "jpg";
+    const path = `${authData.user.id}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("creator-media").upload(path, file, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: file.type,
     });
-    if (!res.ok) throw new Error("Upload failed");
-    const { storageId } = (await res.json()) as {
-      storageId: Id<"_storage">;
-    };
-    return storageId;
+    if (error) throw error;
+    const { data } = supabase.storage.from("creator-media").getPublicUrl(path);
+    return { url: data.publicUrl, path };
   };
 }

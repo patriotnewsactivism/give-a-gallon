@@ -97,6 +97,12 @@ export const VERIFICATION_TIERS = {
     bg: "bg-fuel/10",
     badge: "✦",
   },
+  platform_verified: {
+    label: "Platform Verified",
+    color: "text-fuel",
+    bg: "bg-fuel/10",
+    badge: "✦",
+  },
 } as const;
 
 export const URGENCY_LEVELS = {

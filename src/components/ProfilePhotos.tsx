@@ -10,7 +10,7 @@ const MAX_BYTES = 8 * 1024 * 1024; // 8MB
 
 /**
  * ProfilePhotos — cover banner + avatar uploader for the settings page.
- * Uploads to Convex storage and attaches the storageId to the creator profile.
+ * Uploads to Supabase Storage and saves the public URL on the creator profile.
  */
 export function ProfilePhotos({
   avatarUrl,
@@ -39,11 +39,11 @@ export function ProfilePhotos({
     }
     setBusy(kind);
     try {
-      const storageId = await upload(file);
+      const uploaded = await upload(file);
       await setImages(
         kind === "avatar"
-          ? { avatarId: storageId }
-          : { coverImageId: storageId },
+          ? { avatarUrl: uploaded.url, avatarPath: uploaded.path }
+          : { coverUrl: uploaded.url, coverPath: uploaded.path },
       );
       toast.success(kind === "avatar" ? "Avatar updated" : "Cover updated");
     } catch {
