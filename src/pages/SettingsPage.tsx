@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "@/lib/backend";
 import { Check, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GALLON_PRICE } from "@/lib/constants";
-import { api } from "../../convex/_generated/api";
-import { CATEGORIES as CATEGORY_LIST } from "../../convex/constants";
+import { api } from "@/lib/backend";
+import { CATEGORIES as CATEGORY_LIST } from "@/lib/constants";
 
 const BIO_TEMPLATES = [
   {
