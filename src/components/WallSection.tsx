@@ -1,10 +1,10 @@
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "@/lib/backend";
 import { Heart, Loader2, MessageCircle, Send, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { api } from "../../convex/_generated/api";
-import type { Id } from "../../convex/_generated/dataModel";
+import { api } from "@/lib/backend";
+import type { Id } from "@/lib/backend";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 
