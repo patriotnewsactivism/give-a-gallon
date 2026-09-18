@@ -7,7 +7,7 @@
  *  - Recent donations feed
  *  - Push notification sender
  */
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "@/lib/backend";
 import {
   Activity,
   Bell,
@@ -32,7 +32,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function fmt$(cents: number) {
