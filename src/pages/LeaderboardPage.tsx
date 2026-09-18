@@ -1,9 +1,9 @@
-import { useQuery } from "convex/react";
+import { useQuery } from "@/lib/backend";
 import { Fuel, Medal, Share2, TrendingUp, Trophy, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 const MEDAL: Record<number, { emoji: string; color: string; bg: string }> = {
   1: {
