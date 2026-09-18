@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useQuery } from "@/lib/backend";
 import {
   BarChart3,
   CheckCircle2,
@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { CountUp } from "@/components/CountUp";
 import { Reveal } from "@/components/Reveal";
-import { api } from "../../convex/_generated/api";
-import { CATEGORIES } from "../../convex/constants";
+import { api } from "@/lib/backend";
+import { CATEGORIES } from "@/lib/constants";
 
 function StatTile({
   icon: Icon,
