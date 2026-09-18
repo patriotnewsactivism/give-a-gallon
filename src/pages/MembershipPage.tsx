@@ -1,4 +1,4 @@
-import { useAction, useConvexAuth, useQuery } from "convex/react";
+import { useAction, useConvexAuth, useQuery } from "@/lib/backend";
 import {
   AlertCircle,
   ArrowRight,
@@ -18,7 +18,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 const TIERS = [
   {
