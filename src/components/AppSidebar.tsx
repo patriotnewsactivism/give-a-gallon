@@ -1,5 +1,5 @@
-import { useAuthActions } from "@convex-dev/auth/react";
-import { useQuery } from "convex/react";
+import { useAuthActions } from "@/lib/backend";
+import { useQuery } from "@/lib/backend";
 import {
   ExternalLink,
   Fuel,
@@ -12,7 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 import { Logo } from "./Logo";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Badge } from "./ui/badge";
