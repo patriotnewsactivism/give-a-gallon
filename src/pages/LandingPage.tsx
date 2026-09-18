@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useQuery } from "@/lib/backend";
 import {
   ArrowRight,
   ChevronRight,
@@ -25,8 +25,8 @@ import { NewestCreators } from "@/components/NewestCreators";
 import { Reveal } from "@/components/Reveal";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES, GALLON_PRICE } from "@/lib/constants";
-import { api } from "../../convex/_generated/api";
-import { VERIFICATION_TIERS } from "../../convex/constants";
+import { api } from "@/lib/backend";
+import { VERIFICATION_TIERS } from "@/lib/constants";
 
 function HeroSection() {
   const stats = useQuery(api.donations.platformStats);
