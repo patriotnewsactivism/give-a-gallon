@@ -3,13 +3,13 @@
  * Shows the most recently created active profiles to drive
  * social proof and encourage new signups.
  */
-import { useQuery } from "convex/react";
+import { useQuery } from "@/lib/backend";
 import { formatDistanceToNow } from "date-fns";
 import { Fuel, Sparkles, UserPlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Reveal } from "@/components/Reveal";
 import { CATEGORIES } from "@/lib/constants";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 function timeAgo(ts: number) {
   try {
