@@ -1,4 +1,4 @@
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "@/lib/backend";
 import {
   AlertCircle,
   ArrowDownToLine,
@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { GALLON_PRICE } from "@/lib/constants";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 export function DashboardPage() {
   const creator = useQuery(api.creators.getMine);
