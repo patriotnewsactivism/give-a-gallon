@@ -2,12 +2,12 @@
  * FeaturedCampaigns — editorial spotlight section
  * Shows isFeatured=true campaigns with optional featuredNote
  */
-import { useQuery } from "convex/react";
+import { useQuery } from "@/lib/backend";
 import { ExternalLink, Fuel, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Reveal } from "@/components/Reveal";
-import { api } from "../../convex/_generated/api";
-import { VERIFICATION_TIERS } from "../../convex/constants";
+import { api } from "@/lib/backend";
+import { VERIFICATION_TIERS } from "@/lib/constants";
 
 const NETWORK_LABEL: Record<string, { label: string; color: string }> = {
   wtpnews: { label: "WTP News Pick", color: "text-fuel" },
