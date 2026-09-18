@@ -3,7 +3,6 @@ import {
   ArrowRight,
   CheckCircle2,
   Fuel,
-  Heart,
   Link2,
   Share2,
   Sparkles,
