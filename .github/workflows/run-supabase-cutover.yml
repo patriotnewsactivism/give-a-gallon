@@ -1,4 +1,4 @@
-name: Run Supabase cutover branch build
+name: Clean Supabase migration branch
 on:
   push:
     branches: [main]
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  cutover:
+  cleanup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,27 +19,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Apply prepared source bundle
+      - name: Remove remaining Convex-only files
         shell: bash
         run: |
-          awk "/cat > \/tmp\/cutover.b64 <<'EOF'/{flag=1;next} /^EOF$/{if(flag){exit}} flag" .github/workflows/apply-supabase-cutover.yml > /tmp/cutover.b64
-          base64 -d /tmp/cutover.b64 > /tmp/cutover.tar.gz
-          tar -xzf /tmp/cutover.tar.gz -C .
-          rm -rf convex convex.json
-          rm -f .github/workflows/convex-deploy.yml
-          rm -rf .agents/skills/convex-* .claude/skills/convex-*
-          rm -f scripts/set-convex-env.mjs scripts/logs.ts scripts/auth.ts scripts/demo-test.ts scripts/test.ts scripts/getEnv.ts scripts/testUser.ts
-          rm -f bun.lock package-lock.json
-      - name: Install and build
+          rm -rf .agents/skills/convex .agents/skills/mike-convex-thumbnail
+          rm -rf .claude/skills/convex .claude/skills/mike-convex-thumbnail
+          rm -f .github/workflows/convex-export.yml
+      - name: Validate build
         run: |
-          npm install
+          npm ci
           npm run build
-      - name: Commit validated cutover to migration branch
+      - name: Commit cleanup
         shell: bash
         run: |
-          rm -f .github/workflows/apply-supabase-cutover.yml
           git config user.name "Give a Gallon migration"
           git config user.email "actions@users.noreply.github.com"
           git add -A
-          git commit -m "Migrate Give a Gallon frontend from Convex to Supabase"
-          git push origin HEAD:supabase-migration
+          if git diff --cached --quiet; then
+            echo "No cleanup changes needed"
+          else
+            git commit -m "Remove remaining Convex-only project files"
+            git push origin HEAD:supabase-migration
+          fi
