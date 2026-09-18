@@ -1,0 +1,45 @@
+name: Run Supabase cutover branch build
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/run-supabase-cutover.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cutover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: supabase-migration
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply prepared source bundle
+        shell: bash
+        run: |
+          awk "/cat > \/tmp\/cutover.b64 <<'EOF'/{flag=1;next} /^EOF$/{if(flag){exit}} flag" .github/workflows/apply-supabase-cutover.yml > /tmp/cutover.b64
+          base64 -d /tmp/cutover.b64 > /tmp/cutover.tar.gz
+          tar -xzf /tmp/cutover.tar.gz -C .
+          rm -rf convex convex.json
+          rm -f .github/workflows/convex-deploy.yml
+          rm -rf .agents/skills/convex-* .claude/skills/convex-*
+          rm -f scripts/set-convex-env.mjs scripts/logs.ts scripts/auth.ts scripts/demo-test.ts scripts/test.ts scripts/getEnv.ts scripts/testUser.ts
+          rm -f bun.lock package-lock.json
+      - name: Install and build
+        run: |
+          npm install
+          npm run build
+      - name: Commit validated cutover to migration branch
+        shell: bash
+        run: |
+          rm -f .github/workflows/apply-supabase-cutover.yml
+          git config user.name "Give a Gallon migration"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Migrate Give a Gallon frontend from Convex to Supabase"
+          git push origin HEAD:supabase-migration
