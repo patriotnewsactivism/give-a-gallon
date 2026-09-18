@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useQuery } from "@/lib/backend";
 import {
   ArrowRight,
   CheckCircle2,
@@ -13,7 +13,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { setReferral } from "@/hooks/useReferral";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 export default function FirmOnboardingPage() {
   const { slug } = useParams<{ slug: string }>();
