@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useQuery } from "@/lib/backend";
 import {
   Award,
   ExternalLink,
@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Reveal } from "@/components/Reveal";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 function formatDate(ts: number) {
   return new Date(ts).toLocaleDateString("en-US", {
