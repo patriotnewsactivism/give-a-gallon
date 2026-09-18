@@ -3,7 +3,7 @@
  * Shows a bell icon in the header with unread badge.
  * Pops a toast for each new notification that arrives in real time.
  */
-import { useQuery } from "convex/react";
+import { useQuery } from "@/lib/backend";
 import {
   AlertTriangle,
   Bell,
@@ -14,7 +14,7 @@ import {
 import { type ReactElement, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
-import { api } from "../../convex/_generated/api";
+import { api } from "@/lib/backend";
 
 const TYPE_ICON: Record<string, ReactElement> = {
   announcement: <Megaphone className="size-3.5 text-blue-400" />,
