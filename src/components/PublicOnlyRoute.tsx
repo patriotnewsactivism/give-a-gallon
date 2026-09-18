@@ -1,4 +1,4 @@
-import { useConvexAuth } from "convex/react";
+import { useConvexAuth } from "@/lib/backend";
 import { Navigate, Outlet } from "react-router-dom";
 import {
   Card,
