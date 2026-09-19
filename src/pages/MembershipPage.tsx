@@ -414,7 +414,7 @@ export function MembershipPage() {
               },
               {
                 q: "What's the 5% platform fee?",
-                a: "Give-A-Gallon takes 5% to cover PayPal fees, server costs, and platform development. The rest goes directly to creators via PayPal Payouts.",
+                a: "Give-A-Gallon takes a 5% platform fee to fund operations and development. PayPal processing is deducted separately at PayPal’s actual transaction cost, and the remaining amount is credited to the creator.",
               },
             ].map(item => (
               <div
