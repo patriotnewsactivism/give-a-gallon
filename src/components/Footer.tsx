@@ -148,10 +148,10 @@ export function Footer() {
                   <span className="text-xs">5% platform fee</span>
                 </li>
                 <li>
-                  <span className="text-xs">~3% PayPal processing</span>
+                  <span className="text-xs">PayPal processing at actual cost</span>
                 </li>
                 <li>
-                  <span className="text-xs">~92% to creators</span>
+                  <span className="text-xs">Remainder to creators</span>
                 </li>
                 <li>
                   <Link
