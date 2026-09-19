@@ -249,8 +249,13 @@ export function DonationSuccessPage() {
 
           {donation && (
             <p className="text-xs text-muted-foreground mb-4">
-              ${(donation.amountCents / 100).toFixed(2)} processed · 5% platform
-              fee · ~92% to creator
+              ${(donation.amountCents / 100).toFixed(2)} processed · platform fee{" "}
+              ${((donation.platformFeeCents ?? 0) / 100).toFixed(2)} · PayPal{" "}
+              {donation.processorFeeCents == null
+                ? "fee pending reconciliation"
+                : `${(donation.processorFeeCents / 100).toFixed(2)}`}
+              {donation.creatorNetCents != null &&
+                ` · creator net ${(donation.creatorNetCents / 100).toFixed(2)}`}
             </p>
           )}
 
