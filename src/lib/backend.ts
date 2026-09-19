@@ -185,9 +185,13 @@ function mapDonation(row: any) {
     donorEmail: row.donor_email,
     gallons: num(row.gallons),
     amountCents: num(row.amount_cents),
-    netCents: num(row.net_cents),
+    netCents: num(row.creator_net_cents ?? row.net_cents),
     feeCents: num(row.platform_fee_cents),
     platformFeeCents: num(row.platform_fee_cents),
+    processorFeeCents: row.processor_fee_cents == null ? null : num(row.processor_fee_cents),
+    creatorNetCents: row.creator_net_cents == null ? null : num(row.creator_net_cents),
+    platformRevenueCents: num(row.platform_revenue_cents),
+    feeReconciled: !!row.fee_reconciled,
     isAnonymous: !!row.is_anonymous,
     status: row.status,
     stripeSessionId: row.stripe_session_id,
@@ -631,12 +635,15 @@ const admin = {
     const now = Date.now();
     const last24 = new Date(now - 86400000).toISOString();
     const last7 = new Date(now - 7 * 86400000).toISOString();
-    const [{ data: stats }, { data: d24 }, { data: d7 }, { data: subs }] = await Promise.all([
+    const [{ data: stats }, { data: d24 }, { data: d7 }, { data: subs }, { data: feeSummary, error: feeSummaryError }] = await Promise.all([
       supabase.from("platform_stats").select("*").eq("key", "global").maybeSingle(),
       supabase.from("donations").select("gallons,amount_cents").eq("status", "completed").gte("created_at", last24),
       supabase.from("donations").select("amount_cents").eq("status", "completed").gte("created_at", last7),
       supabase.from("subscriptions").select("amount_cents").eq("status", "active"),
+      supabase.rpc("get_platform_fee_summary"),
     ]);
+    throwIf(feeSummaryError);
+    const fees = Array.isArray(feeSummary) ? feeSummary[0] : feeSummary;
     return {
       totalCreators: num(stats?.total_creators),
       activeCreators: num(stats?.total_creators),
@@ -646,6 +653,12 @@ const admin = {
       activeSubscriptions: (subs ?? []).length,
       last24hDonations: (d24 ?? []).length, last24hGallons: (d24 ?? []).reduce((s: number, d: any) => s + num(d.gallons), 0), last24hAmountCents: (d24 ?? []).reduce((s: number, d: any) => s + num(d.amount_cents), 0),
       last7dDonations: (d7 ?? []).length, last7dAmountCents: (d7 ?? []).reduce((s: number, d: any) => s + num(d.amount_cents), 0), monthlyRecurringCents: (subs ?? []).reduce((s: number, d: any) => s + num(d.amount_cents), 0),
+      platformFeeCents: num(fees?.platform_fee_cents),
+      processorFeeCents: num(fees?.processor_fee_cents),
+      creatorNetCents: num(fees?.creator_net_cents),
+      platformRevenueCents: num(fees?.platform_revenue_cents),
+      feeLedgerGrossCents: num(fees?.gross_cents),
+      unreconciledDonations: num(fees?.unreconciled_donations),
     };
   },
   listAllCreators: async () => {
@@ -663,6 +676,29 @@ const admin = {
       lastLoginAt: ms(pmap.get(r.user_legacy_id)?.last_login_at),
       lastDonationAt: last.get(r.id)?.at ?? null,
       lastDonationGallons: last.get(r.id)?.gallons ?? null,
+    }));
+  },
+  getPlatformFeeLedger: async ({ limit = 100 }: any = {}) => {
+    if (!(await isAdminUser())) throw new Error("Unauthorized");
+    const { data, error } = await supabase
+      .from("platform_fee_ledger")
+      .select("*, donations!inner(creator_id,donor_name,is_anonymous,created_at,creators!inner(slug,display_name))")
+      .order("created_at", { ascending: false })
+      .limit(Math.min(Number(limit) || 100, 500));
+    throwIf(error);
+    return (data ?? []).map((row: any) => ({
+      donationId: row.donation_id,
+      provider: row.provider,
+      grossCents: num(row.gross_cents),
+      platformFeeCents: num(row.platform_fee_cents),
+      processorFeeCents: row.processor_fee_cents == null ? null : num(row.processor_fee_cents),
+      creatorNetCents: row.creator_net_cents == null ? null : num(row.creator_net_cents),
+      platformRevenueCents: num(row.platform_revenue_cents),
+      reconciled: !!row.reconciled,
+      creatorSlug: row.donations?.creators?.slug,
+      creatorName: row.donations?.creators?.display_name,
+      donorName: row.donations?.is_anonymous ? "Anonymous" : (row.donations?.donor_name || "Anonymous"),
+      createdAt: ms(row.donations?.created_at ?? row.created_at),
     }));
   },
   listAllDonations: async ({ limit = 50 }: any = {}) => {
