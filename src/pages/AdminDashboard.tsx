@@ -108,6 +108,12 @@ export function AdminDashboard() {
       : (api as any).notifications.getRecentPublic,
     isAdmin ? { limit: 50 } : undefined,
   );
+  const feeLedger = useQuery(
+    isAdmin
+      ? (api as any).admin.getPlatformFeeLedger
+      : (api as any).notifications.getRecentPublic,
+    isAdmin ? { limit: 100 } : undefined,
+  );
   const notifications = useQuery((api as any).notifications.getRecent);
   const sendNotification = useMutation((api as any).admin.sendNotification);
   const toggleActive = useMutation((api as any).admin.toggleCreatorActive);
@@ -115,7 +121,7 @@ export function AdminDashboard() {
   const seedDemoData = useMutation((api as any).admin.seedDemoData);
 
   const [tab, setTab] = useState<
-    "overview" | "creators" | "donations" | "notifications"
+    "overview" | "creators" | "donations" | "fees" | "notifications"
   >("overview");
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
@@ -272,7 +278,7 @@ export function AdminDashboard() {
         {/* Tabs */}
         <div className="max-w-7xl mx-auto px-4 flex gap-1 pb-2">
           {(
-            ["overview", "creators", "donations", "notifications"] as const
+            ["overview", "creators", "donations", "fees", "notifications"] as const
           ).map(t => (
             <button
               key={t}
@@ -331,6 +337,21 @@ export function AdminDashboard() {
                 </div>
               ))}
             </div>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {[
+                { label: "Gross Donations", value: fmt$(ov.feeLedgerGrossCents ?? 0) },
+                { label: "Platform Fees (5%)", value: fmt$(ov.platformFeeCents ?? 0) },
+                { label: "PayPal Processing", value: fmt$(ov.processorFeeCents ?? 0) },
+                { label: "Creator Net", value: fmt$(ov.creatorNetCents ?? 0) },
+                { label: "Unreconciled", value: ov.unreconciledDonations ?? 0 },
+              ].map(s => (
+                <div key={s.label} className="p-4 rounded-xl border border-border/40 bg-card/50">
+                  <div className="text-xs text-muted-foreground mb-1">{s.label}</div>
+                  <div className="text-xl font-black">{s.value}</div>
+                </div>
+              ))}
+            </div>
+
             {/* 24h & 7d */}
             <div className="grid sm:grid-cols-2 gap-3">
               <div className="p-4 rounded-xl border border-border/40 bg-card/50 space-y-2">
@@ -648,7 +669,16 @@ export function AdminDashboard() {
                       Gallons
                     </th>
                     <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground text-right">
-                      Amount
+                      Gross
+                    </th>
+                    <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground text-right">
+                      Platform Fee
+                    </th>
+                    <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground text-right">
+                      PayPal Fee
+                    </th>
+                    <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground text-right">
+                      Creator Net
                     </th>
                     <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground">
                       Message
@@ -686,6 +716,15 @@ export function AdminDashboard() {
                       <td className="px-3 py-3 text-right font-medium">
                         {fmt$(d.amountCents)}
                       </td>
+                      <td className="px-3 py-3 text-right font-semibold text-fuel">
+                        {fmt$(d.platformFeeCents ?? 0)}
+                      </td>
+                      <td className="px-3 py-3 text-right text-muted-foreground">
+                        {d.processorFeeCents == null ? "Pending" : fmt$(d.processorFeeCents)}
+                      </td>
+                      <td className="px-3 py-3 text-right font-medium">
+                        {d.creatorNetCents == null ? "Pending" : fmt$(d.creatorNetCents)}
+                      </td>
                       <td className="px-3 py-3 max-w-xs">
                         {d.message ? (
                           <span className="text-xs text-muted-foreground italic truncate block max-w-48">
@@ -704,6 +743,62 @@ export function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {/* ── FEES TAB ───────────────────────────────────────────────────── */}
+        {tab === "fees" && Array.isArray(feeLedger) && (
+          <div className="space-y-3">
+            <div>
+              <div className="font-semibold">Platform Fee Ledger</div>
+              <div className="text-xs text-muted-foreground">
+                Every completed donation is reconciled as gross donation − PayPal processing − 5% platform fee = creator net.
+              </div>
+            </div>
+            <div className="rounded-xl border border-border/40 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/30 border-b border-border/40">
+                    <tr>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Donor</th>
+                      <th className="text-left px-3 py-2.5 text-xs font-semibold text-muted-foreground">Campaign</th>
+                      <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground text-right">Gross</th>
+                      <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground text-right">Platform 5%</th>
+                      <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground text-right">PayPal</th>
+                      <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground text-right">Creator Net</th>
+                      <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground">Status</th>
+                      <th className="px-3 py-2.5 text-xs font-semibold text-muted-foreground">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {feeLedger.map((row: any) => (
+                      <tr key={row.donationId} className="border-b border-border/20">
+                        <td className="px-4 py-3 font-medium">{row.donorName}</td>
+                        <td className="px-3 py-3">
+                          <Link to={`/${row.creatorSlug}`} className="hover:text-fuel transition-colors">
+                            {row.creatorName}
+                          </Link>
+                        </td>
+                        <td className="px-3 py-3 text-right">{fmt$(row.grossCents)}</td>
+                        <td className="px-3 py-3 text-right font-semibold text-fuel">{fmt$(row.platformFeeCents)}</td>
+                        <td className="px-3 py-3 text-right text-muted-foreground">
+                          {row.processorFeeCents == null ? "Pending" : fmt$(row.processorFeeCents)}
+                        </td>
+                        <td className="px-3 py-3 text-right font-medium">
+                          {row.creatorNetCents == null ? "Pending" : fmt$(row.creatorNetCents)}
+                        </td>
+                        <td className="px-3 py-3">
+                          <span className={`text-xs px-2 py-1 rounded-full ${row.reconciled ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"}`}>
+                            {row.reconciled ? "Reconciled" : "Needs reconciliation"}
+                          </span>
+                        </td>
+                        <td className="px-3 py-3 text-xs text-muted-foreground">{fmtDate(row.createdAt)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
