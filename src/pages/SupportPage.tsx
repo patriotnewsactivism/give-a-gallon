@@ -19,7 +19,7 @@ const CATEGORIES = [
 const FAQS = [
   {
     q: "How much is a gallon, and where does my money go?",
-    a: "One gallon of fuel is $4.25. After a 5% platform fee and ~3% PayPal processing, 92% goes directly to the creator.",
+    a: "One gallon of fuel is $4.25. Give-A-Gallon deducts a 5% platform fee, and PayPal processing is deducted separately at PayPal’s actual transaction cost. The remainder is credited to the creator.",
   },
   {
     q: "Can I get a refund?",
