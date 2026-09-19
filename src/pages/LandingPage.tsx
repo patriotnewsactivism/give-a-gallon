@@ -128,7 +128,7 @@ function HeroSection() {
                 <strong className="text-foreground">~30 minutes</strong>.
                 Powered by PayPal —{" "}
                 <strong className="text-foreground">
-                  92% goes directly to the creator
+                  the remainder goes directly to the creator after disclosed fees
                 </strong>
                 .
               </p>
@@ -143,7 +143,7 @@ function HeroSection() {
               </Link>
             </div>
 
-            {/* 92% stat */}
+            {/* Fee transparency stat */}
             <div className="rounded-2xl border border-border/40 bg-card/50 p-4 text-center">
               <div
                 className="text-3xl font-extrabold text-fuel mb-1"
@@ -152,7 +152,7 @@ function HeroSection() {
                 92%
               </div>
               <div className="text-xs text-muted-foreground">
-                of every donation goes directly to the creator
+                platform fee — PayPal processing is deducted at actual cost
               </div>
             </div>
           </div>
@@ -221,7 +221,7 @@ function HeroSection() {
                 <Shield className="size-3.5 text-fuel" /> Secured by PayPal
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Fuel className="size-3.5 text-fuel" /> 92% to activists
+                <Fuel className="size-3.5 text-fuel" /> 5% platform fee
               </span>
               <span className="inline-flex items-center gap-1.5 text-fuel font-bold">
                 <Zap className="size-3.5 fill-fuel text-fuel" /> Instant payouts
@@ -1029,13 +1029,9 @@ function InstantPayoutSection() {
 
 function PlatformFeeSection() {
   const tiers = [
-    { value: "92%", label: "To the Activist", accent: "text-fuel" },
     { value: "5%", label: "Platform Fee", accent: "text-foreground" },
-    {
-      value: "~3%",
-      label: "Payment Processing",
-      accent: "text-muted-foreground",
-    },
+    { value: "Actual", label: "PayPal Processing", accent: "text-muted-foreground" },
+    { value: "Remainder", label: "To the Activist", accent: "text-fuel" },
   ];
   return (
     <section className="border-t border-border/30 py-20 sm:py-28">
@@ -1073,8 +1069,7 @@ function PlatformFeeSection() {
           </div>
 
           <p className="mt-4 text-xs text-muted-foreground">
-            5% keeps the lights on. ~3% goes to payment processing (PayPal). The
-            rest goes straight to the activist.
+            Give-A-Gallon retains a 5% platform fee. PayPal processing is deducted at its actual transaction cost. The remainder goes straight to the activist.
           </p>
         </Reveal>
       </div>
