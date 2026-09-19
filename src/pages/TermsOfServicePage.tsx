@@ -107,7 +107,7 @@ export function TermsOfServicePage() {
                 </tr>
                 <tr className="border-b border-border/20">
                   <td className="py-3 px-4">PayPal processing</td>
-                  <td className="py-3 px-4">~3%</td>
+                  <td className="py-3 px-4">Actual PayPal rate</td>
                   <td className="py-3 px-4">Deducted from donation</td>
                 </tr>
                 <tr className="border-b border-border/20">
@@ -115,7 +115,7 @@ export function TermsOfServicePage() {
                     Net to Campaign Creator
                   </td>
                   <td className="py-3 px-4 text-foreground font-medium">
-                    ~92%
+                    Remainder after disclosed fees
                   </td>
                   <td className="py-3 px-4">—</td>
                 </tr>
@@ -126,7 +126,7 @@ export function TermsOfServicePage() {
                 </tr>
                 <tr className="border-b border-border/20">
                   <td className="py-3 px-4">⚡ Instant payout</td>
-                  <td className="py-3 px-4">~3% (PayPal processing fee)</td>
+                  <td className="py-3 px-4">Any PayPal payout fee, at actual cost</td>
                   <td className="py-3 px-4">Campaign Creator (at cost)</td>
                 </tr>
               </tbody>
