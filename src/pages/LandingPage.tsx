@@ -149,7 +149,7 @@ function HeroSection() {
                 className="text-3xl font-extrabold text-fuel mb-1"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                92%
+                5%
               </div>
               <div className="text-xs text-muted-foreground">
                 platform fee — PayPal processing is deducted at actual cost
